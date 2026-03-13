@@ -2,6 +2,8 @@
 
 Condensed implementation reference for preset (optimal region) model deployment. See [SKILL.md](../SKILL.md) for overview.
 
+**Table of Contents:** [Phase 1: Verify Authentication](#phase-1-verify-authentication) · [Phase 2: Get Current Project](#phase-2-get-current-project) · [Phase 3: Get Model Name](#phase-3-get-model-name) · [Phase 4: Check Current Region Capacity](#phase-4-check-current-region-capacity) · [Phase 5: Query Multi-Region Capacity](#phase-5-query-multi-region-capacity) · [Phase 6: Select Region and Project](#phase-6-select-region-and-project) · [Phase 7: Deploy Model](#phase-7-deploy-model)
+
 ---
 
 ## Phase 1: Verify Authentication

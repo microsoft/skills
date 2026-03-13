@@ -2,6 +2,8 @@
 
 > Reference for: `models/deploy-model/customize/SKILL.md`
 
+**Table of Contents:** [Selection Guides](#selection-guides) · [Advanced Topics](#advanced-topics)
+
 ## Selection Guides
 
 ### How to Choose SKU

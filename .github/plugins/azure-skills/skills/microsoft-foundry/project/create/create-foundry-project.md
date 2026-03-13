@@ -9,7 +9,9 @@ allowed-tools: Read, Write, Bash, AskUserQuestion
 
 # Create Azure AI Foundry Project
 
-Create a new Azure AI Foundry project using azd. Provisions: Foundry account, project, Container Registry, Application Insights, managed identity, and RBAC permissions.
+Create a new Azure AI Foundry project using azd. Provisions: Foundry account, project, Application Insights, managed identity, and RBAC permissions. Optionally enables hosted agents (capability host + Container Registry).
+
+**Table of Contents:** [Prerequisites](#prerequisites) · [Workflow](#workflow) · [Best Practices](#best-practices) · [Troubleshooting](#troubleshooting) · [Related Skills](#related-skills) · [Resources](#resources)
 
 ## Prerequisites
 
@@ -53,6 +55,7 @@ Use AskUserQuestion for:
 
 1. **Project name** — used as azd environment name and resource group (`rg-<name>`). Must contain only alphanumeric characters and hyphens. Examples: `my-ai-project`, `dev-agents`
 2. **Azure location** (optional) — defaults to North Central US (required for hosted agents preview)
+3. **Enable hosted agents?** (yes/no) — provisions a capability host and Container Registry for deploying hosted agents. Defaults to no.
 
 ### Step 3: Create Directory and Initialize
 
@@ -72,13 +75,21 @@ If user specified a non-default location:
 azd config set defaults.location <location>
 ```
 
+If user chose to enable hosted agents:
+
+```bash
+azd env set ENABLE_HOSTED_AGENTS true
+```
+
+This provisions a capability host (`capabilityHosts/agents`) on the Foundry account and auto-adds an Azure Container Registry for hosted agent deployments.
+
 ### Step 4: Provision Infrastructure
 
 ```bash
 azd provision --no-prompt
 ```
 
-Takes 5–10 minutes. Creates resource group, Foundry account/project, Container Registry, Application Insights, managed identity, and RBAC roles.
+Takes 5–10 minutes. Creates resource group, Foundry account/project, Application Insights, managed identity, and RBAC roles. If hosted agents enabled, also creates Container Registry and capability host.
 
 ### Step 5: Retrieve Project Details
 

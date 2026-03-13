@@ -20,6 +20,8 @@ This sub-skill orchestrates creation of Azure AI Services multi-service resource
 
 > **Note:** For monitoring resource usage and quotas, use the `microsoft-foundry:quota` skill.
 
+**Table of Contents:** [Quick Reference](#quick-reference) · [When to Use](#when-to-use) · [Prerequisites](#prerequisites) · [Core Workflows](#core-workflows) · [Important Notes](#important-notes) · [Additional Resources](#additional-resources)
+
 ## Quick Reference
 
 | Property | Value |

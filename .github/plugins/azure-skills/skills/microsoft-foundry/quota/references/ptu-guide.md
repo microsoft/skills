@@ -1,5 +1,7 @@
 # Provisioned Throughput Units (PTU) Guide
 
+**Table of Contents:** [Understanding PTU vs Standard TPM](#understanding-ptu-vs-standard-tpm) · [When to Use PTU](#when-to-use-ptu) · [PTU Capacity Planning](#ptu-capacity-planning) · [Deploy Model with PTU](#deploy-model-with-ptu) · [Request PTU Quota Increase](#request-ptu-quota-increase) · [Understanding Region and Deployment Quotas](#understanding-region-and-deployment-quotas) · [External Resources](#external-resources)
+
 ## Understanding PTU vs Standard TPM
 
 Microsoft Foundry offers two quota types:

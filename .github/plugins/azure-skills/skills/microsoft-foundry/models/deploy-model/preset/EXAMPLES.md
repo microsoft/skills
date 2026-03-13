@@ -38,6 +38,11 @@
 **Scenario:** Deploy "latest gpt-4o" when multiple versions exist.
 **Result:** Latest stable version auto-selected. Capacity aggregated across versions.
 
+## Example 8: Anthropic Model (claude-sonnet-4-6)
+
+**Scenario:** Deploy claude-sonnet-4-6 (Anthropic model requiring modelProviderData).
+**Result:** User prompted for industry selection → tenant country code and org name fetched automatically → deployed via ARM REST API with `modelProviderData` payload in ~2 min. Capacity set to 1 (MaaS billing).
+
 ---
 
 ## Summary of Scenarios
@@ -51,6 +56,7 @@
 | **5: First-Time** | ~5m | Complete onboarding |
 | **6: Name Conflict** | ~1m | Auto-retry with suffix |
 | **7: Multi-Version** | ~1m | Latest version auto-selected |
+| **8: Anthropic** | ~2m | Industry prompt, tenant info, REST API deploy |
 
 ## Common Patterns
 

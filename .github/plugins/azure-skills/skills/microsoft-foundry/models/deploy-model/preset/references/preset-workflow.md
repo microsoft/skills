@@ -136,6 +136,26 @@ az cognitiveservices account list-models \
 MODEL_VERSION="<version-or-latest>"
 ```
 
+**Detect model format:**
+
+```bash
+# Get model format from model catalog (e.g., OpenAI, Anthropic, Meta-Llama, Mistral, Cohere)
+MODEL_FORMAT=$(az cognitiveservices account list-models \
+  --name "$ACCOUNT_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --query "[?name=='$MODEL_NAME'].format" -o tsv | head -1)
+
+# Default to OpenAI if not found
+MODEL_FORMAT=${MODEL_FORMAT:-"OpenAI"}
+
+echo "Model format: $MODEL_FORMAT"
+```
+
+> 💡 **Model format determines the deployment path:**
+> - `OpenAI` — Standard CLI deployment, TPM-based capacity, RAI policies apply
+> - `Anthropic` — REST API deployment with `modelProviderData`, capacity=1, no RAI
+> - All other formats (`Meta-Llama`, `Mistral`, `Cohere`, etc.) — Standard CLI deployment, capacity=1 (MaaS), no RAI
+
 ---
 
 ## Phase 4: Check Current Region Capacity
@@ -145,7 +165,7 @@ Before checking other regions, see if the current project's region has capacity:
 ```bash
 # Query capacity for current region
 CAPACITY_JSON=$(az rest --method GET \
-  --url "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/providers/Microsoft.CognitiveServices/locations/$PROJECT_REGION/modelCapacities?api-version=2024-10-01&modelFormat=OpenAI&modelName=$MODEL_NAME&modelVersion=$MODEL_VERSION")
+  --url "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/providers/Microsoft.CognitiveServices/locations/$PROJECT_REGION/modelCapacities?api-version=2024-10-01&modelFormat=$MODEL_FORMAT&modelName=$MODEL_NAME&modelVersion=$MODEL_VERSION")
 
 # Extract available capacity for GlobalStandard SKU
 CURRENT_CAPACITY=$(echo "$CAPACITY_JSON" | jq -r '.value[] | select(.properties.skuName=="GlobalStandard") | .properties.availableCapacity')
@@ -174,7 +194,7 @@ Only execute this phase if current region has no capacity.
 ```bash
 # Get capacity for all regions in subscription
 ALL_REGIONS_JSON=$(az rest --method GET \
-  --url "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/providers/Microsoft.CognitiveServices/modelCapacities?api-version=2024-10-01&modelFormat=OpenAI&modelName=$MODEL_NAME&modelVersion=$MODEL_VERSION")
+  --url "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/providers/Microsoft.CognitiveServices/modelCapacities?api-version=2024-10-01&modelFormat=$MODEL_FORMAT&modelName=$MODEL_NAME&modelVersion=$MODEL_VERSION")
 
 # Save to file for processing
 echo "$ALL_REGIONS_JSON" > /tmp/capacity_check.json
@@ -376,27 +396,33 @@ Write-Host "Generated deployment name: $DEPLOYMENT_NAME"
 
 **Calculate deployment capacity:**
 
-Follow UX capacity calculation logic: use 50% of available capacity (minimum 50 TPM):
+Follow UX capacity calculation logic. For OpenAI models, use 50% of available capacity (minimum 50 TPM). For all other models (MaaS), capacity is always 1:
 
 ```bash
-SELECTED_CAPACITY=$(echo "$ALL_REGIONS_JSON" | jq -r ".value[] | select(.location==\"$SELECTED_REGION\" and .properties.skuName==\"GlobalStandard\") | .properties.availableCapacity")
+if [ "$MODEL_FORMAT" = "OpenAI" ]; then
+  # OpenAI models: TPM-based capacity (50% of available, minimum 50)
+  SELECTED_CAPACITY=$(echo "$ALL_REGIONS_JSON" | jq -r ".value[] | select(.location==\"$SELECTED_REGION\" and .properties.skuName==\"GlobalStandard\") | .properties.availableCapacity")
 
-# Apply UX capacity calculation: 50% of available (minimum 50)
-if [ "$SELECTED_CAPACITY" -gt 50 ]; then
-  DEPLOY_CAPACITY=$((SELECTED_CAPACITY / 2))
-  if [ "$DEPLOY_CAPACITY" -lt 50 ]; then
-    DEPLOY_CAPACITY=50
+  if [ "$SELECTED_CAPACITY" -gt 50 ]; then
+    DEPLOY_CAPACITY=$((SELECTED_CAPACITY / 2))
+    if [ "$DEPLOY_CAPACITY" -lt 50 ]; then
+      DEPLOY_CAPACITY=50
+    fi
+  else
+    DEPLOY_CAPACITY=$SELECTED_CAPACITY
   fi
-else
-  DEPLOY_CAPACITY=$SELECTED_CAPACITY
-fi
 
-echo "Deploying with capacity: $DEPLOY_CAPACITY TPM (50% of available: $SELECTED_CAPACITY TPM)"
+  echo "Deploying with capacity: $DEPLOY_CAPACITY TPM (50% of available: $SELECTED_CAPACITY TPM)"
+else
+  # Non-OpenAI models (MaaS): capacity is always 1
+  DEPLOY_CAPACITY=1
+  echo "MaaS model — deploying with capacity: 1 (pay-per-token billing)"
+fi
 ```
 
-**Create deployment using Azure CLI:**
+### If MODEL_FORMAT is NOT "Anthropic" — Standard CLI Deployment
 
-> 💡 **Note:** The Azure CLI now supports GlobalStandard SKU deployments directly. Use the native `az cognitiveservices account deployment create` command.
+> 💡 **Note:** The Azure CLI supports all non-Anthropic model formats directly.
 
 *Bash version:*
 ```bash
@@ -408,7 +434,7 @@ az cognitiveservices account deployment create \
   --deployment-name "$DEPLOYMENT_NAME" \
   --model-name "$MODEL_NAME" \
   --model-version "$MODEL_VERSION" \
-  --model-format "OpenAI" \
+  --model-format "$MODEL_FORMAT" \
   --sku-name "GlobalStandard" \
   --sku-capacity "$DEPLOY_CAPACITY"
 ```
@@ -423,10 +449,125 @@ az cognitiveservices account deployment create `
   --deployment-name $DEPLOYMENT_NAME `
   --model-name $MODEL_NAME `
   --model-version $MODEL_VERSION `
-  --model-format "OpenAI" `
+  --model-format $MODEL_FORMAT `
   --sku-name "GlobalStandard" `
   --sku-capacity $DEPLOY_CAPACITY
 ```
+
+> 💡 **Note:** For non-OpenAI MaaS models (Meta-Llama, Mistral, Cohere, etc.), `$DEPLOY_CAPACITY` is `1` (set in capacity calculation above).
+
+### If MODEL_FORMAT is "Anthropic" — REST API Deployment with modelProviderData
+
+The Azure CLI does not support `--model-provider-data`. You must use the ARM REST API directly.
+
+**Step 1: Prompt user to select industry**
+
+Present the following list and ask the user to choose one:
+
+```
+ 1. None                    (API value: none)
+ 2. Biotechnology           (API value: biotechnology)
+ 3. Consulting              (API value: consulting)
+ 4. Education               (API value: education)
+ 5. Finance                 (API value: finance)
+ 6. Food & Beverage         (API value: food_and_beverage)
+ 7. Government              (API value: government)
+ 8. Healthcare              (API value: healthcare)
+ 9. Insurance               (API value: insurance)
+10. Law                     (API value: law)
+11. Manufacturing           (API value: manufacturing)
+12. Media                   (API value: media)
+13. Nonprofit               (API value: nonprofit)
+14. Technology              (API value: technology)
+15. Telecommunications      (API value: telecommunications)
+16. Sport & Recreation      (API value: sport_and_recreation)
+17. Real Estate             (API value: real_estate)
+18. Retail                  (API value: retail)
+19. Other                   (API value: other)
+```
+
+> ⚠️ **Do NOT pick a default industry or hardcode a value. Always ask the user.** This is required by Anthropic's terms of service. The industry list is static — there is no REST API that provides it.
+
+Store selection as `SELECTED_INDUSTRY` (use the API value, e.g., `technology`).
+
+**Step 2: Fetch tenant info (country code and organization name)**
+
+```bash
+TENANT_INFO=$(az rest --method GET \
+  --url "https://management.azure.com/tenants?api-version=2024-11-01" \
+  --query "value[0].{countryCode:countryCode, displayName:displayName}" -o json)
+
+COUNTRY_CODE=$(echo "$TENANT_INFO" | jq -r '.countryCode')
+ORG_NAME=$(echo "$TENANT_INFO" | jq -r '.displayName')
+```
+
+*PowerShell version:*
+```powershell
+$tenantInfo = az rest --method GET `
+  --url "https://management.azure.com/tenants?api-version=2024-11-01" `
+  --query "value[0].{countryCode:countryCode, displayName:displayName}" -o json | ConvertFrom-Json
+
+$countryCode = $tenantInfo.countryCode
+$orgName = $tenantInfo.displayName
+```
+
+**Step 3: Deploy via ARM REST API**
+
+*Bash version:*
+```bash
+echo "Creating Anthropic model deployment via REST API..."
+
+az rest --method PUT \
+  --url "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.CognitiveServices/accounts/$ACCOUNT_NAME/deployments/$DEPLOYMENT_NAME?api-version=2024-10-01" \
+  --body "{
+    \"sku\": {
+      \"name\": \"GlobalStandard\",
+      \"capacity\": 1
+    },
+    \"properties\": {
+      \"model\": {
+        \"format\": \"Anthropic\",
+        \"name\": \"$MODEL_NAME\",
+        \"version\": \"$MODEL_VERSION\"
+      },
+      \"modelProviderData\": {
+        \"industry\": \"$SELECTED_INDUSTRY\",
+        \"countryCode\": \"$COUNTRY_CODE\",
+        \"organizationName\": \"$ORG_NAME\"
+      }
+    }
+  }"
+```
+
+*PowerShell version:*
+```powershell
+Write-Host "Creating Anthropic model deployment via REST API..."
+
+$body = @{
+    sku = @{
+        name = "GlobalStandard"
+        capacity = 1
+    }
+    properties = @{
+        model = @{
+            format = "Anthropic"
+            name = $MODEL_NAME
+            version = $MODEL_VERSION
+        }
+        modelProviderData = @{
+            industry = $SELECTED_INDUSTRY
+            countryCode = $countryCode
+            organizationName = $orgName
+        }
+    }
+} | ConvertTo-Json -Depth 5
+
+az rest --method PUT `
+  --url "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.CognitiveServices/accounts/$ACCOUNT_NAME/deployments/${DEPLOYMENT_NAME}?api-version=2024-10-01" `
+  --body $body
+```
+
+> 💡 **Note:** Anthropic models use `capacity: 1` (MaaS billing model), not TPM-based capacity.
 
 **Monitor deployment progress:**
 ```bash

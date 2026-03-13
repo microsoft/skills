@@ -1,5 +1,7 @@
 # Detailed Workflows: Quota Management
 
+**Table of Contents:** [Workflow 1: View Current Quota Usage](#workflow-1-view-current-quota-usage---detailed-steps) · [Workflow 2: Find Best Region for Model Deployment](#workflow-2-find-best-region-for-model-deployment---detailed-steps) · [Workflow 3: Check Quota Before Deployment](#workflow-3-check-quota-before-deployment---detailed-steps) · [Workflow 4: Monitor Quota Across Deployments](#workflow-4-monitor-quota-across-deployments---detailed-steps) · [Quick Command Reference](#quick-command-reference) · [MCP Tools Reference](#mcp-tools-reference-optional-wrappers)
+
 ## Workflow 1: View Current Quota Usage - Detailed Steps
 
 ### Step 1: Show Regional Quota Summary (REQUIRED APPROACH)

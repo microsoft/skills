@@ -31,6 +31,12 @@
 **Config:** gpt-4o / GlobalStandard / 20K TPM / Dynamic Quota / Spillover → `gpt-4o-backup`
 **Result:** Primary handles up to 20K TPM; overflow auto-redirects to backup deployment.
 
+## Example 6: Anthropic Model Deployment (claude-sonnet-4-6)
+
+**Scenario:** Deploy claude-sonnet-4-6 with customized settings.
+**Config:** claude-sonnet-4-6 / GlobalStandard / capacity 1 (MaaS) / Industry: Healthcare / No RAI policy (Anthropic manages content filtering)
+**Result:** User selected "Healthcare" as industry → tenant country code (US) and org name fetched automatically → deployed via ARM REST API with `modelProviderData` in ~2 min.
+
 ---
 
 ## Comparison Matrix
@@ -42,6 +48,7 @@
 | Ex 3 | gpt-4o | ProvisionedManaged | 200 PTU | - | ✓ | - | Predictable workload |
 | Ex 4 | gpt-4o-mini | Standard | 1K TPM | - | - | - | Dev/testing |
 | Ex 5 | gpt-4o | GlobalStandard | 20K TPM | ✓ | - | ✓ | Peak load |
+| Ex 6 | claude-sonnet-4-6 | GlobalStandard | 1 (MaaS) | - | - | - | Anthropic model |
 
 ## Common Patterns
 

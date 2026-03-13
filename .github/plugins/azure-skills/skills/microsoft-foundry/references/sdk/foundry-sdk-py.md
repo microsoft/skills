@@ -2,6 +2,8 @@
 
 Python-specific implementations for working with Microsoft Foundry.
 
+**Table of Contents:** [Prerequisites](#prerequisites) · [Model Discovery and Deployment](#model-discovery-and-deployment-mcp) · [RAG Agent with Azure AI Search](#rag-agent-with-azure-ai-search) · [Creating Agents](#creating-agents) · [Agent Evaluation](#agent-evaluation) · [Knowledge Index Operations](#knowledge-index-operations-mcp) · [Best Practices](#best-practices) · [Error Handling](#error-handling)
+
 ## Prerequisites
 
 ```bash
@@ -35,6 +37,8 @@ foundry_models_deploy(
 ```
 
 ## RAG Agent with Azure AI Search
+
+> **Auth:** `DefaultAzureCredential` is for local development. See [auth-best-practices.md](../auth-best-practices.md) for production patterns.
 
 ```python
 import os
@@ -126,15 +130,27 @@ agent = project_client.agents.create_agent(
 ### Agent with Web Search
 
 ```python
-from azure.ai.agents.models import BingGroundingToolDefinition
+from azure.ai.projects.models import (
+    PromptAgentDefinition, WebSearchPreviewTool, ApproximateLocation,
+)
 
-agent = project_client.agents.create_agent(
-    model=os.environ["MODEL_DEPLOYMENT_NAME"],
-    name="WebSearchAgent",
-    instructions="Search the web for current information. Provide sources.",
-    tools=[BingGroundingToolDefinition()],
+agent = project_client.agents.create_version(
+    agent_name="WebSearchAgent",
+    definition=PromptAgentDefinition(
+        model=os.environ["MODEL_DEPLOYMENT_NAME"],
+        instructions="Search the web for current information. Provide sources.",
+        tools=[
+            WebSearchPreviewTool(
+                user_location=ApproximateLocation(
+                    country="US", city="Seattle", region="Washington"
+                )
+            )
+        ],
+    ),
 )
 ```
+
+> 💡 **Tip:** `WebSearchPreviewTool` requires no external resource or connection. For Bing Grounding (which requires a dedicated Bing resource and project connection), see [Bing Grounding reference](../../agent/create/references/tool-bing-grounding.md).
 
 ### Interacting with Agents
 
