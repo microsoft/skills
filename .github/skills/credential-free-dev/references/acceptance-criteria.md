@@ -7,9 +7,21 @@
 
 ## 1. Authentication Patterns
 
-### 1.1 DefaultAzureCredential Usage
+### 1.1 Production Credential Selection
 
-#### ✅ CORRECT: DefaultAzureCredential with endpoint URL
+#### ✅ CORRECT: ManagedIdentityCredential for production
+```python
+from azure.identity import ManagedIdentityCredential
+from azure.storage.blob import BlobServiceClient
+
+credential = ManagedIdentityCredential()
+client = BlobServiceClient(
+    account_url="https://mystorageaccount.blob.core.windows.net",
+    credential=credential
+)
+```
+
+#### ✅ CORRECT: DefaultAzureCredential for local development
 ```python
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
@@ -19,6 +31,15 @@ client = BlobServiceClient(
     account_url="https://mystorageaccount.blob.core.windows.net",
     credential=credential
 )
+```
+
+#### ❌ INCORRECT: DefaultAzureCredential in production
+```python
+# WRONG — DefaultAzureCredential's credential chain probing causes subtle failures,
+# latency, and silent fallback to unintended credentials in production.
+# Use ManagedIdentityCredential explicitly.
+from azure.identity import DefaultAzureCredential
+credential = DefaultAzureCredential()  # Don't use in production
 ```
 
 #### ❌ INCORRECT: Hardcoded key in code
@@ -68,11 +89,11 @@ credential = ClientSecretCredential(
 
 ### 2.1 Storage Blob
 
-#### ✅ CORRECT: Endpoint URL + credential
+#### ✅ CORRECT: Endpoint URL + ManagedIdentityCredential
 ```python
 client = BlobServiceClient(
     account_url="https://myaccount.blob.core.windows.net",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -83,11 +104,11 @@ client = BlobServiceClient.from_connection_string("...AccountKey=...")
 
 ### 2.2 Service Bus
 
-#### ✅ CORRECT: Namespace + credential
+#### ✅ CORRECT: Namespace + ManagedIdentityCredential
 ```python
 client = ServiceBusClient(
     fully_qualified_namespace="my-namespace.servicebus.windows.net",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -98,11 +119,11 @@ client = ServiceBusClient.from_connection_string("...SharedAccessKey=...")
 
 ### 2.3 Cosmos DB
 
-#### ✅ CORRECT: URL + credential
+#### ✅ CORRECT: URL + ManagedIdentityCredential
 ```python
 client = CosmosClient(
     "https://myaccount.documents.azure.com:443/",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 

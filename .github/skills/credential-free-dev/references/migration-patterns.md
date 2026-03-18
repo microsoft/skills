@@ -8,11 +8,11 @@ Detailed before/after code for migrating Azure services from connection strings 
 # BEFORE (connection string with password)
 conn_str = "Server=myserver.database.windows.net;Database=mydb;User Id=myuser;Password=mypassword;"
 
-# AFTER (managed identity with Azure Identity SDK)
-from azure.identity import DefaultAzureCredential
+# AFTER (managed identity — production)
+from azure.identity import ManagedIdentityCredential
 import pyodbc
 
-credential = DefaultAzureCredential()
+credential = ManagedIdentityCredential()
 token = credential.get_token("https://database.windows.net/.default")
 conn = pyodbc.connect(
     "Driver={ODBC Driver 18 for SQL Server};"
@@ -34,7 +34,7 @@ conn = pyodbc.connect(
    ALTER ROLE db_datareader ADD MEMBER [my-app-name];
    ```
 4. Remove the password from your connection string
-5. Use `DefaultAzureCredential` in code to acquire tokens
+5. Use `ManagedIdentityCredential` in code to acquire tokens
 
 ---
 
@@ -48,11 +48,11 @@ client = BlobServiceClient.from_connection_string(
 )
 
 # AFTER (managed identity)
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 from azure.storage.blob import BlobServiceClient
 client = BlobServiceClient(
     account_url="https://mystorageaccount.blob.core.windows.net",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -60,7 +60,7 @@ client = BlobServiceClient(
 
 1. Enable MI on your compute resource
 2. Assign `Storage Blob Data Reader` (or `Contributor`/`Owner`) role to the MI on the storage account
-3. Replace connection string with account URL + `DefaultAzureCredential`
+3. Replace connection string with account URL + `ManagedIdentityCredential`
 4. Remove the storage account key from all config
 
 ---
@@ -76,11 +76,11 @@ client = CosmosClient(
 )
 
 # AFTER (managed identity via Entra RBAC)
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 from azure.cosmos import CosmosClient
 client = CosmosClient(
     "https://myaccount.documents.azure.com:443/",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -88,7 +88,7 @@ client = CosmosClient(
 
 1. Enable Entra auth on Cosmos DB account (may need to disable key-based auth)
 2. Assign `Cosmos DB Built-in Data Reader` (or `Contributor`) role
-3. Replace key with `DefaultAzureCredential`
+3. Replace key with `ManagedIdentityCredential`
 
 ---
 
@@ -102,11 +102,11 @@ client = ServiceBusClient.from_connection_string(
 )
 
 # AFTER (managed identity)
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 from azure.servicebus import ServiceBusClient
 client = ServiceBusClient(
     fully_qualified_namespace="my-namespace.servicebus.windows.net",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -114,7 +114,7 @@ client = ServiceBusClient(
 
 1. Enable MI on your compute resource
 2. Assign `Azure Service Bus Data Sender` and/or `Azure Service Bus Data Receiver` role
-3. Replace connection string with namespace + `DefaultAzureCredential`
+3. Replace connection string with namespace + `ManagedIdentityCredential`
 
 ---
 
@@ -129,12 +129,12 @@ client = EventHubProducerClient.from_connection_string(
 )
 
 # AFTER (managed identity)
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 from azure.eventhub import EventHubProducerClient
 client = EventHubProducerClient(
     fully_qualified_namespace="my-namespace.servicebus.windows.net",
     eventhub_name="my-hub",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -142,7 +142,7 @@ client = EventHubProducerClient(
 
 1. Enable MI on your compute resource
 2. Assign `Azure Event Hubs Data Sender` and/or `Azure Event Hubs Data Receiver` role
-3. Replace connection string with namespace + `DefaultAzureCredential`
+3. Replace connection string with namespace + `ManagedIdentityCredential`
 
 ---
 
@@ -151,12 +151,12 @@ client = EventHubProducerClient(
 ```python
 # Key Vault already requires Entra auth — but ensure you're using MI, not client secret
 
-# CORRECT
-from azure.identity import DefaultAzureCredential
+# CORRECT (production)
+from azure.identity import ManagedIdentityCredential
 from azure.keyvault.secrets import SecretClient
 client = SecretClient(
     vault_url="https://my-vault.vault.azure.net",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -164,7 +164,7 @@ client = SecretClient(
 
 1. Enable MI on your compute resource
 2. Assign `Key Vault Secrets User` (for reading secrets) or `Key Vault Secrets Officer` (for read/write)
-3. Use vault URL + `DefaultAzureCredential`
+3. Use vault URL + `ManagedIdentityCredential`
 
 ---
 
@@ -178,11 +178,11 @@ client = AzureAppConfigurationClient.from_connection_string(
 )
 
 # AFTER (managed identity)
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 from azure.appconfiguration import AzureAppConfigurationClient
 client = AzureAppConfigurationClient(
     base_url="https://myconfig.azconfig.io",
-    credential=DefaultAzureCredential()
+    credential=ManagedIdentityCredential()
 )
 ```
 
@@ -190,7 +190,7 @@ client = AzureAppConfigurationClient(
 
 1. Enable MI on your compute resource
 2. Assign `App Configuration Data Reader` role
-3. Replace connection string with endpoint URL + `DefaultAzureCredential`
+3. Replace connection string with endpoint URL + `ManagedIdentityCredential`
 
 ---
 
@@ -205,7 +205,7 @@ var client = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=.
 // AFTER
 var client = new BlobServiceClient(
     new Uri("https://mystorageaccount.blob.core.windows.net"),
-    new DefaultAzureCredential());
+    new ManagedIdentityCredential());
 ```
 
 ### Azure Service Bus
@@ -217,7 +217,7 @@ var client = new ServiceBusClient("Endpoint=sb://...;SharedAccessKeyName=...;Sha
 // AFTER
 var client = new ServiceBusClient(
     "my-namespace.servicebus.windows.net",
-    new DefaultAzureCredential());
+    new ManagedIdentityCredential());
 ```
 
 ### Azure Cosmos DB
@@ -229,7 +229,7 @@ var client = new CosmosClient("https://myaccount.documents.azure.com:443/", "pri
 // AFTER
 var client = new CosmosClient(
     "https://myaccount.documents.azure.com:443/",
-    new DefaultAzureCredential());
+    new ManagedIdentityCredential());
 ```
 
 ---
@@ -243,11 +243,11 @@ var client = new CosmosClient(
 const client = BlobServiceClient.fromConnectionString("DefaultEndpointsProtocol=https;...");
 
 // AFTER
-import { DefaultAzureCredential } from "@azure/identity";
+import { ManagedIdentityCredential } from "@azure/identity";
 import { BlobServiceClient } from "@azure/storage-blob";
 const client = new BlobServiceClient(
     "https://mystorageaccount.blob.core.windows.net",
-    new DefaultAzureCredential()
+    new ManagedIdentityCredential()
 );
 ```
 
@@ -258,11 +258,11 @@ const client = new BlobServiceClient(
 const client = new ServiceBusClient("Endpoint=sb://...;SharedAccessKeyName=...;SharedAccessKey=...");
 
 // AFTER
-import { DefaultAzureCredential } from "@azure/identity";
+import { ManagedIdentityCredential } from "@azure/identity";
 import { ServiceBusClient } from "@azure/service-bus";
 const client = new ServiceBusClient(
     "my-namespace.servicebus.windows.net",
-    new DefaultAzureCredential()
+    new ManagedIdentityCredential()
 );
 ```
 
@@ -279,7 +279,7 @@ BlobServiceClient client = new BlobServiceClientBuilder()
     .buildClient();
 
 // AFTER
-TokenCredential credential = new DefaultAzureCredentialBuilder().build();
+TokenCredential credential = new ManagedIdentityCredentialBuilder().build();
 BlobServiceClient client = new BlobServiceClientBuilder()
     .endpoint("https://mystorageaccount.blob.core.windows.net")
     .credential(credential)
@@ -294,7 +294,7 @@ ServiceBusClientBuilder builder = new ServiceBusClientBuilder()
     .connectionString("Endpoint=sb://...;SharedAccessKeyName=...;SharedAccessKey=...");
 
 // AFTER
-TokenCredential credential = new DefaultAzureCredentialBuilder().build();
+TokenCredential credential = new ManagedIdentityCredentialBuilder().build();
 ServiceBusClientBuilder builder = new ServiceBusClientBuilder()
     .fullyQualifiedNamespace("my-namespace.servicebus.windows.net")
     .credential(credential);
