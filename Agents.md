@@ -87,6 +87,18 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
+## Git Hook Safety
+
+**Never bypass git hooks.**
+
+- Do not use `--no-verify` on `git commit` or `git push`
+- Do not override `core.hooksPath` to disable hooks
+- If a hook fails, fix the underlying issue — do not skip the hook
+
+Git hooks enforce quality gates (tests, linting, secret scanning). Bypassing them defeats those safeguards. The `.claude/settings.json` in this repo includes [`block-no-verify`](https://github.com/tupe12334/block-no-verify) to enforce this automatically.
+
+---
+
 ## Clean Architecture
 
 Follow these layered boundaries when building features:
