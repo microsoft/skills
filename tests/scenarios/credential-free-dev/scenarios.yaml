@@ -1,0 +1,215 @@
+# Test scenarios for credential-free-dev skill evaluation
+# Each scenario tests credential-free development patterns across Azure services
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: storage_blob_credential_free
+    prompt: |
+      Create a Python script that reads blobs from Azure Storage.
+      Use credential-free authentication with managed identity.
+    expected_patterns:
+      - "DefaultAzureCredential"
+      - "BlobServiceClient"
+      - "azure.identity"
+      - "blob.core.windows.net"
+    forbidden_patterns:
+      - "AccountKey="
+      - "from_connection_string"
+      - "SharedAccessKey"
+      - "api_key"
+    tags:
+      - storage
+      - python
+      - basic
+    mock_response: |
+      from azure.identity import DefaultAzureCredential
+      from azure.storage.blob import BlobServiceClient
+
+      credential = DefaultAzureCredential()
+      client = BlobServiceClient(
+          account_url="https://mystorageaccount.blob.core.windows.net",
+          credential=credential
+      )
+
+      container = client.get_container_client("my-container")
+      for blob in container.list_blobs():
+          print(blob.name)
+
+  - name: cosmos_db_credential_free
+    prompt: |
+      Connect to Azure Cosmos DB from a Python app using managed identity
+      instead of the primary key. Show the migration from key-based auth.
+    expected_patterns:
+      - "DefaultAzureCredential"
+      - "CosmosClient"
+      - "azure.identity"
+      - "documents.azure.com"
+    forbidden_patterns:
+      - "primary-key"
+      - "master_key"
+      - "AccountKey="
+    tags:
+      - cosmos
+      - python
+      - migration
+    mock_response: |
+      from azure.identity import DefaultAzureCredential
+      from azure.cosmos import CosmosClient
+
+      # Credential-free: use DefaultAzureCredential instead of primary key
+      credential = DefaultAzureCredential()
+      client = CosmosClient(
+          "https://myaccount.documents.azure.com:443/",
+          credential=credential
+      )
+
+      database = client.get_database_client("my-database")
+      container = database.get_container_client("my-container")
+
+      # Query items
+      items = container.query_items(
+          query="SELECT * FROM c WHERE c.category = @category",
+          parameters=[{"name": "@category", "value": "example"}],
+          enable_cross_partition_query=True
+      )
+      for item in items:
+          print(item)
+
+  - name: service_bus_credential_free
+    prompt: |
+      Migrate an Azure Service Bus sender from connection string to
+      managed identity authentication in Python.
+    expected_patterns:
+      - "DefaultAzureCredential"
+      - "ServiceBusClient"
+      - "fully_qualified_namespace"
+      - "servicebus.windows.net"
+    forbidden_patterns:
+      - "from_connection_string"
+      - "SharedAccessKey"
+      - "SharedAccessKeyName"
+    tags:
+      - servicebus
+      - python
+      - migration
+    mock_response: |
+      from azure.identity import DefaultAzureCredential
+      from azure.servicebus import ServiceBusClient, ServiceBusMessage
+
+      credential = DefaultAzureCredential()
+      client = ServiceBusClient(
+          fully_qualified_namespace="my-namespace.servicebus.windows.net",
+          credential=credential
+      )
+
+      with client:
+          sender = client.get_queue_sender(queue_name="my-queue")
+          with sender:
+              message = ServiceBusMessage("Hello, credential-free!")
+              sender.send_messages(message)
+
+  - name: github_actions_workload_identity
+    prompt: |
+      Set up a GitHub Actions workflow to deploy to Azure using workload
+      identity federation instead of storing a client secret.
+    expected_patterns:
+      - "azure/login@v2"
+      - "client-id"
+      - "tenant-id"
+      - "subscription-id"
+    forbidden_patterns:
+      - "AZURE_CLIENT_SECRET"
+      - "AZURE_CREDENTIALS"
+      - "client_secret"
+      - "creds:"
+    tags:
+      - github-actions
+      - wif
+      - cicd
+    mock_response: |
+      name: Deploy to Azure
+      on:
+        push:
+          branches: [main]
+
+      permissions:
+        id-token: write
+        contents: read
+
+      jobs:
+        deploy:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v4
+
+            - uses: azure/login@v2
+              with:
+                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+            - name: Deploy
+              run: az webapp deploy --name my-app --src-path ./app.zip
+
+  - name: dotnet_storage_credential_free
+    prompt: |
+      Show how to connect to Azure Blob Storage from a .NET application
+      using DefaultAzureCredential instead of a connection string.
+    expected_patterns:
+      - "DefaultAzureCredential"
+      - "BlobServiceClient"
+      - "Azure.Identity"
+      - "blob.core.windows.net"
+    forbidden_patterns:
+      - "AccountKey="
+      - "FromConnectionString"
+      - "SharedAccessKey"
+    tags:
+      - storage
+      - dotnet
+      - basic
+    mock_response: |
+      using Azure.Identity;
+      using Azure.Storage.Blobs;
+
+      var credential = new DefaultAzureCredential();
+      var client = new BlobServiceClient(
+          new Uri("https://mystorageaccount.blob.core.windows.net"),
+          credential);
+
+      var container = client.GetBlobContainerClient("my-container");
+      await foreach (var blob in container.GetBlobsAsync())
+      {
+          Console.WriteLine(blob.Name);
+      }
+
+  - name: rbac_least_privilege
+    prompt: |
+      My app needs to read blobs from Azure Storage. What RBAC role
+      should I assign to the managed identity?
+    expected_patterns:
+      - "Storage Blob Data Reader"
+    forbidden_patterns:
+      - "Contributor(?!.*Data)"
+      - "(?<!\bData )Owner"
+      - "Storage Account Key Operator"
+    tags:
+      - rbac
+      - guidance
+    mock_response: |
+      Assign the **Storage Blob Data Reader** role to your managed identity,
+      scoped to the specific storage account (or container if supported).
+
+      ```bash
+      az role assignment create \
+        --assignee <managed-identity-object-id> \
+        --role "Storage Blob Data Reader" \
+        --scope /subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Storage/storageAccounts/<account>
+      ```
+
+      Avoid broader roles like Contributor or Owner. The Storage Blob Data Reader
+      role grants read-only access to blob data without access to management operations.

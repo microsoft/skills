@@ -12,7 +12,7 @@ Skills, custom agents, AGENTS.md templates, and MCP configurations for AI coding
 
 > **Blog post:** [Context-Driven Development: Agent Skills for Microsoft Foundry and Azure](https://devblogs.microsoft.com/all-things-azure/context-driven-development-agent-skills-for-microsoft-foundry-and-azure/)
 
-> **🔍 Skill Explorer:** [Browse all 132 skills with 1-click install](https://microsoft.github.io/skills/)
+> **🔍 Skill Explorer:** [Browse all 133 skills with 1-click install](https://microsoft.github.io/skills/)
 
 ## Quick Start
 
@@ -70,11 +70,11 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ## Skill Catalog
 
-> 132 skills in `.github/skills/` — flat structure with language suffixes for automatic discovery
+> 133 skills in `.github/skills/` — flat structure with language suffixes for automatic discovery
 
 | Language | Count | Suffix | 
 |----------|-------|--------|
-| [Core](#core) | 9 | — |
+| [Core](#core) | 10 | — |
 | [Python](#python) | 41 | `-py` |
 | [.NET](#net) | 28 | `-dotnet` |
 | [TypeScript](#typescript) | 25 | `-ts` |
@@ -85,12 +85,13 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ### Core
 
-> 9 skills — tooling, infrastructure, language-agnostic
+> 10 skills — tooling, infrastructure, language-agnostic
 
 | Skill | Description |
 |-------|-------------|
 | [cloud-solution-architect](.github/skills/cloud-solution-architect/) | Design well-architected Azure cloud systems. Architecture styles, 44 design patterns, technology choices, mission-critical design, WAF pillars. |
 | [copilot-sdk](.github/skills/copilot-sdk/) | Build applications powered by GitHub Copilot using the Copilot SDK. Session management, custom tools, streaming, hooks, MCP servers, BYOK, deployment patterns. |
+| [credential-free-dev](.github/skills/credential-free-dev/) | Eliminate secrets from Azure apps using managed identities, workload identity federation, and Azure Identity SDK. Migration patterns, RBAC roles, DefaultAzureCredential. |
 | [entra-agent-id](.github/skills/entra-agent-id/) | Microsoft Entra Agent ID (preview) — create OAuth2-capable AI agent identities via Microsoft Graph beta API. Blueprints, BlueprintPrincipals, permissions, WIF. |
 | [frontend-design-review](.github/skills/frontend-design-review/) | Review and create distinctive frontend interfaces. Design system compliance, quality pillars, accessibility, and creative aesthetics. |
 | [github-issue-creator](.github/skills/github-issue-creator/) | Convert raw notes, error logs, or screenshots into structured GitHub issues. |
@@ -631,11 +632,11 @@ pnpm test
 
 ### Test Coverage Summary
 
-**128 skills with 1158 test scenarios** — all skills have acceptance criteria and test scenarios.
+**129 skills with 1164 test scenarios** — all skills have acceptance criteria and test scenarios.
 
 | Language | Skills | Scenarios | Top Skills by Scenarios |
 |----------|--------|-----------|-------------------------|
-| Core | 7 | 72 | `copilot-sdk` (11), `podcast-generation` (8), `skill-creator` (8) |
+| Core | 8 | 78 | `copilot-sdk` (11), `podcast-generation` (8), `skill-creator` (8) |
 | Python | 41 | 331 | `azure-ai-projects-py` (12), `pydantic-models-py` (12), `azure-ai-translation-text-py` (11) |
 | .NET | 29 | 290 | `azure-resource-manager-sql-dotnet` (14), `azure-resource-manager-redis-dotnet` (14), `azure-servicebus-dotnet` (13) |
 | TypeScript | 25 | 270 | `azure-storage-blob-ts` (17), `azure-servicebus-ts` (14), `aspire-ts` (13) |
