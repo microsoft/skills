@@ -47,25 +47,36 @@ Search `microsoft-docs` MCP for current patterns:
 > — [Authentication best practices with the Azure Identity library](https://learn.microsoft.com/dotnet/azure/sdk/authentication/best-practices)
 
 Use `ManagedIdentityCredential` directly for Azure-hosted workloads. For user-assigned
-managed identities, pass the `client_id` explicitly.
+managed identities, pass the `client_id` (or object ID / resource ID in constrained
+environments where client ID isn't available) explicitly.
 
 ## DefaultAzureCredential (Local Development Only)
 
 `DefaultAzureCredential` is convenient for local development because it automatically
-falls through to developer credentials (Azure CLI, VS, etc.). **Do not use in production.**
+falls through to developer tool credentials. **Do not use in production.**
 
-### Credential Chain (in order)
+The credential chain order and included credentials vary by language. See the authoritative per-language references:
 
-1. Environment variables (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`)
-2. Workload Identity (Kubernetes, federated token)
-3. Managed Identity (system-assigned, then user-assigned)
-4. Azure CLI (`az login`)
-5. Azure PowerShell (`Connect-AzAccount`)
-6. Azure Developer CLI (`azd auth login`)
-7. Interactive browser (if enabled)
+- [.NET](https://aka.ms/azsdk/net/identity/credential-chains#defaultazurecredential-overview)
+- [C++](https://aka.ms/azsdk/cpp/identity/credential-chains#defaultazurecredential-overview)
+- [Go](https://aka.ms/azsdk/go/identity/credential-chains#defaultazurecredential-overview)
+- [Java](https://aka.ms/azsdk/java/identity/credential-chains#defaultazurecredential-overview)
+- [JavaScript](https://aka.ms/azsdk/js/identity/credential-chains#defaultazurecredential-overview)
+- [Python](https://aka.ms/azsdk/python/identity/credential-chains#defaultazurecredential-overview)
 
-Locally, steps 4-6 fire using your developer identity. In production this chain
-introduces latency and unpredictable fallback — use `ManagedIdentityCredential` instead.
+In production this chain introduces latency and unpredictable fallback — use `ManagedIdentityCredential` instead.
+
+### Optimize for Local Dev with `AZURE_TOKEN_CREDENTIALS`
+
+Set `AZURE_TOKEN_CREDENTIALS=dev` to disable production-grade credentials (MI, WIF, Environment)
+and only keep developer tool credentials in the chain. This prevents accidental use of
+deployed-service credentials during local development.
+
+> **Minimum SDK versions:** Python `azure-identity` 1.23.0+, .NET `Azure.Identity` 1.15.0+,
+> Java `azure-identity` 1.16.1+, JavaScript `@azure/identity` 4.11.0+, Go `azidentity` 1.10.0+,
+> C++ `azure-identity-cpp` 1.13.1+.
+>
+> See [Exclude a credential type category](https://learn.microsoft.com/azure/developer/python/sdk/authentication/credential-chains?tabs=dac#exclude-a-credential-type-category) for details.
 
 ### SDK Packages
 
@@ -76,6 +87,7 @@ introduces latency and unpredictable fallback — use `ManagedIdentityCredential
 | Java | `azure-identity` | Maven: `com.azure:azure-identity` |
 | TypeScript | `@azure/identity` | `npm install @azure/identity` |
 | Go | `azidentity` | `go get github.com/Azure/azure-sdk-for-go/sdk/azidentity` |
+| C++ | `azure-identity-cpp` | `vcpkg add port azure-identity-cpp` |
 
 ### Production Pattern (All Languages)
 
@@ -90,14 +102,14 @@ client = ServiceClient(endpoint, credential=credential)
 ```csharp
 // C# — production
 var credential = new ManagedIdentityCredential();  // system-assigned
-// var credential = new ManagedIdentityCredential("<user-assigned-mi-client-id>");  // user-assigned
+// var credential = new ManagedIdentityCredential(ManagedIdentityId.FromUserAssignedClientId("<user-assigned-mi-client-id>"));  // user-assigned
 var client = new ServiceClient(new Uri(endpoint), credential);
 ```
 
 ```java
 // Java — production
-TokenCredential credential = new ManagedIdentityCredentialBuilder().build();  // system-assigned
-// TokenCredential credential = new ManagedIdentityCredentialBuilder()
+ManagedIdentityCredential credential = new ManagedIdentityCredentialBuilder().build();  // system-assigned
+// ManagedIdentityCredential credential = new ManagedIdentityCredentialBuilder()
 //     .clientId("<user-assigned-mi-client-id>").build();  // user-assigned
 ServiceClient client = new ServiceClientBuilder()
     .endpoint(endpoint)
@@ -109,7 +121,7 @@ ServiceClient client = new ServiceClientBuilder()
 // TypeScript — production
 import { ManagedIdentityCredential } from "@azure/identity";
 const credential = new ManagedIdentityCredential();  // system-assigned
-// const credential = new ManagedIdentityCredential("<user-assigned-mi-client-id>");  // user-assigned
+// const credential = new ManagedIdentityCredential({ clientId: "<user-assigned-mi-client-id>" });  // user-assigned
 const client = new ServiceClient(endpoint, credential);
 ```
 
@@ -170,7 +182,7 @@ No `AZURE_CLIENT_SECRET` needed. The GitHub OIDC token is exchanged directly.
 
 1. **Forgetting RBAC roles.** Enabling MI is step 1. Assigning the right role on the target resource is step 2. Most "MI doesn't work" issues are missing role assignments.
 2. **Overly broad roles.** `Contributor` on a resource group when you need `Storage Blob Data Reader` on one account.
-3. **Not testing locally.** `DefaultAzureCredential` falls through to Azure CLI. Make sure `az login` is done with the right subscription.
+3. **Not testing locally.** `DefaultAzureCredential` falls through to Azure CLI. Make sure `az login` is used with the right subscription.
 4. **Using `DefaultAzureCredential` in production.** Its credential chain probing adds latency, can fall back to unintended credentials, and masks configuration errors. Use `ManagedIdentityCredential` explicitly for Azure-hosted production apps.
 5. **Mixing key and MI auth.** Some SDKs behave differently when both a connection string and a credential are provided. Pick one.
 6. **Assuming all services support MI.** Most do. Some legacy or partner services don't yet. Check the [services that support managed identities](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/managed-identities-status) list.
@@ -182,3 +194,4 @@ No `AZURE_CLIENT_SECRET` needed. The GitHub OIDC token is exchanged directly.
 | File | Contents |
 |------|----------|
 | [references/migration-patterns.md](references/migration-patterns.md) | Detailed before/after code for SQL, Storage, Cosmos DB, Service Bus, Event Hubs, Key Vault |
+| [references/acceptance-criteria.md](references/acceptance-criteria.md) | Correct/incorrect patterns for skill evaluation |

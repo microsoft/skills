@@ -50,7 +50,7 @@ One of: **Agent Identity Developer**, **Agent Identity Administrator**, or **App
 ## Environment Variables
 
 ```bash
-AZURE_TENANT_ID=<your tenant-id>
+AZURE_TENANT_ID=<your-tenant-id>
 AZURE_CLIENT_ID=<app-registration-client-id>
 AZURE_CLIENT_SECRET=<app-registration-secret>
 ```

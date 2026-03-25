@@ -12,7 +12,7 @@ scenarios:
       Create a Python script that reads blobs from Azure Storage.
       Use credential-free authentication with managed identity.
     expected_patterns:
-      - "DefaultAzureCredential"
+      - "ManagedIdentityCredential"
       - "BlobServiceClient"
       - "azure.identity"
       - "blob.core.windows.net"
@@ -26,10 +26,10 @@ scenarios:
       - python
       - basic
     mock_response: |
-      from azure.identity import DefaultAzureCredential
+      from azure.identity import ManagedIdentityCredential
       from azure.storage.blob import BlobServiceClient
 
-      credential = DefaultAzureCredential()
+      credential = ManagedIdentityCredential()
       client = BlobServiceClient(
           account_url="https://mystorageaccount.blob.core.windows.net",
           credential=credential
@@ -44,7 +44,7 @@ scenarios:
       Connect to Azure Cosmos DB from a Python app using managed identity
       instead of the primary key. Show the migration from key-based auth.
     expected_patterns:
-      - "DefaultAzureCredential"
+      - "ManagedIdentityCredential"
       - "CosmosClient"
       - "azure.identity"
       - "documents.azure.com"
@@ -57,11 +57,11 @@ scenarios:
       - python
       - migration
     mock_response: |
-      from azure.identity import DefaultAzureCredential
+      from azure.identity import ManagedIdentityCredential
       from azure.cosmos import CosmosClient
 
-      # Credential-free: use DefaultAzureCredential instead of primary key
-      credential = DefaultAzureCredential()
+      # Credential-free: use ManagedIdentityCredential for production
+      credential = ManagedIdentityCredential()
       client = CosmosClient(
           "https://myaccount.documents.azure.com:443/",
           credential=credential
@@ -84,7 +84,7 @@ scenarios:
       Migrate an Azure Service Bus sender from connection string to
       managed identity authentication in Python.
     expected_patterns:
-      - "DefaultAzureCredential"
+      - "ManagedIdentityCredential"
       - "ServiceBusClient"
       - "fully_qualified_namespace"
       - "servicebus.windows.net"
@@ -97,10 +97,10 @@ scenarios:
       - python
       - migration
     mock_response: |
-      from azure.identity import DefaultAzureCredential
+      from azure.identity import ManagedIdentityCredential
       from azure.servicebus import ServiceBusClient, ServiceBusMessage
 
-      credential = DefaultAzureCredential()
+      credential = ManagedIdentityCredential()
       client = ServiceBusClient(
           fully_qualified_namespace="my-namespace.servicebus.windows.net",
           credential=credential
@@ -158,9 +158,9 @@ scenarios:
   - name: dotnet_storage_credential_free
     prompt: |
       Show how to connect to Azure Blob Storage from a .NET application
-      using DefaultAzureCredential instead of a connection string.
+      using ManagedIdentityCredential instead of a connection string.
     expected_patterns:
-      - "DefaultAzureCredential"
+      - "ManagedIdentityCredential"
       - "BlobServiceClient"
       - "Azure.Identity"
       - "blob.core.windows.net"
@@ -176,7 +176,7 @@ scenarios:
       using Azure.Identity;
       using Azure.Storage.Blobs;
 
-      var credential = new DefaultAzureCredential();
+      var credential = new ManagedIdentityCredential();
       var client = new BlobServiceClient(
           new Uri("https://mystorageaccount.blob.core.windows.net"),
           credential);
@@ -213,3 +213,35 @@ scenarios:
 
       Avoid broader roles like Contributor or Owner. The Storage Blob Data Reader
       role grants read-only access to blob data without access to management operations.
+
+  - name: local_dev_default_credential
+    prompt: |
+      Show how to authenticate to Azure Blob Storage during local
+      development using your developer identity.
+    expected_patterns:
+      - "DefaultAzureCredential"
+      - "BlobServiceClient"
+      - "azure.identity"
+      - "blob.core.windows.net"
+    forbidden_patterns:
+      - "AccountKey="
+      - "from_connection_string"
+      - "ManagedIdentityCredential"
+    tags:
+      - storage
+      - python
+      - local-dev
+    mock_response: |
+      from azure.identity import DefaultAzureCredential
+      from azure.storage.blob import BlobServiceClient
+
+      # Local dev only: DefaultAzureCredential falls through to Azure CLI / VS credentials
+      credential = DefaultAzureCredential()
+      client = BlobServiceClient(
+          account_url="https://mystorageaccount.blob.core.windows.net",
+          credential=credential
+      )
+
+      container = client.get_container_client("my-container")
+      for blob in container.list_blobs():
+          print(blob.name)
