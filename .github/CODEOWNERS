@@ -10,6 +10,9 @@
 # Copilot for Azure skills plugin (synced from upstream)
 .github/plugins/azure-skills/            @microsoft/ghcp4a
 
+# Azure Identity SDK skills
+.github/plugins/*/skills/azure-identity-*/SKILL.md      @scottaddie
+
 # Community-contributed skill: Microsoft Entra Agent ID
 .github/skills/entra-agent-id/           @ArLucaID @rbinrais @thegovind
 
