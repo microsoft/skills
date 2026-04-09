@@ -1,6 +1,6 @@
-# Xquik REST API — Complete Endpoint Reference
+# Xquik REST API - Complete Endpoint Reference
 
-Base URL: `https://api.xquik.com/v1`
+Base URL: `https://xquik.com/api/v1`
 Auth: `X-API-Key` header on all requests.
 
 ---

@@ -8,7 +8,7 @@ description: >-
   "follower extraction", "twitter monitoring", "giveaway draw".
 ---
 
-# X (Twitter) Data Platform — Xquik REST API
+# X (Twitter) Data Platform - Xquik REST API
 
 Real-time X (Twitter) data access via the Xquik REST API. 120 endpoints, 2 MCP tools, HMAC webhooks, 23 bulk extraction types.
 
@@ -17,7 +17,7 @@ Real-time X (Twitter) data access via the Xquik REST API. 120 endpoints, 2 MCP t
 ```bash
 # Get an API key at https://xquik.com
 # Set the header: X-API-Key: <your-key>
-BASE=https://api.xquik.com/v1
+BASE=https://xquik.com/api/v1
 ```
 
 ## Authentication
