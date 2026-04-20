@@ -5,7 +5,7 @@ description: "Build on the Microsoft Purview Developer Platform — integrate da
 
 # Microsoft Purview Developer Platform
 
-Build apps and agents that integrate Microsoft Purview data protection, DLP policy enforcement, sensitivity labels, and compliance logging. The platform exposes three integration surfaces — choose the right one for your scenario.
+Build apps and agents that integrate Microsoft Purview data protection, DLP policy enforcement, sensitivity labels, and compliance logging. There are two primary integration surfaces — direct Microsoft Graph API calls for LOB apps, and Agent Framework Purview middleware for agents — plus Agent 365 telemetry that flows into Purview for compliance.
 
 ## Which Purview Surface Do I Call?
 
@@ -22,7 +22,7 @@ The most common confusion: should I use Microsoft Graph directly or the Agent Fr
 
 > **Key rule**: The term "Purview SDK" refers to using the Microsoft Graph SDK clients (e.g., `Microsoft.Graph` for .NET, `msgraph-sdk-python` for Python) to call the Purview data security and governance APIs. The **Agent Framework Purview middleware** wraps these Graph calls for inline DLP enforcement. Do not duplicate the same calls across layers.
 >
-> **Agent 365 and Purview**: If you are building an Agent 365 agent, its Observability SDK sends telemetry that flows into Microsoft Purview and Microsoft Defender for audit and compliance. However, the A365 SDK itself is not a Purview integration — it is an enterprise agent platform. See the [Agent 365 developer skill](../agent-365-developer/SKILL.md) for full A365 guidance. You can combine Agent Framework Purview middleware (for inline DLP) with A365 Observability (for telemetry) in the same agent.
+> **Agent 365 and Purview**: If you are building an Agent 365 agent, its Observability SDK sends telemetry that flows into Microsoft Purview and Microsoft Defender for audit and compliance. However, the A365 SDK itself is not a Purview integration — it is an enterprise agent platform. See the [Agent 365 developer documentation](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/) for full A365 guidance. You can combine Agent Framework Purview middleware (for inline DLP) with A365 Observability (for telemetry) in the same agent.
 
 ---
 
@@ -37,12 +37,14 @@ The most common confusion: should I use Microsoft Graph directly or the Agent Fr
 | Scenario | Permission (least privileged) | Type |
 |---|---|---|
 | Compute protection scopes (delegated) | `ProtectionScopes.Compute.User` | Delegated |
-| Compute protection scopes (app) | `ProtectionScopes.Compute.All` | Application |
+| Compute protection scopes (app) | `ProtectionScopes.Compute.User` | Application |
 | Process content (delegated) | `Content.Process.User` | Delegated |
-| Process content (app) | `Content.Process.All` | Application |
+| Process content (app) | `Content.Process.User` | Application |
 | Log content activity | `ContentActivity.Write` | Delegated or Application |
 | Read sensitivity labels | `SensitivityLabel.Read` | Delegated or Application |
 | Read all sensitivity labels (app) | `SensitivityLabels.Read.All` | Application |
+
+> **Note**: `.All` variants (e.g., `ProtectionScopes.Compute.All`, `Content.Process.All`) are higher-privilege permissions. Use `.User` as least-privileged first; only upgrade to `.All` if your app requires broader access.
 
 ---
 
@@ -56,9 +58,11 @@ The typical Purview integration follows three steps:
 3. Process content / Log activity  →  Call processContent and/or create contentActivity
 ```
 
+> **REST vs SDK naming**: The REST API wraps the request body in `contentToProcess`, while the generated Graph SDK models use `ContentToProcess` (C#) or `content_to_process` (Python) as a property of the typed request body object (e.g., `ProcessContentPostRequestBody`). Do not mix REST field names with SDK method calls.
+
 ---
 
-## Scenario 1: Reading and Applying a Sensitivity Label
+## Scenario 1: Reading Sensitivity Labels
 
 List sensitivity labels available in the tenant and filter by content format or label ID.
 
@@ -77,7 +81,8 @@ using Microsoft.Graph;
 using Azure.Identity;
 
 var credential = new DefaultAzureCredential();
-var graphClient = new GraphServiceClient(credential);
+var scopes = new[] { "https://graph.microsoft.com/.default" };
+var graphClient = new GraphServiceClient(credential, scopes);
 
 // List tenant sensitivity labels
 var labels = await graphClient.Security.DataSecurityAndGovernance.SensitivityLabels
@@ -98,16 +103,22 @@ foreach (var label in labels.Value)
 import asyncio
 from azure.identity import DefaultAzureCredential
 from msgraph import GraphServiceClient
+from msgraph.generated.security.data_security_and_governance.sensitivity_labels.sensitivity_labels_request_builder import SensitivityLabelsRequestBuilder
 
 async def main():
     credential = DefaultAzureCredential()
-    client = GraphServiceClient(credential)
+    scopes = ["https://graph.microsoft.com/.default"]
+    client = GraphServiceClient(credentials=credential, scopes=scopes)
 
     # List tenant sensitivity labels
+    query_params = SensitivityLabelsRequestBuilder.SensitivityLabelsRequestBuilderGetQueryParameters(
+        filter="applicableTo has 'file'"
+    )
+    config = SensitivityLabelsRequestBuilder.SensitivityLabelsRequestBuilderGetRequestConfiguration(
+        query_parameters=query_params
+    )
     labels = await client.security.data_security_and_governance.sensitivity_labels.get(
-        request_configuration=lambda config: setattr(
-            config.query_parameters, "filter", "applicableTo has 'file'"
-        )
+        request_configuration=config
     )
 
     for label in labels.value:
@@ -188,6 +199,8 @@ Content-Type: application/json
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 
+// Initialize graphClient with scopes (see Scenario 1)
+
 var contentActivity = new ContentActivity
 {
     ContentMetadata = new ProcessContentRequest
@@ -233,7 +246,8 @@ from msgraph.generated.models.integrated_application_metadata import IntegratedA
 
 async def main():
     credential = DefaultAzureCredential()
-    client = GraphServiceClient(credential)
+    scopes = ["https://graph.microsoft.com/.default"]
+    client = GraphServiceClient(credentials=credential, scopes=scopes)
 
     content_activity = ContentActivity(
         content_metadata=ProcessContentRequest(
@@ -363,8 +377,12 @@ Content-Type: application/json
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 
+// Initialize graphClient with scopes (see Scenario 1)
+// Note: SDK request body type names are auto-generated and may vary by SDK version.
+// Check the generated namespace for your installed Microsoft.Graph package version.
+
 // Step 1: Compute protection scopes
-var scopeRequest = new UserProtectionScopeContainerComputePostRequestBody
+var scopeRequest = new Microsoft.Graph.Users.Item.DataSecurityAndGovernance.ProtectionScopes.Compute.ComputePostRequestBody
 {
     Activities = "uploadText,downloadText",
     Locations = new List<PolicyLocation>
@@ -385,37 +403,40 @@ foreach (var scope in scopes.Value)
     if (scope.ExecutionMode == "evaluateInline")
     {
         // Must wait for processContent verdict before allowing user action
-        var processRequest = new ProcessContentRequest
+        var processRequestBody = new Microsoft.Graph.Users.Item.DataSecurityAndGovernance.ProcessContent.ProcessContentPostRequestBody
         {
-            ContentEntries = new List<ProcessContentMetadataBase>
+            ContentToProcess = new ProcessContentRequest
             {
-                new ProcessConversationMetadata
+                ContentEntries = new List<ProcessContentMetadataBase>
                 {
-                    Identifier = Guid.NewGuid().ToString(),
-                    Content = new TextContent { Data = userInput },
-                    Name = "User prompt",
-                    CorrelationId = Guid.NewGuid().ToString(),
-                    SequenceNumber = 0
-                }
-            },
-            ActivityMetadata = new ActivityMetadata { Activity = "uploadText" },
-            IntegratedAppMetadata = new IntegratedApplicationMetadata
-            {
-                Name = "My Enterprise App",
-                Version = "1.0"
-            },
-            DeviceMetadata = new DeviceMetadata
-            {
-                OperatingSystemSpecifications = new OperatingSystemSpecifications
+                    new ProcessConversationMetadata
+                    {
+                        Identifier = Guid.NewGuid().ToString(),
+                        Content = new TextContent { Data = userInput },
+                        Name = "User prompt",
+                        CorrelationId = Guid.NewGuid().ToString(),
+                        SequenceNumber = 0
+                    }
+                },
+                ActivityMetadata = new ActivityMetadata { Activity = "uploadText" },
+                IntegratedAppMetadata = new IntegratedApplicationMetadata
                 {
-                    OperatingSystemPlatform = "Windows 11",
-                    OperatingSystemVersion = "10.0.26100.0"
+                    Name = "My Enterprise App",
+                    Version = "1.0"
+                },
+                DeviceMetadata = new DeviceMetadata
+                {
+                    OperatingSystemSpecifications = new OperatingSystemSpecifications
+                    {
+                        OperatingSystemPlatform = "Windows 11",
+                        OperatingSystemVersion = "10.0.26100.0"
+                    }
                 }
             }
         };
 
         var result = await graphClient.Users[userId].DataSecurityAndGovernance
-            .ProcessContent.PostAsync(processRequest);
+            .ProcessContent.PostAsync(processRequestBody);
 
         // Check for DLP actions
         foreach (var action in result.PolicyActions)
@@ -437,60 +458,74 @@ import asyncio
 from uuid import uuid4
 from azure.identity import DefaultAzureCredential
 from msgraph import GraphServiceClient
+from msgraph.generated.models.policy_location_application import PolicyLocationApplication
+from msgraph.generated.models.process_conversation_metadata import ProcessConversationMetadata
+from msgraph.generated.models.text_content import TextContent
+from msgraph.generated.models.activity_metadata import ActivityMetadata
+from msgraph.generated.models.integrated_application_metadata import IntegratedApplicationMetadata
+from msgraph.generated.models.device_metadata import DeviceMetadata
+from msgraph.generated.models.operating_system_specifications import OperatingSystemSpecifications
+from msgraph.generated.models.process_content_request import ProcessContentRequest
 
 async def main():
     credential = DefaultAzureCredential()
-    client = GraphServiceClient(credential)
+    scopes = ["https://graph.microsoft.com/.default"]
+    client = GraphServiceClient(credentials=credential, scopes=scopes)
     user_id = "<user-object-id>"
 
     # Step 1: Compute protection scopes
-    scope_body = {
-        "activities": "uploadText,downloadText",
-        "locations": [
-            {
-                "@odata.type": "microsoft.graph.policyLocationApplication",
-                "value": "83ef208a-0396-4893-9d4f-d36efbffc8bd"
-            }
-        ]
-    }
+    # Note: SDK request body type names are auto-generated and may vary by SDK version.
+    from msgraph.generated.users.item.data_security_and_governance.protection_scopes.compute.compute_post_request_body import ComputePostRequestBody
 
-    scopes = await client.users.by_user_id(user_id).data_security_and_governance \
-        .protection_scopes.compute.post(scope_body)
+    scope_request = ComputePostRequestBody(
+        activities="uploadText,downloadText",
+        locations=[
+            PolicyLocationApplication(
+                odata_type="microsoft.graph.policyLocationApplication",
+                value="83ef208a-0396-4893-9d4f-d36efbffc8bd"
+            )
+        ]
+    )
+    scopes_result = await client.users.by_user_id(user_id).data_security_and_governance \
+        .protection_scopes.compute.post(scope_request)
 
     # Step 2: Process content for inline evaluation
-    for scope in scopes.value:
+    for scope in scopes_result.value:
         if scope.execution_mode == "evaluateInline":
             user_input = "Content to evaluate for DLP policies"
-            process_body = {
-                "contentToProcess": {
-                    "contentEntries": [
-                        {
-                            "@odata.type": "microsoft.graph.processConversationMetadata",
-                            "identifier": str(uuid4()),
-                            "content": {
-                                "@odata.type": "microsoft.graph.textContent",
-                                "data": user_input
-                            },
-                            "name": "User prompt",
-                            "correlationId": str(uuid4()),
-                            "sequenceNumber": 0
-                        }
+
+            from msgraph.generated.users.item.data_security_and_governance.process_content.process_content_post_request_body import ProcessContentPostRequestBody
+
+            process_request = ProcessContentPostRequestBody(
+                content_to_process=ProcessContentRequest(
+                    content_entries=[
+                        ProcessConversationMetadata(
+                            odata_type="microsoft.graph.processConversationMetadata",
+                            identifier=str(uuid4()),
+                            content=TextContent(
+                                odata_type="microsoft.graph.textContent",
+                                data=user_input
+                            ),
+                            name="User prompt",
+                            correlation_id=str(uuid4()),
+                            sequence_number=0
+                        )
                     ],
-                    "activityMetadata": {"activity": "uploadText"},
-                    "integratedAppMetadata": {
-                        "name": "My Enterprise App",
-                        "version": "1.0"
-                    },
-                    "deviceMetadata": {
-                        "operatingSystemSpecifications": {
-                            "operatingSystemPlatform": "Windows 11",
-                            "operatingSystemVersion": "10.0.26100.0"
-                        }
-                    }
-                }
-            }
+                    activity_metadata=ActivityMetadata(activity="uploadText"),
+                    integrated_app_metadata=IntegratedApplicationMetadata(
+                        name="My Enterprise App",
+                        version="1.0"
+                    ),
+                    device_metadata=DeviceMetadata(
+                        operating_system_specifications=OperatingSystemSpecifications(
+                            operating_system_platform="Windows 11",
+                            operating_system_version="10.0.26100.0"
+                        )
+                    )
+                )
+            )
             result = await client.users.by_user_id(user_id) \
-                .data_security_and_governance.process_content.post(process_body)
+                .data_security_and_governance.process_content.post(process_request)
 
             for action in result.policy_actions:
                 if action.odata_type == "#microsoft.graph.restrictAccessAction":
@@ -633,7 +668,7 @@ If you are building an [Agent 365](https://learn.microsoft.com/en-us/microsoft-a
 
 - A365 Observability is **not a replacement** for the Agent Framework Purview middleware — it does not perform inline DLP enforcement.
 - You can use **both together**: Agent Framework Purview middleware for real-time DLP on content, and A365 Observability for enterprise telemetry and governance.
-- For full Agent 365 SDK guidance (identity, blueprints, notifications, tooling, deployment lifecycle), see the dedicated **Agent 365 developer skill**.
+- For full Agent 365 SDK guidance (identity, blueprints, notifications, tooling, deployment lifecycle), see the dedicated [Agent 365 developer documentation](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/).
 
 > **Note**: Agent 365 is currently in preview and requires enrollment in the [Frontier preview program](https://adoption.microsoft.com/copilot/frontier-program/).
 
@@ -686,18 +721,22 @@ var agent = builder
 await graphClient.Users[userId].DataSecurityAndGovernance.ProcessContent.PostAsync(request);
 ```
 
-### ❌ Wrong: Using the wrong auth scopes
+### ❌ Wrong: Missing required permissions in Entra app registration
 
 ```csharp
-// ❌ WRONG — using generic Graph scopes that don't grant Purview access
-var scopes = new[] { "https://graph.microsoft.com/.default" };
+// ❌ WRONG — registering the app without Purview-specific Graph permissions
+// The app uses https://graph.microsoft.com/.default at runtime (which is correct),
+// but has only generic Graph permissions like User.Read in the app registration.
+// Result: 403 Forbidden when calling Purview APIs.
 
-// ✅ CORRECT — request the specific Purview permissions
-// In your app registration, add:
-//   ProtectionScopes.Compute.All
-//   Content.Process.All
+// ✅ CORRECT — add these specific permissions to your Entra app registration:
+//   ProtectionScopes.Compute.User  (least privileged) or ProtectionScopes.Compute.All
+//   Content.Process.User           (least privileged) or Content.Process.All
 //   ContentActivity.Write
 //   SensitivityLabel.Read
+// Then use https://graph.microsoft.com/.default at runtime — it picks up all granted permissions.
+var scopes = new[] { "https://graph.microsoft.com/.default" };
+var graphClient = new GraphServiceClient(credential, scopes);
 ```
 
 ### ❌ Wrong: Not caching protection scopes
@@ -711,11 +750,12 @@ foreach (var message in userMessages)
     // process...
 }
 
-// ✅ CORRECT — compute once, cache with ETag, refresh only when policies change
-var scopes = await graphClient.Users[userId].DataSecurityAndGovernance
-    .ProtectionScopes.Compute.PostAsync(request);
-// Cache the response and ETag header
-// On subsequent calls, pass ETag in If-None-Match header to detect changes
+// ✅ CORRECT — compute once, cache the ETag, pass it to processContent
+// 1. Call protectionScopes/compute and cache the ETag from the response header
+// 2. On each processContent call, pass the cached ETag in the If-None-Match header
+// 3. Check the protectionScopeState in the processContent response:
+//    - "notModified" → policies unchanged, continue using cached scopes
+//    - "modified" → policies changed, re-call protectionScopes/compute to refresh
 ```
 
 ### ❌ Wrong: Ignoring the execution mode
