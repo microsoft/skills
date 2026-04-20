@@ -1,0 +1,210 @@
+# Test scenarios for azure-maf-orchestration-patterns-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: sequential_orchestration
+    prompt: |
+      Create a sequential workflow with writer and reviewer agents.
+    expected_patterns:
+      - "from agent_framework import SequentialBuilder"
+      - "SequentialBuilder()"
+      - ".participants("
+      - ".build()"
+      - "run_stream"
+      - "WorkflowOutputEvent"
+    forbidden_patterns:
+      - "SequentialWorkflow"
+      - "SequentialBuilder(["
+    tags:
+      - basic
+      - sequential
+    mock_response: |
+      import asyncio
+      from agent_framework import SequentialBuilder, WorkflowOutputEvent
+
+      async def main():
+          workflow = SequentialBuilder().participants([writer, reviewer]).build()
+          async for event in workflow.run_stream("Write a poem"):
+              if isinstance(event, WorkflowOutputEvent):
+                  print(event.data)
+
+      asyncio.run(main())
+
+  - name: concurrent_with_aggregator
+    prompt: |
+      Create a concurrent workflow with three agents and a custom aggregator.
+    expected_patterns:
+      - "ConcurrentBuilder"
+      - ".participants("
+      - ".with_aggregator("
+      - ".build()"
+    tags:
+      - basic
+      - concurrent
+    mock_response: |
+      import asyncio
+      from agent_framework import ConcurrentBuilder, WorkflowOutputEvent
+
+      async def main():
+          workflow = (
+              ConcurrentBuilder()
+              .participants([researcher, marketer, legal])
+              .with_aggregator(summarize_results)
+              .build()
+          )
+          async for event in workflow.run_stream("Analyze the market"):
+              if isinstance(event, WorkflowOutputEvent):
+                  print(event.data)
+
+      asyncio.run(main())
+
+  - name: group_chat_round_robin
+    prompt: |
+      Create a group chat with round-robin speaker selection and termination condition.
+    expected_patterns:
+      - "GroupChatBuilder"
+      - "GroupChatState"
+      - "with_select_speaker_func"
+      - "with_termination_condition"
+      - ".participants("
+    tags:
+      - basic
+      - group-chat
+    mock_response: |
+      import asyncio
+      from agent_framework import GroupChatBuilder, GroupChatState, WorkflowOutputEvent
+
+      def round_robin(state: GroupChatState) -> str:
+          names = list(state.participants.keys())
+          return names[state.current_round % len(names)]
+
+      async def main():
+          workflow = (
+              GroupChatBuilder()
+              .with_select_speaker_func(round_robin)
+              .participants([researcher, writer])
+              .with_termination_condition(lambda conv: len(conv) >= 4)
+              .build()
+          )
+          async for event in workflow.run_stream("Start discussion"):
+              if isinstance(event, WorkflowOutputEvent):
+                  print(event.data)
+
+      asyncio.run(main())
+
+  - name: handoff_orchestration
+    prompt: |
+      Create a handoff workflow for customer support with triage, refund, and order agents.
+    expected_patterns:
+      - "HandoffBuilder"
+      - "name="
+      - "participants="
+      - "with_start_agent"
+      - "with_termination_condition"
+    forbidden_patterns:
+      - "GroupChatBuilder"
+    tags:
+      - basic
+      - handoff
+    mock_response: |
+      import asyncio
+      from agent_framework import HandoffBuilder, WorkflowOutputEvent
+
+      async def main():
+          workflow = (
+              HandoffBuilder(
+                  name="customer_support",
+                  participants=[triage_agent, refund_agent, order_agent],
+              )
+              .with_start_agent(triage_agent)
+              .with_termination_condition(
+                  lambda conv: len(conv) > 0 and "resolved" in conv[-1].text.lower()
+              )
+              .build()
+          )
+          async for event in workflow.run_stream("I need help"):
+              if isinstance(event, WorkflowOutputEvent):
+                  print(event.data)
+
+      asyncio.run(main())
+
+  - name: magentic_orchestration
+    prompt: |
+      Create a Magentic orchestration with a standard manager and plan review.
+    expected_patterns:
+      - "MagenticBuilder"
+      - "with_standard_manager"
+      - "max_round_count="
+      - "max_stall_count="
+      - "with_plan_review"
+    tags:
+      - advanced
+      - magentic
+    mock_response: |
+      import asyncio
+      from agent_framework import MagenticBuilder, WorkflowOutputEvent
+
+      async def main():
+          workflow = (
+              MagenticBuilder()
+              .participants([researcher_agent, coder_agent])
+              .with_standard_manager(
+                  agent=manager_agent,
+                  max_round_count=10,
+                  max_stall_count=3,
+                  max_reset_count=2,
+              )
+              .with_plan_review()
+              .build()
+          )
+          async for event in workflow.run_stream("Build a web scraper"):
+              if isinstance(event, WorkflowOutputEvent):
+                  print(event.data)
+
+      asyncio.run(main())
+
+  - name: hitl_approval
+    prompt: |
+      Add human-in-the-loop approval to a sequential workflow.
+    expected_patterns:
+      - "with_request_info"
+      - "AgentRequestInfoResponse"
+      - "approve"
+    tags:
+      - advanced
+      - hitl
+    mock_response: |
+      from agent_framework import SequentialBuilder, AgentRequestInfoResponse
+
+      builder = (
+          SequentialBuilder()
+          .participants([writer, reviewer, publisher])
+          .with_request_info(agents=[reviewer])
+      )
+
+      response = AgentRequestInfoResponse.approve()
+
+  - name: error_missing_termination
+    prompt: |
+      Show a group chat without termination condition — this may run forever.
+    expected_patterns:
+      - "GroupChatBuilder"
+      - ".build()"
+    forbidden_patterns:
+      - "with_termination_condition"
+    tags:
+      - error-handling
+    mock_response: |
+      from agent_framework import GroupChatBuilder
+
+      # WRONG: Missing termination condition — may run forever
+      workflow = (
+          GroupChatBuilder()
+          .with_select_speaker_func(selector)
+          .participants([agent1, agent2])
+          .build()
+      )

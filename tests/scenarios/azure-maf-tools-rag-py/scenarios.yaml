@@ -1,0 +1,161 @@
+# Test scenarios for azure-maf-tools-rag-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: function_tool_basic
+    prompt: |
+      Create a function tool with Annotated type hints and pass it to a ChatAgent.
+    expected_patterns:
+      - "from typing import Annotated"
+      - "from pydantic import Field"
+      - "Field(description="
+      - "tools=["
+    forbidden_patterns:
+      - "from agent_framework.tools import"
+      - "@tool"
+    tags:
+      - basic
+      - function-tools
+    mock_response: |
+      from typing import Annotated
+      from pydantic import Field
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+
+      def get_weather(
+          location: Annotated[str, Field(description="The city to check")],
+      ) -> str:
+          """Get weather for a location."""
+          return f"Sunny in {location}"
+
+      agent = ChatAgent(
+          chat_client=OpenAIChatClient(),
+          instructions="You are a weather assistant.",
+          tools=[get_weather],
+      )
+
+  - name: mcp_stdio_tool
+    prompt: |
+      Use an MCP stdio tool with async context manager and pass it to an agent run.
+    expected_patterns:
+      - "from agent_framework import MCPStdioTool"
+      - "async with MCPStdioTool"
+      - "tools=mcp"
+      - "await agent.run"
+    forbidden_patterns:
+      - "from agent_framework.mcp import"
+    tags:
+      - basic
+      - mcp
+      - async
+    mock_response: |
+      import asyncio
+      from agent_framework import MCPStdioTool
+
+      async def main():
+          async with MCPStdioTool(name="calc", command="uvx", args=["mcp-server-calculator"]) as mcp:
+              result = await agent.run("What is 15 * 23?", tools=mcp)
+              print(result.text)
+
+      asyncio.run(main())
+
+  - name: hosted_web_search
+    prompt: |
+      Create an agent with HostedWebSearchTool for web search capability.
+    expected_patterns:
+      - "HostedWebSearchTool"
+      - "HostedWebSearchTool("
+      - "tools=["
+    tags:
+      - basic
+      - hosted-tools
+    mock_response: |
+      from agent_framework import ChatAgent, HostedWebSearchTool
+      from agent_framework.openai import OpenAIChatClient
+
+      agent = ChatAgent(
+          chat_client=OpenAIChatClient(),
+          instructions="Search assistant.",
+          tools=[HostedWebSearchTool(
+              additional_properties={"user_location": {"city": "Seattle", "country": "US"}}
+          )],
+      )
+
+  - name: agent_as_tool
+    prompt: |
+      Compose agents by using one agent as a tool for another via as_tool().
+    expected_patterns:
+      - "as_tool()"
+      - "tools=[weather_agent.as_tool()]"
+      - "name="
+      - "description="
+    forbidden_patterns:
+      - "tools=[weather_agent]"
+    tags:
+      - advanced
+      - composition
+    mock_response: |
+      import asyncio
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          client = OpenAIChatClient()
+          weather_agent = client.as_agent(
+              name="WeatherAgent",
+              description="Answers weather questions.",
+              tools=[get_weather],
+          )
+          main_agent = client.as_agent(
+              instructions="Respond in French.",
+              tools=[weather_agent.as_tool()],
+          )
+          result = await main_agent.run("Weather in Paris?")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: rag_vector_store
+    prompt: |
+      Set up RAG using Azure AI Search with semantic_kernel and as_agent_framework_tool.
+    expected_patterns:
+      - "AzureAISearchCollection"
+      - "create_search_function"
+      - "as_agent_framework_tool"
+      - "string_mapper="
+      - "KernelParameterMetadata"
+    tags:
+      - advanced
+      - rag
+    mock_response: |
+      from semantic_kernel.connectors.azure_ai_search import AzureAISearchCollection
+      from semantic_kernel.functions import KernelParameterMetadata
+
+      search_function = collection.create_search_function(
+          function_name="search_kb",
+          description="Search the knowledge base.",
+          search_type="keyword_hybrid",
+          parameters=[
+              KernelParameterMetadata(name="query", description="Search query.", type="str", is_required=True, type_object=str),
+          ],
+          string_mapper=lambda x: f"[{x.record.category}] {x.record.title}: {x.record.content}",
+      )
+      search_tool = search_function.as_agent_framework_tool()
+      agent = client.as_agent(instructions="...", tools=search_tool)
+
+  - name: error_mcp_without_async_with
+    prompt: |
+      Show the WRONG pattern of using MCPStdioTool without async with.
+    expected_patterns:
+      - "MCPStdioTool("
+      - "agent.run"
+    tags:
+      - error-handling
+    mock_response: |
+      from agent_framework import MCPStdioTool
+
+      mcp = MCPStdioTool(name="calc", command="uvx", args=["mcp-server-calculator"])
+      result = await agent.run("Calculate", tools=mcp)

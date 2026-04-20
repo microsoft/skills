@@ -1,0 +1,145 @@
+# Test scenarios for azure-maf-declarative-workflows-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: minimal_yaml_workflow
+    prompt: |
+      Create a minimal declarative workflow YAML with a SendActivity action.
+    expected_patterns:
+      - "name:"
+      - "actions:"
+      - "kind: SendActivity"
+      - "activity:"
+      - "text:"
+    tags:
+      - basic
+      - yaml
+    mock_response: |
+      name: greeting-workflow
+      actions:
+        - kind: SendActivity
+          activity:
+            text: "Hello, welcome!"
+
+  - name: python_workflow_factory
+    prompt: |
+      Load and run a declarative workflow from a YAML file using WorkflowFactory in Python.
+    expected_patterns:
+      - "from agent_framework.declarative import WorkflowFactory"
+      - "WorkflowFactory()"
+      - "register_agent"
+      - "create_workflow_from_yaml_path"
+      - "await workflow.run"
+    forbidden_patterns:
+      - "from agent_framework import WorkflowFactory"
+    tags:
+      - basic
+      - python
+    mock_response: |
+      import asyncio
+      from pathlib import Path
+      from agent_framework.declarative import WorkflowFactory
+
+      async def main():
+          factory = WorkflowFactory()
+          factory.register_agent("MyAgent", agent)
+          workflow = factory.create_workflow_from_yaml_path(
+              Path(__file__).parent / "workflow.yaml"
+          )
+          result = await workflow.run({"name": "Alice"})
+          for output in result.get_outputs():
+              print(f"Output: {output}")
+
+      asyncio.run(main())
+
+  - name: expression_syntax
+    prompt: |
+      Create a YAML workflow that uses expression syntax with = prefix.
+    expected_patterns:
+      - "=Concat("
+      - "Workflow.Inputs.name"
+    tags:
+      - basic
+      - expressions
+    mock_response: |
+      name: greeting-workflow
+      inputs:
+        name:
+          type: string
+          description: User's name
+      actions:
+        - kind: SendActivity
+          activity:
+            text: =Concat("Hello, ", Workflow.Inputs.name, "!")
+
+  - name: if_control_flow
+    prompt: |
+      Create a YAML workflow with If/then/else control flow.
+    expected_patterns:
+      - "kind: If"
+      - "condition:"
+      - "then:"
+      - "else:"
+    tags:
+      - advanced
+      - control-flow
+    mock_response: |
+      name: age-check
+      inputs:
+        age:
+          type: number
+      actions:
+        - kind: If
+          condition: =Workflow.Inputs.age >= 18
+          then:
+            - kind: SendActivity
+              activity:
+                text: "Welcome, adult user!"
+          else:
+            - kind: SendActivity
+              activity:
+                text: "Welcome, young user!"
+
+  - name: invoke_azure_agent
+    prompt: |
+      Create a YAML workflow that invokes a registered Azure agent.
+    expected_patterns:
+      - "kind: InvokeAzureAgent"
+      - "agent:"
+      - "name:"
+      - "conversationId:"
+    forbidden_patterns:
+      - "agentName:"
+    tags:
+      - advanced
+      - agent-invocation
+    mock_response: |
+      name: agent-workflow
+      actions:
+        - kind: InvokeAzureAgent
+          agent:
+            name: MyAgent
+          conversationId: =System.ConversationId
+          output:
+            responseObject: Local.Result
+            autoSend: true
+
+  - name: error_missing_name
+    prompt: |
+      Show a YAML workflow missing the required name field.
+    expected_patterns:
+      - "actions:"
+    forbidden_patterns:
+      - "name:"
+    tags:
+      - error-handling
+    mock_response: |
+      # WRONG: Missing required 'name' field
+      actions:
+        - kind: SendActivity
+          activity:
+            text: "Hello"

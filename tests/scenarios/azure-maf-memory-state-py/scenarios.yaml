@@ -1,0 +1,127 @@
+# Test scenarios for azure-maf-memory-state-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: thread_multi_turn
+    prompt: |
+      Create a multi-turn conversation using a thread for context persistence.
+    expected_patterns:
+      - "get_new_thread"
+      - "thread=thread"
+      - "await agent.run"
+    forbidden_patterns:
+      - "AgentThread()"
+    tags:
+      - basic
+      - threads
+    mock_response: |
+      import asyncio
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          agent = ChatAgent(chat_client=OpenAIChatClient(), instructions="You are helpful.")
+          thread = agent.get_new_thread()
+          await agent.run("My name is Alice", thread=thread)
+          r = await agent.run("What's my name?", thread=thread)
+          print(r.text)
+
+      asyncio.run(main())
+
+  - name: redis_message_store
+    prompt: |
+      Configure a ChatAgent with RedisChatMessageStore factory for persistent storage.
+    expected_patterns:
+      - "from agent_framework.redis import RedisChatMessageStore"
+      - "chat_message_store_factory=lambda"
+      - "redis_url="
+    forbidden_patterns:
+      - "from agent_framework import RedisChatMessageStore"
+      - "chat_message_store_factory=store"
+    tags:
+      - basic
+      - redis
+    mock_response: |
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+      from agent_framework.redis import RedisChatMessageStore
+
+      agent = ChatAgent(
+          chat_client=OpenAIChatClient(),
+          instructions="You are helpful.",
+          chat_message_store_factory=lambda: RedisChatMessageStore(
+              redis_url="redis://localhost:6379"
+          ),
+      )
+
+  - name: context_provider
+    prompt: |
+      Create a custom ContextProvider that injects additional instructions.
+    expected_patterns:
+      - "from agent_framework import ContextProvider, Context"
+      - "class TimeContext(ContextProvider)"
+      - "async def invoking"
+      - "return Context("
+      - "context_providers="
+    tags:
+      - advanced
+      - context-providers
+    mock_response: |
+      from agent_framework import ContextProvider, Context, ChatAgent, ChatMessage
+      from collections.abc import MutableSequence
+      from typing import Any
+
+      class TimeContext(ContextProvider):
+          async def invoking(self, messages: ChatMessage | MutableSequence[ChatMessage], **kwargs: Any) -> Context:
+              return Context(instructions="The current time is 3:00 PM.")
+
+          async def invoked(self, request_messages, response_messages=None, invoke_exception=None, **kwargs):
+              pass
+
+          def serialize(self) -> str:
+              return "{}"
+
+      agent = ChatAgent(chat_client=client, instructions="...", context_providers=TimeContext())
+
+  - name: mem0_provider
+    prompt: |
+      Configure an agent with Mem0Provider for automatic memory management.
+    expected_patterns:
+      - "from agent_framework.mem0 import Mem0Provider"
+      - "Mem0Provider("
+      - "api_key="
+      - "user_id="
+      - "context_providers="
+    forbidden_patterns:
+      - "from agent_framework import Mem0Provider"
+    tags:
+      - advanced
+      - mem0
+    mock_response: |
+      from agent_framework import ChatAgent
+      from agent_framework.mem0 import Mem0Provider
+
+      memory = Mem0Provider(api_key="your-key", user_id="user_123", application_id="my_app")
+      agent = ChatAgent(chat_client=client, instructions="...", context_providers=memory)
+
+  - name: error_shared_store_instance
+    prompt: |
+      Show the WRONG pattern of sharing a single store instance across threads.
+    expected_patterns:
+      - "shared_store"
+      - "lambda: shared_store"
+    tags:
+      - error-handling
+    mock_response: |
+      from agent_framework import ChatAgent, ChatMessageStore
+
+      # WRONG: Sharing a single store across threads
+      shared_store = ChatMessageStore()
+      agent = ChatAgent(
+          chat_client=client,
+          chat_message_store_factory=lambda: shared_store,  # Wrong — each thread needs its own store
+      )

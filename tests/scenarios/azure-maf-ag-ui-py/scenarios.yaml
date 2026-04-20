@@ -1,0 +1,145 @@
+# Test scenarios for azure-maf-ag-ui-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: fastapi_sse_endpoint
+    prompt: |
+      Create a FastAPI AG-UI endpoint with SSE streaming using add_agent_framework_fastapi_endpoint.
+    expected_patterns:
+      - "from agent_framework_ag_ui import add_agent_framework_fastapi_endpoint"
+      - "from fastapi import FastAPI"
+      - "FastAPI()"
+      - "add_agent_framework_fastapi_endpoint(app"
+    forbidden_patterns:
+      - "from agent_framework.ag_ui import"
+      - "from ag_ui import"
+    tags:
+      - basic
+      - fastapi
+    mock_response: |
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+      from agent_framework_ag_ui import add_agent_framework_fastapi_endpoint
+      from fastapi import FastAPI
+
+      agent = ChatAgent(
+          name="MyAgent",
+          chat_client=OpenAIChatClient(),
+          instructions="You are helpful.",
+      )
+
+      app = FastAPI()
+      add_agent_framework_fastapi_endpoint(app, agent, "/")
+
+  - name: run_with_uvicorn
+    prompt: |
+      Run the AG-UI FastAPI application with uvicorn.
+    expected_patterns:
+      - "uvicorn"
+      - "host="
+      - "port="
+    tags:
+      - basic
+      - deployment
+    mock_response: |
+      import uvicorn
+      from app import app
+
+      if __name__ == "__main__":
+          uvicorn.run(app, host="0.0.0.0", port=8000)
+
+  - name: frontend_tool
+    prompt: |
+      Create a frontend tool that renders a component on the client side.
+    expected_patterns:
+      - "FrontendTool"
+      - "name="
+      - "description="
+      - "component="
+      - "tools=["
+    tags:
+      - advanced
+      - frontend
+    mock_response: |
+      from agent_framework_ag_ui import FrontendTool
+      from agent_framework import ChatAgent
+
+      weather_widget = FrontendTool(
+          name="weather_widget",
+          description="Shows a weather widget for a location.",
+          component="WeatherWidget",
+      )
+
+      agent = ChatAgent(
+          chat_client=client,
+          instructions="Use the weather widget to show weather.",
+          tools=[weather_widget],
+      )
+
+  - name: state_sync
+    prompt: |
+      Use shared_state for synchronizing state between agent and client.
+    expected_patterns:
+      - "shared_state"
+      - "agent_factory"
+    tags:
+      - advanced
+      - state
+    mock_response: |
+      from agent_framework_ag_ui import add_agent_framework_fastapi_endpoint
+
+      def agent_factory(shared_state):
+          instructions = f"User preference: {shared_state.get('theme', 'default')}"
+          return ChatAgent(
+              chat_client=client,
+              instructions=instructions,
+          )
+
+      add_agent_framework_fastapi_endpoint(app, agent_factory, "/")
+
+  - name: cors_configuration
+    prompt: |
+      Add CORS middleware to the AG-UI FastAPI app for cross-origin access.
+    expected_patterns:
+      - "CORSMiddleware"
+      - "add_middleware"
+      - "allow_origins"
+      - "allow_methods"
+    tags:
+      - basic
+      - deployment
+    mock_response: |
+      from fastapi import FastAPI
+      from fastapi.middleware.cors import CORSMiddleware
+
+      app = FastAPI()
+      app.add_middleware(
+          CORSMiddleware,
+          allow_origins=["http://localhost:3000"],
+          allow_credentials=True,
+          allow_methods=["*"],
+          allow_headers=["*"],
+      )
+
+  - name: error_missing_cors
+    prompt: |
+      Show the WRONG pattern of deploying AG-UI without CORS configuration.
+    expected_patterns:
+      - "FastAPI()"
+      - "add_agent_framework_fastapi_endpoint"
+    forbidden_patterns:
+      - "CORSMiddleware"
+      - "add_middleware"
+    tags:
+      - error-handling
+    mock_response: |
+      from fastapi import FastAPI
+      from agent_framework_ag_ui import add_agent_framework_fastapi_endpoint
+
+      # WRONG: Missing CORS — frontend will get blocked by browser
+      app = FastAPI()
+      add_agent_framework_fastapi_endpoint(app, agent, "/")

@@ -1,0 +1,228 @@
+# Test scenarios for azure-maf-agent-types-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: openai_chat_client
+    prompt: |
+      Create an agent using OpenAIChatClient with explicit model and API key.
+    expected_patterns:
+      - "from agent_framework.openai import OpenAIChatClient"
+      - "OpenAIChatClient("
+      - "as_agent"
+      - "instructions="
+    forbidden_patterns:
+      - "from agent_framework import OpenAIChatClient"
+    tags:
+      - basic
+      - openai
+    mock_response: |
+      import asyncio
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          agent = OpenAIChatClient(
+              ai_model_id="gpt-4o-mini",
+              api_key="your-api-key",
+          ).as_agent(instructions="You are helpful.")
+          result = await agent.run("Hello")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: azure_openai_responses_client
+    prompt: |
+      Create an agent using AzureOpenAIResponsesClient with sync credential.
+    expected_patterns:
+      - "from agent_framework.azure import AzureOpenAIResponsesClient"
+      - "from azure.identity import AzureCliCredential"
+      - "credential=AzureCliCredential()"
+    forbidden_patterns:
+      - "from azure.identity.aio import"
+      - "async_credential="
+    tags:
+      - basic
+      - azure
+    mock_response: |
+      import asyncio
+      from agent_framework.azure import AzureOpenAIResponsesClient
+      from azure.identity import AzureCliCredential
+
+      async def main():
+          agent = AzureOpenAIResponsesClient(
+              credential=AzureCliCredential(),
+          ).as_agent(instructions="You are helpful.")
+          result = await agent.run("Hello")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: anthropic_client
+    prompt: |
+      Create an agent using AnthropicClient with API key.
+    expected_patterns:
+      - "from agent_framework.anthropic import AnthropicClient"
+      - "AnthropicClient("
+      - "as_agent"
+    forbidden_patterns:
+      - "from agent_framework import AnthropicClient"
+    tags:
+      - basic
+      - anthropic
+    mock_response: |
+      import asyncio
+      from agent_framework.anthropic import AnthropicClient
+
+      async def main():
+          agent = AnthropicClient().as_agent(
+              instructions="You are helpful."
+          )
+          result = await agent.run("Hello")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: azure_ai_foundry_agent
+    prompt: |
+      Create an agent using AzureAIAgentClient with async credential and async with.
+    expected_patterns:
+      - "from agent_framework.azure import AzureAIAgentClient"
+      - "from azure.identity.aio import AzureCliCredential"
+      - "async with"
+      - "async_credential=credential"
+    forbidden_patterns:
+      - "from azure.identity import AzureCliCredential"
+      - "credential=AzureCliCredential()"
+    tags:
+      - basic
+      - azure-foundry
+      - async
+    mock_response: |
+      import asyncio
+      from agent_framework.azure import AzureAIAgentClient
+      from azure.identity.aio import AzureCliCredential
+
+      async def main():
+          async with (
+              AzureCliCredential() as credential,
+              AzureAIAgentClient(async_credential=credential).as_agent(
+                  instructions="You are helpful."
+              ) as agent,
+          ):
+              result = await agent.run("Hello!")
+              print(result.text)
+
+      asyncio.run(main())
+
+  - name: a2a_agent
+    prompt: |
+      Create an A2A agent using agent card discovery from a remote host.
+    expected_patterns:
+      - "from agent_framework.a2a import A2AAgent"
+      - "A2ACardResolver"
+      - "get_agent_card"
+      - "/.well-known/agent.json"
+    forbidden_patterns:
+      - "/.well-known/agent-card.json"
+    tags:
+      - basic
+      - a2a
+    mock_response: |
+      import asyncio
+      import httpx
+      from a2a.client import A2ACardResolver
+      from agent_framework.a2a import A2AAgent
+
+      async def main():
+          async with httpx.AsyncClient(timeout=60.0) as http_client:
+              resolver = A2ACardResolver(httpx_client=http_client, base_url="https://my-host")
+              card = await resolver.get_agent_card(relative_card_path="/.well-known/agent.json")
+              agent = A2AAgent(name=card.name, description=card.description, agent_card=card, url="https://my-host")
+              result = await agent.run("Hello")
+              print(result.text)
+
+      asyncio.run(main())
+
+  - name: explicit_chat_agent_wrapper
+    prompt: |
+      Create a ChatAgent explicitly with chat_client and tools parameters.
+    expected_patterns:
+      - "from agent_framework import ChatAgent"
+      - "ChatAgent("
+      - "chat_client="
+      - "tools="
+    forbidden_patterns:
+      - "as_agent"
+    tags:
+      - basic
+      - chat-agent
+    mock_response: |
+      import asyncio
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+
+      def get_weather(location: str) -> str:
+          """Get weather for a location."""
+          return f"Sunny in {location}"
+
+      async def main():
+          agent = ChatAgent(
+              chat_client=OpenAIChatClient(),
+              instructions="You are a weather assistant.",
+              tools=[get_weather],
+          )
+          result = await agent.run("Weather in Seattle?")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: error_wrong_import_path
+    prompt: |
+      Show the WRONG way to import provider clients directly from agent_framework.
+    expected_patterns:
+      - "from agent_framework import OpenAIChatClient"
+    tags:
+      - error-handling
+    mock_response: |
+      # WRONG: Provider clients must be imported from their submodules
+      from agent_framework import OpenAIChatClient  # Wrong — use agent_framework.openai
+
+  - name: custom_agent_implementation
+    prompt: |
+      Create a custom agent by extending BaseAgent with run and run_stream methods.
+    expected_patterns:
+      - "from agent_framework import BaseAgent"
+      - "class EchoAgent(BaseAgent)"
+      - "async def run"
+      - "async def run_stream"
+      - "_normalize_messages"
+    forbidden_patterns:
+      - "ChatAgent"
+    tags:
+      - advanced
+      - custom-agent
+    mock_response: |
+      from agent_framework import BaseAgent, AgentResponse, AgentResponseUpdate, AgentThread, ChatMessage
+      from collections.abc import AsyncIterable
+      from typing import Any
+
+      class EchoAgent(BaseAgent):
+          async def run(
+              self,
+              messages: str | ChatMessage | list[str] | list[ChatMessage] | None = None,
+              *,
+              thread: AgentThread | None = None,
+              **kwargs: Any,
+          ) -> AgentResponse:
+              normalized = self._normalize_messages(messages)
+              text = normalized[-1].text if normalized else "No input"
+              response_msg = ChatMessage(role="assistant", text=f"Echo: {text}")
+              if thread is not None:
+                  await self._notify_thread_of_new_messages(thread, normalized, response_msg)
+              return AgentResponse(messages=[response_msg])
+
+          async def run_stream(self, messages=None, *, thread=None, **kwargs) -> AsyncIterable[AgentResponseUpdate]:
+              yield AgentResponseUpdate(text="Echo stream")

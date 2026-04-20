@@ -1,0 +1,115 @@
+# Test scenarios for azure-maf-hosting-deployment-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: devui_programmatic
+    prompt: |
+      Launch DevUI programmatically with an agent using serve().
+    expected_patterns:
+      - "from agent_framework.devui import serve"
+      - "serve(entities="
+      - "auto_open="
+    forbidden_patterns:
+      - "from agent_framework_devui import serve"
+    tags:
+      - basic
+      - devui
+    mock_response: |
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+      from agent_framework.devui import serve
+
+      agent = ChatAgent(
+          name="MyAgent",
+          chat_client=OpenAIChatClient(),
+          instructions="You are helpful.",
+      )
+      serve(entities=[agent], auto_open=True)
+
+  - name: ag_ui_fastapi
+    prompt: |
+      Set up an AG-UI endpoint with FastAPI for production hosting.
+    expected_patterns:
+      - "from agent_framework_ag_ui import add_agent_framework_fastapi_endpoint"
+      - "from fastapi import FastAPI"
+      - "FastAPI()"
+      - "add_agent_framework_fastapi_endpoint(app, agent"
+    forbidden_patterns:
+      - "from agent_framework.ag_ui import"
+    tags:
+      - basic
+      - ag-ui
+      - production
+    mock_response: |
+      from agent_framework import ChatAgent
+      from agent_framework_ag_ui import add_agent_framework_fastapi_endpoint
+      from fastapi import FastAPI
+
+      agent = ChatAgent(chat_client=client, instructions="...", name="MyAgent")
+      app = FastAPI()
+      add_agent_framework_fastapi_endpoint(app, agent, "/")
+
+  - name: azure_functions_durable
+    prompt: |
+      Set up durable agents with AgentFunctionApp for Azure Functions.
+    expected_patterns:
+      - "from agent_framework.azure import AgentFunctionApp"
+      - "AgentFunctionApp(agents="
+      - "name="
+    tags:
+      - basic
+      - azure-functions
+    mock_response: |
+      import os
+      from agent_framework.azure import AgentFunctionApp, AzureOpenAIChatClient
+      from azure.identity import DefaultAzureCredential
+
+      agent = AzureOpenAIChatClient(
+          credential=DefaultAzureCredential(),
+          endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+          deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+      ).as_agent(instructions="You are helpful.", name="MyAgent")
+
+      app = AgentFunctionApp(agents=[agent])
+
+  - name: devui_directory_discovery
+    prompt: |
+      Set up an agent directory for DevUI discovery with proper __init__.py export.
+    expected_patterns:
+      - "__init__.py"
+      - "agent ="
+      - "ChatAgent("
+      - "name="
+    forbidden_patterns:
+      - "my_agent ="
+    tags:
+      - advanced
+      - devui
+    mock_response: |
+      # weather_agent/__init__.py
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+
+      agent = ChatAgent(
+          name="weather_agent",
+          chat_client=OpenAIChatClient(),
+          instructions="You are a weather assistant.",
+      )
+
+  - name: error_devui_production
+    prompt: |
+      Show the WRONG pattern of using DevUI serve() for production deployment.
+    expected_patterns:
+      - "serve("
+      - 'host="0.0.0.0"'
+    tags:
+      - error-handling
+    mock_response: |
+      from agent_framework.devui import serve
+
+      # WRONG: DevUI is for development only, not production
+      serve(entities=[agent], host="0.0.0.0", port=80)

@@ -1,0 +1,259 @@
+# Test scenarios for azure-maf-getting-started-py skill evaluation
+# Tests basic agent creation, running, streaming, and credential patterns
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: basic_openai_agent
+    prompt: |
+      Create a basic agent using OpenAIChatClient that responds to a simple question.
+      Use asyncio.run as the entry point.
+    expected_patterns:
+      - "from agent_framework.openai import OpenAIChatClient"
+      - "as_agent"
+      - "instructions="
+      - "await agent.run"
+      - "asyncio.run"
+    forbidden_patterns:
+      - "from agent_framework import OpenAIChatClient"
+    tags:
+      - basic
+      - openai
+    mock_response: |
+      import asyncio
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          agent = OpenAIChatClient().as_agent(
+              instructions="You are a helpful assistant."
+          )
+          result = await agent.run("What is 2+2?")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: azure_openai_agent_sync_credential
+    prompt: |
+      Create an agent using AzureOpenAIChatClient with AzureCliCredential.
+      Use environment variables for endpoint and deployment name.
+    expected_patterns:
+      - "from agent_framework.azure import AzureOpenAIChatClient"
+      - "from azure.identity import AzureCliCredential"
+      - "credential=AzureCliCredential()"
+      - "as_agent"
+    forbidden_patterns:
+      - "from azure.identity.aio import AzureCliCredential"
+      - "async with.*AzureCliCredential"
+      - "async_credential="
+    tags:
+      - basic
+      - azure
+      - authentication
+    mock_response: |
+      import asyncio
+      import os
+      from agent_framework.azure import AzureOpenAIChatClient
+      from azure.identity import AzureCliCredential
+
+      async def main():
+          agent = AzureOpenAIChatClient(
+              credential=AzureCliCredential(),
+              endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+              deployment_name=os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"],
+          ).as_agent(instructions="You are a helpful assistant.")
+          result = await agent.run("Hello!")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: azure_foundry_async_credential
+    prompt: |
+      Create an agent using AzureAIClient with async credential from azure.identity.aio.
+      Use proper async context managers for both credential and agent.
+    expected_patterns:
+      - "from azure.identity.aio import AzureCliCredential"
+      - "from agent_framework.azure import AzureAIClient"
+      - "async with"
+      - "async_credential=credential"
+    forbidden_patterns:
+      - "from azure.identity import AzureCliCredential"
+      - "credential=AzureCliCredential()"
+    tags:
+      - basic
+      - azure-foundry
+      - authentication
+      - async
+    mock_response: |
+      import asyncio
+      from agent_framework.azure import AzureAIClient
+      from azure.identity.aio import AzureCliCredential
+
+      async def main():
+          async with (
+              AzureCliCredential() as credential,
+              AzureAIClient(async_credential=credential).as_agent(
+                  instructions="You are helpful."
+              ) as agent,
+          ):
+              result = await agent.run("Hello!")
+              print(result.text)
+
+      asyncio.run(main())
+
+  - name: streaming_response
+    prompt: |
+      Create an agent and use run_stream to get a streaming response.
+      Print each chunk as it arrives using async for.
+    expected_patterns:
+      - "async for"
+      - "run_stream"
+      - "chunk.text"
+      - "end=\"\""
+      - "flush=True"
+    forbidden_patterns:
+      - "await agent.run_stream"
+    tags:
+      - basic
+      - streaming
+      - async
+    mock_response: |
+      import asyncio
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          agent = OpenAIChatClient().as_agent(instructions="You are helpful.")
+          async for chunk in agent.run_stream("Tell me a story"):
+              if chunk.text:
+                  print(chunk.text, end="", flush=True)
+
+      asyncio.run(main())
+
+  - name: multi_turn_with_thread
+    prompt: |
+      Create a multi-turn conversation using a thread to maintain context.
+      Ask two questions where the second depends on the first.
+    expected_patterns:
+      - "get_new_thread"
+      - "thread=thread"
+      - "await agent.run"
+    forbidden_patterns:
+      - "AgentThread()"
+      - "thread=\""
+    tags:
+      - basic
+      - multi-turn
+      - threads
+    mock_response: |
+      import asyncio
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          agent = OpenAIChatClient().as_agent(instructions="You are helpful.")
+          thread = agent.get_new_thread()
+          r1 = await agent.run("My name is Alice", thread=thread)
+          print(r1.text)
+          r2 = await agent.run("What's my name?", thread=thread)
+          print(r2.text)
+
+      asyncio.run(main())
+
+  - name: error_wrong_credential_type
+    prompt: |
+      Create an AzureAIClient agent using sync credential instead of async.
+      This should demonstrate the WRONG pattern.
+    expected_patterns:
+      - "from azure.identity import AzureCliCredential"
+      - "AzureAIClient"
+    forbidden_patterns:
+      - "from azure.identity.aio import"
+    tags:
+      - error-handling
+      - authentication
+    mock_response: |
+      import asyncio
+      from agent_framework.azure import AzureAIClient
+      from azure.identity import AzureCliCredential
+
+      async def main():
+          # WRONG: AzureAIClient requires async credential from azure.identity.aio
+          credential = AzureCliCredential()
+          agent = AzureAIClient(async_credential=credential).as_agent(
+              instructions="You are helpful."
+          )
+          result = await agent.run("Hello")
+
+      asyncio.run(main())
+
+  - name: thread_serialization
+    prompt: |
+      Show how to serialize a thread to JSON and deserialize it later
+      for continuing a conversation.
+    expected_patterns:
+      - "await thread.serialize()"
+      - "await agent.deserialize_thread"
+      - "json.dump"
+    forbidden_patterns:
+      - "pickle"
+    tags:
+      - advanced
+      - serialization
+    mock_response: |
+      import asyncio
+      import json
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          agent = OpenAIChatClient().as_agent(instructions="You are helpful.")
+          thread = agent.get_new_thread()
+          await agent.run("My name is Alice", thread=thread)
+
+          serialized = await thread.serialize()
+          with open("thread.json", "w") as f:
+              json.dump(serialized, f)
+
+          with open("thread.json") as f:
+              data = json.load(f)
+          restored = await agent.deserialize_thread(data)
+          r = await agent.run("What's my name?", thread=restored)
+          print(r.text)
+
+      asyncio.run(main())
+
+  - name: multimodal_image_input
+    prompt: |
+      Send an image URL to the agent using ChatMessage with UriContent.
+      Ask the agent to describe the image.
+    expected_patterns:
+      - "ChatMessage"
+      - "TextContent"
+      - "UriContent"
+      - "Role.USER"
+      - "media_type="
+    forbidden_patterns:
+      - "role=\"user\""
+      - "DataContent"
+    tags:
+      - advanced
+      - multimodal
+    mock_response: |
+      import asyncio
+      from agent_framework import ChatMessage, TextContent, UriContent, Role
+      from agent_framework.openai import OpenAIChatClient
+
+      async def main():
+          agent = OpenAIChatClient().as_agent(instructions="Describe images.")
+          thread = agent.get_new_thread()
+
+          messages = [
+              ChatMessage(role=Role.USER, contents=[
+                  TextContent(text="What is in this image?"),
+                  UriContent(uri="https://example.com/photo.jpg", media_type="image/jpeg"),
+              ])
+          ]
+          result = await agent.run(messages, thread=thread)
+          print(result.text)
+
+      asyncio.run(main())

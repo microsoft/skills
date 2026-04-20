@@ -12,7 +12,7 @@ Skills, custom agents, AGENTS.md templates, and MCP configurations for AI coding
 
 > **Blog post:** [Context-Driven Development: Agent Skills for Microsoft Foundry and Azure](https://devblogs.microsoft.com/all-things-azure/context-driven-development-agent-skills-for-microsoft-foundry-and-azure/)
 
-> **🔍 Skill Explorer:** [Browse all 132 skills with 1-click install](https://microsoft.github.io/skills/)
+> **🔍 Skill Explorer:** [Browse all 143 skills with 1-click install](https://microsoft.github.io/skills/)
 
 ## Quick Start
 
@@ -59,7 +59,7 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 | Resource | Description |
 |----------|-------------|
-| **[128 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
+| **[172 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
 | **[Plugins](#plugins)** | Installable plugin packages (deep-wiki, azure-skills and more) |
 | **[Custom Agents](#agents)** | Role-specific agents (backend, frontend, infrastructure, planner) |
 | **[AGENTS.md](AGENTS.md)** | Template for configuring agent behavior in your projects |
@@ -70,12 +70,12 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ## Skill Catalog
 
-> 132 skills in `.github/skills/` — flat structure with language suffixes for automatic discovery
+> 172 skills in `.github/skills/` — flat structure with language suffixes for automatic discovery
 
 | Language | Count | Suffix | 
 |----------|-------|--------|
-| [Core](#core) | 9 | — |
-| [Python](#python) | 41 | `-py` |
+| [Core](#core) | 7 | — |
+| [Python](#python) | 53 | `-py` |
 | [.NET](#net) | 28 | `-dotnet` |
 | [TypeScript](#typescript) | 25 | `-ts` |
 | [Java](#java) | 25 | `-java` |
@@ -102,10 +102,10 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ### Python
 
-> 41 skills • suffix: `-py`
+> 53 skills • suffix: `-py`
 
 <details>
-<summary><strong>Foundry & AI</strong> (7 skills)</summary>
+<summary><strong>Foundry & AI</strong> (6 skills)</summary>
 
 | Skill | Description |
 |-------|-------------|
@@ -115,6 +115,25 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 | [agents-v2-py](.github/plugins/azure-sdk-python/skills/agents-v2-py/) | Foundry Agents SDK — container-based agents with ImageBasedHostedAgentDefinition, custom images, tools. |
 | [azure-ai-projects-py](.github/plugins/azure-sdk-python/skills/azure-ai-projects-py/) | High-level Foundry SDK — project client, versioned agents, evals, connections, OpenAI-compatible clients. |
 | [azure-search-documents-py](.github/plugins/azure-sdk-python/skills/azure-search-documents-py/) | AI Search SDK — vector search, hybrid search, semantic ranking, indexing, skillsets. |
+
+</details>
+
+<details>
+<summary><strong>MAF (Microsoft Agent Framework)</strong> (11 skills)</summary>
+
+| Skill | Description |
+|-------|-------------|
+| [azure-maf-ag-ui-py](.github/plugins/azure-maf-python/skills/azure-maf-ag-ui-py/) | MAF AG-UI Protocol — FastAPI integration, SSE streaming, frontend/backend tools, HITL, state sync. |
+| [azure-maf-agent-types-py](.github/plugins/azure-maf-python/skills/azure-maf-agent-types-py/) | MAF Agent Types — OpenAI, Azure OpenAI, Anthropic, A2A, Foundry, durable, and custom providers. |
+| [azure-maf-claude-agent-sdk-py](.github/plugins/azure-maf-python/skills/azure-maf-claude-agent-sdk-py/) | MAF Claude Agent SDK — ClaudeAgent, Claude Code CLI, built-in tools, MCP, permission modes. |
+| [azure-maf-declarative-workflows-py](.github/plugins/azure-maf-python/skills/azure-maf-declarative-workflows-py/) | MAF Declarative Workflows — YAML-based workflows, expressions, actions, WorkflowFactory. |
+| [azure-maf-getting-started-py](.github/plugins/azure-maf-python/skills/azure-maf-getting-started-py/) | MAF Getting Started — installation, ChatAgent, AgentThread, run/run_stream, multi-turn basics. |
+| [azure-maf-hosting-deployment-py](.github/plugins/azure-maf-python/skills/azure-maf-hosting-deployment-py/) | MAF Hosting & Deployment — DevUI, AG-UI+FastAPI, Azure Functions, Python vs .NET hosting. |
+| [azure-maf-memory-state-py](.github/plugins/azure-maf-python/skills/azure-maf-memory-state-py/) | MAF Memory & State — ChatMessageStore, Redis, thread serialization, Mem0, ContextProvider. |
+| [azure-maf-middleware-observability-py](.github/plugins/azure-maf-python/skills/azure-maf-middleware-observability-py/) | MAF Middleware & Observability — agent/function middleware, OpenTelemetry, Purview governance. |
+| [azure-maf-orchestration-patterns-py](.github/plugins/azure-maf-python/skills/azure-maf-orchestration-patterns-py/) | MAF Orchestration — sequential, concurrent, group chat, Magentic, handoff, HITL patterns. |
+| [azure-maf-tools-rag-py](.github/plugins/azure-maf-python/skills/azure-maf-tools-rag-py/) | MAF Tools & RAG — function tools, hosted tools, MCP, VectorStore search, agent composition. |
+| [azure-maf-workflow-fundamentals-py](.github/plugins/azure-maf-python/skills/azure-maf-workflow-fundamentals-py/) | MAF Workflows — WorkflowBuilder, executors, edges, Pregel model, checkpointing. |
 
 </details>
 
@@ -558,6 +577,7 @@ Plugins are installable packages containing curated sets of agents, commands, an
 |--------|-------------|----------|
 | [deep-wiki](https://github.com/microsoft/skills/tree/main/.github/plugins/deep-wiki) | AI-powered wiki generator with Mermaid diagrams, source citations, onboarding guides, AGENTS.md, and llms.txt | `/deep-wiki:generate`, `/deep-wiki:crisp`, `/deep-wiki:catalogue`, `/deep-wiki:page`, `/deep-wiki:research`, `/deep-wiki:ask`, `/deep-wiki:onboard`, `/deep-wiki:agents`, `/deep-wiki:llms`, `/deep-wiki:changelog`, `/deep-wiki:ado`, `/deep-wiki:build`, `/deep-wiki:deploy` |
 | [azure-skills](https://github.com/microsoft/skills/tree/main/.github/plugins/azure-skills) | Microsoft Azure MCP integration for cloud resource management, deployments, and Azure services. Includes 18 skills covering AI, storage, diagnostics, cost optimization, compliance, RBAC, and a 3-step deployment workflow (`azure-prepare` → `azure-validate` → `azure-deploy`). | Skills-based (no slash commands) — auto-triggered by intent matching via `azure` and `foundry-mcp` MCP servers |
+| [azure-maf-python](https://github.com/microsoft/skills/tree/main/.github/plugins/azure-maf-python) | Microsoft Agent Framework (MAF) skills for Python — 11 skills covering agent types, orchestration patterns, workflows, tools, memory, middleware, hosting, and AG-UI. | Skills-based (no slash commands) |
 ---
 
 ## MCP Servers
@@ -587,6 +607,7 @@ Role-specific agent personas in [`.github/agents/`](.github/agents/):
 | `infrastructure.agent.md` | Bicep, Azure CLI, Container Apps, networking |
 | `planner.agent.md` | Task decomposition, architecture decisions |
 | `presenter.agent.md` | Documentation, demos, technical writing |
+| `maf-architect.agent.md` | MAF solution architecture, agent system design, orchestration pattern selection |
 
 Use [`AGENTS.md`](AGENTS.md) as a template for configuring agent behavior in your own projects.
 
@@ -631,12 +652,12 @@ pnpm test
 
 ### Test Coverage Summary
 
-**128 skills with 1158 test scenarios** — all skills have acceptance criteria and test scenarios.
+**172 skills with 1220 test scenarios** — all skills have acceptance criteria and test scenarios.
 
 | Language | Skills | Scenarios | Top Skills by Scenarios |
 |----------|--------|-----------|-------------------------|
-| Core | 7 | 72 | `copilot-sdk` (11), `podcast-generation` (8), `skill-creator` (8) |
-| Python | 41 | 331 | `azure-ai-projects-py` (12), `pydantic-models-py` (12), `azure-ai-translation-text-py` (11) |
+| Core | 7 | 62 | `copilot-sdk` (11), `podcast-generation` (8), `skill-creator` (8) |
+| Python | 53 | 403 | `azure-ai-projects-py` (12), `pydantic-models-py` (12), `azure-ai-translation-text-py` (11) |
 | .NET | 29 | 290 | `azure-resource-manager-sql-dotnet` (14), `azure-resource-manager-redis-dotnet` (14), `azure-servicebus-dotnet` (13) |
 | TypeScript | 25 | 270 | `azure-storage-blob-ts` (17), `azure-servicebus-ts` (14), `aspire-ts` (13) |
 | Java | 26 | 195 | `azure-storage-blob-java` (12), `azure-identity-java` (12), `azure-data-tables-java` (11) |

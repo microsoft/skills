@@ -1,0 +1,167 @@
+# Test scenarios for azure-maf-middleware-observability-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: agent_run_middleware
+    prompt: |
+      Create agent-level middleware that logs every run invocation.
+    expected_patterns:
+      - "from agent_framework import AgentRunMiddleware"
+      - "class LoggingMiddleware(AgentRunMiddleware)"
+      - "async def invoke"
+      - "run_context"
+      - "next_handler"
+    forbidden_patterns:
+      - "from agent_framework.middleware import"
+    tags:
+      - basic
+      - agent-middleware
+    mock_response: |
+      import logging
+      from agent_framework import AgentRunMiddleware
+
+      logger = logging.getLogger(__name__)
+
+      class LoggingMiddleware(AgentRunMiddleware):
+          async def invoke(self, run_context, next_handler, **kwargs):
+              logger.info(f"Agent run started: {run_context.agent_name}")
+              response = await next_handler(run_context, **kwargs)
+              logger.info(f"Agent run completed: {run_context.agent_name}")
+              return response
+
+  - name: function_invocation_middleware
+    prompt: |
+      Create function-level middleware that validates tool call arguments.
+    expected_patterns:
+      - "from agent_framework import FunctionInvocationMiddleware"
+      - "class ValidationMiddleware(FunctionInvocationMiddleware)"
+      - "async def invoke"
+      - "function_context"
+      - "next_handler"
+    tags:
+      - basic
+      - function-middleware
+    mock_response: |
+      from agent_framework import FunctionInvocationMiddleware
+
+      class ValidationMiddleware(FunctionInvocationMiddleware):
+          async def invoke(self, function_context, next_handler, **kwargs):
+              for arg_name, arg_value in function_context.arguments.items():
+                  if isinstance(arg_value, str) and len(arg_value) > 10000:
+                      raise ValueError(f"Argument {arg_name} exceeds max length")
+              return await next_handler(function_context, **kwargs)
+
+  - name: attach_middleware_to_agent
+    prompt: |
+      Attach both agent-level and function-level middleware to a ChatAgent.
+    expected_patterns:
+      - "agent_run_middlewares="
+      - "function_invocation_middlewares="
+      - "ChatAgent("
+    forbidden_patterns:
+      - "middleware=["
+    tags:
+      - basic
+      - middleware
+    mock_response: |
+      from agent_framework import ChatAgent
+      from agent_framework.openai import OpenAIChatClient
+
+      agent = ChatAgent(
+          chat_client=OpenAIChatClient(),
+          instructions="You are helpful.",
+          agent_run_middlewares=[LoggingMiddleware()],
+          function_invocation_middlewares=[ValidationMiddleware()],
+      )
+
+  - name: opentelemetry_tracing
+    prompt: |
+      Configure OpenTelemetry tracing for an agent with console exporter.
+    expected_patterns:
+      - "from opentelemetry import trace"
+      - "TracerProvider"
+      - "ConsoleSpanExporter"
+      - "set_tracer_provider"
+    tags:
+      - basic
+      - observability
+    mock_response: |
+      from opentelemetry import trace
+      from opentelemetry.sdk.trace import TracerProvider
+      from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
+
+      provider = TracerProvider()
+      provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+      trace.set_tracer_provider(provider)
+
+  - name: azure_monitor_exporter
+    prompt: |
+      Configure Azure Monitor exporter for production telemetry.
+    expected_patterns:
+      - "AzureMonitorTraceExporter"
+      - "connection_string="
+      - "BatchSpanProcessor"
+    forbidden_patterns:
+      - "ConsoleSpanExporter"
+    tags:
+      - advanced
+      - observability
+      - production
+    mock_response: |
+      from opentelemetry import trace
+      from opentelemetry.sdk.trace import TracerProvider
+      from opentelemetry.sdk.trace.export import BatchSpanProcessor
+      from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
+
+      provider = TracerProvider()
+      provider.add_span_processor(
+          BatchSpanProcessor(
+              AzureMonitorTraceExporter(
+                  connection_string="InstrumentationKey=..."
+              )
+          )
+      )
+      trace.set_tracer_provider(provider)
+
+  - name: chat_level_middleware
+    prompt: |
+      Create a ChatCompletionMiddleware for modifying LLM requests and responses.
+    expected_patterns:
+      - "from agent_framework import ChatCompletionMiddleware"
+      - "async def invoke"
+      - "chat_context"
+      - "next_handler"
+    tags:
+      - advanced
+      - chat-middleware
+    mock_response: |
+      from agent_framework import ChatCompletionMiddleware
+
+      class ContentFilterMiddleware(ChatCompletionMiddleware):
+          async def invoke(self, chat_context, next_handler, **kwargs):
+              response = await next_handler(chat_context, **kwargs)
+              for msg in response.messages:
+                  if msg.text and "banned_word" in msg.text.lower():
+                      msg.text = "[Content filtered]"
+              return response
+
+  - name: error_sync_middleware_method
+    prompt: |
+      Show the WRONG pattern of using a synchronous invoke method in middleware.
+    expected_patterns:
+      - "def invoke"
+    forbidden_patterns:
+      - "async def invoke"
+    tags:
+      - error-handling
+    mock_response: |
+      from agent_framework import AgentRunMiddleware
+
+      class WrongMiddleware(AgentRunMiddleware):
+          # WRONG: invoke must be async
+          def invoke(self, run_context, next_handler, **kwargs):
+              return next_handler(run_context, **kwargs)

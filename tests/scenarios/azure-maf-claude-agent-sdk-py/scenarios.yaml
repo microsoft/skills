@@ -1,0 +1,157 @@
+# Test scenarios for azure-maf-claude-agent-sdk-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: basic_claude_agent
+    prompt: |
+      Create a ClaudeAgent with API key authentication.
+    expected_patterns:
+      - "from agent_framework.anthropic import ClaudeAgent"
+      - "ClaudeAgent("
+      - "api_key="
+    forbidden_patterns:
+      - "from agent_framework import ClaudeAgent"
+    tags:
+      - basic
+      - claude
+    mock_response: |
+      import asyncio
+      from agent_framework.anthropic import ClaudeAgent
+
+      async def main():
+          agent = ClaudeAgent(api_key="your-key", instructions="You are helpful.")
+          result = await agent.run("Hello!")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: claude_code_cli_tool
+    prompt: |
+      Create a ClaudeAgent that uses Claude Code CLI as a built-in tool.
+    expected_patterns:
+      - "ClaudeAgent("
+      - "tools=["
+      - "\"claude_code\""
+    tags:
+      - basic
+      - tools
+    mock_response: |
+      import asyncio
+      from agent_framework.anthropic import ClaudeAgent
+
+      async def main():
+          agent = ClaudeAgent(
+              api_key="your-key",
+              instructions="Use Claude Code for coding tasks.",
+              tools=["claude_code"],
+          )
+          result = await agent.run("Write a Python fibonacci function")
+          print(result.text)
+
+      asyncio.run(main())
+
+  - name: built_in_tools_web_search
+    prompt: |
+      Create a ClaudeAgent with web search and computer tools enabled.
+    expected_patterns:
+      - "tools=["
+      - "\"web_search\""
+      - "\"computer\""
+    tags:
+      - basic
+      - tools
+    mock_response: |
+      from agent_framework.anthropic import ClaudeAgent
+
+      agent = ClaudeAgent(
+          api_key="your-key",
+          tools=["web_search", "computer"],
+      )
+
+  - name: mcp_tool_connection
+    prompt: |
+      Connect an MCP server tool to a ClaudeAgent.
+    expected_patterns:
+      - "MCPStdioTool"
+      - "async with"
+      - "tools=mcp"
+    tags:
+      - advanced
+      - mcp
+    mock_response: |
+      import asyncio
+      from agent_framework import MCPStdioTool
+      from agent_framework.anthropic import ClaudeAgent
+
+      async def main():
+          async with MCPStdioTool(name="fs", command="uvx", args=["mcp-server-filesystem", "."]) as mcp:
+              agent = ClaudeAgent(
+                  api_key="your-key",
+                  instructions="Use the filesystem tool.",
+                  tools=mcp,
+              )
+              result = await agent.run("List files in the current directory")
+              print(result.text)
+
+      asyncio.run(main())
+
+  - name: permission_modes
+    prompt: |
+      Configure a ClaudeAgent with different permission modes.
+    expected_patterns:
+      - "allowed_tools="
+      - "disallowed_tools="
+    tags:
+      - advanced
+      - security
+    mock_response: |
+      from agent_framework.anthropic import ClaudeAgent
+
+      agent = ClaudeAgent(
+          api_key="your-key",
+          allowed_tools=["Read", "Grep", "Glob"],
+          disallowed_tools=["Shell", "Write"],
+      )
+
+  - name: agent_hooks
+    prompt: |
+      Create custom hooks for monitoring ClaudeAgent execution.
+    expected_patterns:
+      - "ClaudeAgentHooks"
+      - "on_tool_start"
+      - "on_tool_end"
+      - "hooks="
+    tags:
+      - advanced
+      - hooks
+    mock_response: |
+      from agent_framework.anthropic import ClaudeAgent, ClaudeAgentHooks
+
+      class MonitorHooks(ClaudeAgentHooks):
+          async def on_tool_start(self, tool_name, tool_input):
+              print(f"Tool starting: {tool_name}")
+
+          async def on_tool_end(self, tool_name, tool_output):
+              print(f"Tool completed: {tool_name}")
+
+      agent = ClaudeAgent(
+          api_key="your-key",
+          hooks=MonitorHooks(),
+      )
+
+  - name: error_wrong_import
+    prompt: |
+      Show the WRONG import pattern for ClaudeAgent.
+    expected_patterns:
+      - "from agent_framework import ClaudeAgent"
+    forbidden_patterns:
+      - "from agent_framework.anthropic import"
+    tags:
+      - error-handling
+    mock_response: |
+      # WRONG: ClaudeAgent must be imported from agent_framework.anthropic
+      from agent_framework import ClaudeAgent

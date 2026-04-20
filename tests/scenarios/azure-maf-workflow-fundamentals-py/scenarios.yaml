@@ -1,0 +1,170 @@
+# Test scenarios for azure-maf-workflow-fundamentals-py skill evaluation
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: class_based_executor
+    prompt: |
+      Create a class-based Executor with a @handler method that uppercases text.
+    expected_patterns:
+      - "from agent_framework import Executor, WorkflowContext, handler"
+      - "class UpperCase(Executor)"
+      - "@handler"
+      - "async def"
+      - "ctx.send_message"
+    forbidden_patterns:
+      - "from agent_framework.workflows import"
+      - "from agent_framework.executors import"
+    tags:
+      - basic
+      - executor
+    mock_response: |
+      from agent_framework import Executor, WorkflowContext, handler
+
+      class UpperCase(Executor):
+          @handler
+          async def to_upper(self, text: str, ctx: WorkflowContext[str]) -> None:
+              await ctx.send_message(text.upper())
+
+  - name: function_based_executor
+    prompt: |
+      Create a function-based executor using the @executor decorator.
+    expected_patterns:
+      - "from agent_framework import WorkflowContext, executor"
+      - "@executor"
+      - "async def"
+      - "ctx.send_message"
+    tags:
+      - basic
+      - executor
+    mock_response: |
+      from agent_framework import WorkflowContext, executor
+
+      @executor(id="upper_case_executor")
+      async def upper_case(text: str, ctx: WorkflowContext[str]) -> None:
+          await ctx.send_message(text.upper())
+
+  - name: workflow_build_and_run
+    prompt: |
+      Build a workflow with two executors connected by an edge and run it with streaming.
+    expected_patterns:
+      - "from agent_framework import WorkflowBuilder"
+      - "set_start_executor"
+      - "add_edge"
+      - "build()"
+      - "run_stream"
+      - "WorkflowOutputEvent"
+      - "async for"
+    forbidden_patterns:
+      - "run_streaming"
+      - "workflow.add_edge"
+    tags:
+      - basic
+      - workflow
+    mock_response: |
+      import asyncio
+      from agent_framework import WorkflowBuilder, WorkflowOutputEvent
+
+      async def main():
+          builder = WorkflowBuilder()
+          builder.set_start_executor(processor)
+          builder.add_edge(processor, formatter)
+          workflow = builder.build()
+
+          async for event in workflow.run_stream("hello"):
+              if isinstance(event, WorkflowOutputEvent):
+                  print(event.data)
+
+      asyncio.run(main())
+
+  - name: conditional_edge
+    prompt: |
+      Create a workflow with a conditional edge that routes based on message content.
+    expected_patterns:
+      - "add_edge"
+      - "condition="
+      - "lambda"
+    tags:
+      - advanced
+      - edges
+    mock_response: |
+      from agent_framework import WorkflowBuilder
+
+      builder = WorkflowBuilder()
+      builder.add_edge(
+          classifier, positive_handler,
+          condition=lambda result: result.sentiment == "positive"
+      )
+      builder.add_edge(
+          classifier, negative_handler,
+          condition=lambda result: result.sentiment == "negative"
+      )
+
+  - name: fan_out_fan_in
+    prompt: |
+      Create a workflow with fan-out to multiple workers and fan-in to an aggregator.
+    expected_patterns:
+      - "add_fan_out_edges"
+      - "add_fan_in_edge"
+    forbidden_patterns:
+      - "add_fan_in_edges"
+    tags:
+      - advanced
+      - edges
+    mock_response: |
+      from agent_framework import WorkflowBuilder
+
+      builder = WorkflowBuilder()
+      builder.set_start_executor(splitter)
+      builder.add_fan_out_edges(splitter, [worker1, worker2, worker3])
+      builder.add_fan_in_edge([worker1, worker2, worker3], aggregator)
+      workflow = builder.build()
+
+  - name: checkpointing
+    prompt: |
+      Enable checkpointing on a workflow and resume from a saved checkpoint.
+    expected_patterns:
+      - "InMemoryCheckpointStorage"
+      - "with_checkpointing"
+      - "checkpoint_id="
+    tags:
+      - advanced
+      - checkpointing
+    mock_response: |
+      import asyncio
+      from agent_framework import InMemoryCheckpointStorage, WorkflowBuilder, WorkflowOutputEvent
+
+      async def main():
+          storage = InMemoryCheckpointStorage()
+          workflow = builder.with_checkpointing(storage).build()
+
+          async for event in workflow.run_stream("input"):
+              if isinstance(event, WorkflowOutputEvent):
+                  print(event.data)
+
+          checkpoints = await storage.list_checkpoints()
+          saved = checkpoints[0]
+          async for event in workflow.run_stream("resume", checkpoint_id=saved.checkpoint_id):
+              pass
+
+      asyncio.run(main())
+
+  - name: error_missing_start_executor
+    prompt: |
+      Show the error when building a workflow without calling set_start_executor.
+    expected_patterns:
+      - "add_edge"
+      - "build()"
+    forbidden_patterns:
+      - "set_start_executor"
+    tags:
+      - error-handling
+    mock_response: |
+      from agent_framework import WorkflowBuilder
+
+      builder = WorkflowBuilder()
+      builder.add_edge(a, b)
+      workflow = builder.build()  # Validation error — no start executor set
