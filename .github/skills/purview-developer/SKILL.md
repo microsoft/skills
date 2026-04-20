@@ -672,6 +672,20 @@ pip install microsoft-agents-a365-runtime
 | Semantic Kernel | `Microsoft.Agents.A365.Observability.Extensions.SemanticKernel` | `microsoft-agents-a365-observability-extensions-semantic-kernel` |
 | LangChain | — | `microsoft-agents-a365-observability-extensions-langchain` |
 
+### Agent 365 Development Lifecycle
+
+Building an Agent 365 agent produces two artifacts: an **agent identity** (blueprint + Entra registration) and **agent code** (your logic + A365 SDK extensions). The lifecycle steps are:
+
+1. **Build and run agent** — Write your agent using any SDK (OpenAI, Semantic Kernel, LangChain, Agent Framework). Add A365 SDK extensions for observability, notifications, tooling, and identity. Use [Agent365-Samples](https://github.com/microsoft/Agent365-samples) for quick starts.
+2. **Setup Agent 365 config** — Run the Agent 365 CLI to create `a365.config.json` with tenant, subscription, and messaging endpoint details.
+3. **Setup agent blueprint** — The blueprint defines identity, permissions, and infrastructure. Run `a365 setup all` to create Azure resources (blueprint, MCP permissions, service principal). If not Global Administrator, a Global Admin must run `a365 setup admin` to complete OAuth2 grants.
+4. **Deploy** — Deploy agent code to Azure (or AWS/GCP). Optional if already hosted.
+5. **Publish to Microsoft 365 admin center** — Makes the agent visible in the admin registry for governance.
+6. **Create agent instances** — Instantiate from the blueprint. The agent appears in your org chart and is reachable via Teams or email.
+7. **Publish to Microsoft Marketplace** (optional) — Submit via Partner Center for broad distribution.
+
+> **Tip**: Steps 2–5 can be automated using the [AI-guided setup](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/ai-guided-setup), which walks through CLI installation, configuration, blueprint creation, deployment, and publishing interactively via GitHub Copilot, Claude Code, or OpenAI Codex.
+
 ### Agent 365 Blueprints and Governance
 
 Agent 365 agents operate under IT-approved **blueprints** — pre-configured definitions that specify:
@@ -681,6 +695,12 @@ Agent 365 agents operate under IT-approved **blueprints** — pre-configured def
 - Lifecycle metadata
 
 When a blueprint is activated for a tenant, every agent instance inherits its rules, ensuring consistent Purview governance across all agent interactions.
+
+### Testing Locally
+
+- Use [mock tooling servers](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/mock-tooling-server) to develop and test locally without authentication or external dependencies.
+- When ready, switch to production MCP servers with full authentication and Microsoft 365 integration.
+- Use [Dev Tunnels](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/test-with-devtunnels) to test with live Microsoft 365 applications before deploying to the cloud.
 
 ---
 
@@ -822,3 +842,5 @@ This skill is for **developers integrating Purview into code**. Do not use it fo
 - Agent 365 Observability SDK (.NET — GitHub): https://github.com/microsoft/Agent365-dotnet/tree/main/src/Observability
 - Agent 365 Observability (NuGet): https://www.nuget.org/packages/Microsoft.Agents.A365.Observability/
 - Agent 365 Monitoring: https://learn.microsoft.com/en-us/microsoft-agent-365/admin/monitor-agents
+- Agent 365 Development Lifecycle: https://learn.microsoft.com/en-us/microsoft-agent-365/developer/a365-dev-lifecycle
+- Agent 365 Samples: https://github.com/microsoft/Agent365-samples
