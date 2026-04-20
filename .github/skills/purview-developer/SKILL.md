@@ -1,27 +1,28 @@
 ---
 name: purview-developer
-description: "Build on the Microsoft Purview Developer Platform — integrate data protection, DLP policy enforcement, sensitivity labels, and compliance logging into apps and agents. Use when adding Purview to an application or agent, calling Purview APIs, applying sensitivity labels in code, integrating DLP into an agent, wiring Purview into Microsoft Agent Framework, or enabling Purview observability with Agent 365 SDK. Covers the Purview SDK, Microsoft Graph Purview resources, Agent Framework Purview middleware, and Agent 365 Observability SDK. Trigger on: Purview, Purview SDK, Purview API, sensitivity label, sensitivityLabel, contentActivity, DLP policy, data loss prevention, protection scope, processContent, dataSecurityAndGovernance, tenantDataSecurityAndGovernance, userDataSecurityAndGovernance, Microsoft Graph sensitivity label, contentActivity API, Purview with Agent Framework, Microsoft.Agents.AI.Purview, agent-framework-purview, PurviewPolicyMiddleware, collection policy, Agent 365, A365 SDK, Agent365, microsoft-agents-a365, A365 observability, Agent 365 Observability SDK."
+description: "Build on the Microsoft Purview Developer Platform — integrate data protection, DLP policy enforcement, sensitivity labels, and compliance logging into apps and agents. Use when adding Purview to an application or agent, calling Purview APIs, applying sensitivity labels in code, integrating DLP into an agent, or wiring Purview into Microsoft Agent Framework. Covers the Purview SDK, Microsoft Graph Purview resources, and Agent Framework Purview middleware. Also explains how Agent 365 telemetry flows into Purview for audit and compliance. Trigger on: Purview, Purview SDK, Purview API, sensitivity label, sensitivityLabel, contentActivity, DLP policy, data loss prevention, protection scope, processContent, dataSecurityAndGovernance, tenantDataSecurityAndGovernance, userDataSecurityAndGovernance, Microsoft Graph sensitivity label, contentActivity API, Purview with Agent Framework, Microsoft.Agents.AI.Purview, agent-framework-purview, PurviewPolicyMiddleware, collection policy."
 ---
 
 # Microsoft Purview Developer Platform
 
-Build apps and agents that integrate Microsoft Purview data protection, DLP policy enforcement, sensitivity labels, and compliance logging. The platform exposes four integration surfaces — choose the right one for your scenario.
+Build apps and agents that integrate Microsoft Purview data protection, DLP policy enforcement, sensitivity labels, and compliance logging. The platform exposes three integration surfaces — choose the right one for your scenario.
 
 ## Which Purview Surface Do I Call?
 
-The most common confusion: should I use Microsoft Graph directly, the Agent Framework middleware, or the Agent 365 SDK? Use this decision table:
+The most common confusion: should I use Microsoft Graph directly or the Agent Framework middleware? Use this decision table:
 
 | I want to… | Surface | Package / Endpoint |
 |---|---|---|
 | **Add DLP + compliance to an Agent Framework agent** | Agent Framework Purview middleware | `Microsoft.Agents.AI.Purview` (NuGet) / `agent-framework-purview` (PyPI) |
-| **Add enterprise observability, identity, and governance to any agent** | Agent 365 Observability SDK | `Microsoft.Agents.A365.Observability` (NuGet) / `microsoft-agents-a365-observability-core` (PyPI) |
 | **Enforce DLP policies on user content in my LOB app** | Microsoft Graph APIs (directly) | `POST /users/{id}/dataSecurityAndGovernance/processContent` |
 | **Log user activity for Purview compliance** | Microsoft Graph APIs (directly) | `POST /users/{id}/dataSecurityAndGovernance/activities/contentActivities` |
 | **Read sensitivity labels for a tenant** | Microsoft Graph APIs (directly) | `GET /security/dataSecurityAndGovernance/sensitivityLabels` |
 | **Determine which policies apply to a user** | Microsoft Graph APIs (directly) | `POST /users/{id}/dataSecurityAndGovernance/protectionScopes/compute` |
 | **Process content at the tenant level (batch/async)** | Microsoft Graph APIs (directly) | `POST /security/dataSecurityAndGovernance/processContentAsync` |
 
-> **Key rule**: The term "Purview SDK" refers to using the Microsoft Graph SDK clients (e.g., `Microsoft.Graph` for .NET, `msgraph-sdk-python` for Python) to call the Purview data security and governance APIs. The **Agent Framework Purview middleware** wraps these Graph calls for inline DLP enforcement. The **Agent 365 SDK** is a separate layer that adds enterprise observability, identity, notifications, and governed MCP tooling to agents built on _any_ framework — its telemetry flows into Purview and Defender for audit and compliance. **Choose the right combination**: use Agent Framework middleware for inline DLP, Agent 365 SDK for enterprise observability, or call Graph APIs directly for LOB apps. Do not duplicate the same calls across layers.
+> **Key rule**: The term "Purview SDK" refers to using the Microsoft Graph SDK clients (e.g., `Microsoft.Graph` for .NET, `msgraph-sdk-python` for Python) to call the Purview data security and governance APIs. The **Agent Framework Purview middleware** wraps these Graph calls for inline DLP enforcement. Do not duplicate the same calls across layers.
+>
+> **Agent 365 and Purview**: If you are building an Agent 365 agent, its Observability SDK sends telemetry that flows into Microsoft Purview and Microsoft Defender for audit and compliance. However, the A365 SDK itself is not a Purview integration — it is an enterprise agent platform. See the [Agent 365 developer skill](../agent-365-developer/SKILL.md) for full A365 guidance. You can combine Agent Framework Purview middleware (for inline DLP) with A365 Observability (for telemetry) in the same agent.
 
 ---
 
@@ -264,7 +265,7 @@ asyncio.run(main())
 
 ---
 
-## Scenario 3: Reading Governance State via protectionScopes
+## Scenario 3: Apply Data Governance and Protection to Your 3P Agent
 
 Before processing user content, call `protectionScopes/compute` to determine which policies apply. Cache the response and use the `ETag` header to detect policy changes.
 
@@ -626,81 +627,15 @@ Register your agent app and add these Microsoft Graph permissions to the Service
 
 ---
 
-## Scenario 5: Enterprise Observability with Agent 365 SDK
+## Agent 365 and Purview
 
-The **Agent 365 SDK** (A365) is a separate layer from the Agent Framework Purview middleware. While the Agent Framework middleware handles inline DLP enforcement, the Agent 365 Observability SDK provides enterprise-grade telemetry, tracing, and monitoring for agents built on _any_ framework (Agent Framework, OpenAI Agents SDK, Semantic Kernel, LangChain, etc.). This telemetry flows into Microsoft Purview and Microsoft Defender for audit, compliance, and threat detection.
+If you are building an [Agent 365](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/) agent, its **Observability SDK** automatically sends telemetry (invocation traces, tool calls, inference events) that flows into **Microsoft Purview** and **Microsoft Defender** for audit, compliance, and threat detection.
+
+- A365 Observability is **not a replacement** for the Agent Framework Purview middleware — it does not perform inline DLP enforcement.
+- You can use **both together**: Agent Framework Purview middleware for real-time DLP on content, and A365 Observability for enterprise telemetry and governance.
+- For full Agent 365 SDK guidance (identity, blueprints, notifications, tooling, deployment lifecycle), see the dedicated **Agent 365 developer skill**.
 
 > **Note**: Agent 365 is currently in preview and requires enrollment in the [Frontier preview program](https://adoption.microsoft.com/copilot/frontier-program/).
-
-### When to Use Agent 365 vs. Agent Framework Purview Middleware
-
-| Capability | Agent Framework Purview Middleware | Agent 365 Observability SDK |
-|---|---|---|
-| **Inline DLP enforcement** | ✅ Blocks/allows content in real time | ❌ Not its role |
-| **OpenTelemetry tracing** | ❌ | ✅ Distributed tracing for invocations, tools, inference |
-| **Works with any agent framework** | ❌ Agent Framework only | ✅ OpenAI, Semantic Kernel, LangChain, etc. |
-| **Agent identity (Entra ID)** | ❌ | ✅ Each agent gets its own Entra identity |
-| **Governed MCP tool access** | ❌ | ✅ IT-controlled tool server permissions |
-| **Notifications (Teams, Outlook)** | ❌ | ✅ @mentions, emails, comments |
-| **Defender integration** | ❌ | ✅ Threat detection and anomaly monitoring |
-
-You can use **both together**: Agent Framework Purview middleware for inline DLP, and Agent 365 Observability for telemetry and governance.
-
-### C# — Agent 365 Observability with Agent Framework
-
-```bash
-dotnet add package Microsoft.Agents.A365.Observability
-dotnet add package Microsoft.Agents.A365.Observability.Runtime
-dotnet add package Microsoft.Agents.A365.Observability.Hosting
-dotnet add package Microsoft.Agents.A365.Observability.Extensions.AgentFramework
-```
-
-### Python — Agent 365 Observability
-
-```bash
-pip install microsoft-agents-a365-observability-core
-pip install microsoft-agents-a365-observability-extensions-agent-framework
-pip install microsoft-agents-a365-runtime
-```
-
-### Framework-Specific Extensions
-
-| Framework | .NET Package | Python Package |
-|---|---|---|
-| Agent Framework | `Microsoft.Agents.A365.Observability.Extensions.AgentFramework` | `microsoft-agents-a365-observability-extensions-agent-framework` |
-| OpenAI Agents SDK | `Microsoft.Agents.A365.Observability.Extensions.OpenAI` | `microsoft-agents-a365-observability-extensions-openai` |
-| Semantic Kernel | `Microsoft.Agents.A365.Observability.Extensions.SemanticKernel` | `microsoft-agents-a365-observability-extensions-semantic-kernel` |
-| LangChain | — | `microsoft-agents-a365-observability-extensions-langchain` |
-
-### Agent 365 Development Lifecycle
-
-Building an Agent 365 agent produces two artifacts: an **agent identity** (blueprint + Entra registration) and **agent code** (your logic + A365 SDK extensions). The lifecycle steps are:
-
-1. **Build and run agent** — Write your agent using any SDK (OpenAI, Semantic Kernel, LangChain, Agent Framework). Add A365 SDK extensions for observability, notifications, tooling, and identity. Use [Agent365-Samples](https://github.com/microsoft/Agent365-samples) for quick starts.
-2. **Setup Agent 365 config** — Run the Agent 365 CLI to create `a365.config.json` with tenant, subscription, and messaging endpoint details.
-3. **Setup agent blueprint** — The blueprint defines identity, permissions, and infrastructure. Run `a365 setup all` to create Azure resources (blueprint, MCP permissions, service principal). If not Global Administrator, a Global Admin must run `a365 setup admin` to complete OAuth2 grants.
-4. **Deploy** — Deploy agent code to Azure (or AWS/GCP). Optional if already hosted.
-5. **Publish to Microsoft 365 admin center** — Makes the agent visible in the admin registry for governance.
-6. **Create agent instances** — Instantiate from the blueprint. The agent appears in your org chart and is reachable via Teams or email.
-7. **Publish to Microsoft Marketplace** (optional) — Submit via Partner Center for broad distribution.
-
-> **Tip**: Steps 2–5 can be automated using the [AI-guided setup](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/ai-guided-setup), which walks through CLI installation, configuration, blueprint creation, deployment, and publishing interactively via GitHub Copilot, Claude Code, or OpenAI Codex.
-
-### Agent 365 Blueprints and Governance
-
-Agent 365 agents operate under IT-approved **blueprints** — pre-configured definitions that specify:
-- Allowed MCP tool access and permissions
-- Security and compliance constraints (DLP, external access)
-- Audit and logging requirements
-- Lifecycle metadata
-
-When a blueprint is activated for a tenant, every agent instance inherits its rules, ensuring consistent Purview governance across all agent interactions.
-
-### Testing Locally
-
-- Use [mock tooling servers](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/mock-tooling-server) to develop and test locally without authentication or external dependencies.
-- When ready, switch to production MCP servers with full authentication and Microsoft 365 integration.
-- Use [Dev Tunnels](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/test-with-devtunnels) to test with live Microsoft 365 applications before deploying to the cloud.
 
 ---
 
@@ -837,10 +772,5 @@ This skill is for **developers integrating Purview into code**. Do not use it fo
 - Microsoft.Agents.AI.Purview (NuGet): https://www.nuget.org/packages/Microsoft.Agents.AI.Purview/
 - Agent Framework Purview — Python (GitHub): https://github.com/microsoft/agent-framework/tree/main/python/packages/purview
 - Agent Framework Purview — Python (PyPI): https://pypi.org/project/agent-framework-purview/
-- Agent 365 SDK Overview: https://learn.microsoft.com/en-us/microsoft-agent-365/developer/agent-365-sdk
-- Agent 365 SDK and CLI: https://learn.microsoft.com/en-us/microsoft-agent-365/developer/
-- Agent 365 Observability SDK (.NET — GitHub): https://github.com/microsoft/Agent365-dotnet/tree/main/src/Observability
-- Agent 365 Observability (NuGet): https://www.nuget.org/packages/Microsoft.Agents.A365.Observability/
-- Agent 365 Monitoring: https://learn.microsoft.com/en-us/microsoft-agent-365/admin/monitor-agents
-- Agent 365 Development Lifecycle: https://learn.microsoft.com/en-us/microsoft-agent-365/developer/a365-dev-lifecycle
-- Agent 365 Samples: https://github.com/microsoft/Agent365-samples
+- Agent 365 Observability and Purview: https://learn.microsoft.com/en-us/microsoft-agent-365/developer/agent-365-sdk
+- Agent 365 Developer Overview: https://learn.microsoft.com/en-us/microsoft-agent-365/developer/
