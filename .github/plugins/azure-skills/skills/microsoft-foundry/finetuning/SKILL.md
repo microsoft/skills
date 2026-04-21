@@ -66,6 +66,7 @@ Read the relevant reference file before performing any step:
 | `references/grader-design.md` | Designing effective RFT graders (type selection, partial credit, threshold calibration) |
 | `references/reward-hacking-prevention.md` | Preventing reward hacking in RFT (grader alignment, monitoring, iteration) |
 | `references/platform-bugs.md` | Known platform bugs and workarounds |
+| `references/large-file-uploads.md` | Uploading large training files (>100MB) via chunked Uploads API |
 
 # Scripts
 

@@ -105,7 +105,30 @@ def get_clients(base_url=None, azure_endpoint=None, project_endpoint=None, api_k
 
 
 def upload_file(openai_client, filepath: str, purpose: str = "fine-tune") -> str:
-    """Upload a file to Azure AI Foundry and wait for processing."""
+    """Upload a JSONL file to Azure AI Foundry and wait for processing.
+    
+    Automatically uses the chunked Uploads API for files >100MB,
+    since the standard files.create() silently fails on large files.
+    
+    Note: For files >100MB, the client must be an openai.AzureOpenAI instance
+    (not openai.OpenAI with a /v1/ URL). The /v1/ project endpoint does not
+    support the Uploads API.
+    """
+    import os
+    file_size = os.path.getsize(filepath)
+    
+    if file_size > 100 * 1024 * 1024:  # >100MB — safety margin below the ~150MB silent failure
+        # Verify client type: Uploads API requires AzureOpenAI, not OpenAI with /v1/ URL
+        import openai
+        if not isinstance(openai_client, openai.AzureOpenAI):
+            raise TypeError(
+                f"Large file upload ({file_size / 1024 / 1024:.0f} MB) requires an "
+                f"openai.AzureOpenAI client, but got {type(openai_client).__name__}. "
+                f"The /v1/ project endpoint does not support the Uploads API. "
+                f"Use get_clients(azure_endpoint=...) instead."
+            )
+        return _upload_large_file(openai_client, filepath, file_size, purpose)
+    
     print(f"📤 Uploading {filepath}...")
     with open(filepath, "rb") as f:
         file_obj = openai_client.files.create(file=f, purpose=purpose)
@@ -114,6 +137,103 @@ def upload_file(openai_client, filepath: str, purpose: str = "fine-tune") -> str
     openai_client.files.wait_for_processing(file_obj.id)
     print(f"   ✅ File ready")
     return file_obj.id
+
+
+def _upload_large_file(
+    openai_client, filepath: str, file_size: int, purpose: str = "fine-tune",
+    chunk_size: int = 64 * 1024 * 1024,
+) -> str:
+    """Upload a large JSONL file using the chunked Uploads API.
+
+    The standard files.create() silently fails on files over ~150MB.
+    We trigger this path at 100MB as a safety margin. This uses the
+    Uploads API to split the file into chunks:
+      1. POST /uploads          — create upload session
+      2. POST /uploads/{id}/parts — upload each chunk
+      3. POST /uploads/{id}/complete — finalize and get file ID
+
+    Requires AzureOpenAI client (not the /v1/ project endpoint).
+
+    Args:
+        openai_client: An openai.AzureOpenAI client instance.
+        filepath: Path to the file to upload.
+        file_size: Size of the file in bytes.
+        purpose: Upload purpose (default "fine-tune").
+        chunk_size: Size of each chunk in bytes (default 64MB).
+
+    Returns:
+        The file ID to use for fine-tuning.
+
+    Raises:
+        RuntimeError: If any upload step fails or processing times out.
+    """
+    import math
+    import time
+
+    filename = os.path.basename(filepath)
+    n_chunks = math.ceil(file_size / chunk_size)
+    print(f"📤 Large file upload: {filename} ({file_size / 1024 / 1024:.1f} MB, {n_chunks} chunks)")
+
+    # Step 1: Create upload session
+    upload = openai_client.uploads.create(
+        filename=filename,
+        purpose=purpose,
+        bytes=file_size,
+        mime_type="application/jsonl",
+    )
+    upload_id = upload.id
+    print(f"   Upload session: {upload_id}")
+
+    # Step 2: Upload chunks
+    part_ids = []
+    with open(filepath, "rb") as f:
+        for i in range(n_chunks):
+            chunk = f.read(chunk_size)
+            print(f"   Part {i + 1}/{n_chunks} ({len(chunk) / 1024 / 1024:.1f} MB)...", end=" ", flush=True)
+            try:
+                part = openai_client.uploads.parts.create(upload_id=upload_id, data=chunk)
+                part_ids.append(part.id)
+                print("✓")
+            except Exception as e:
+                print(f"✗ {e}")
+                try:
+                    openai_client.uploads.cancel(upload_id=upload_id)
+                except Exception:
+                    pass
+                raise RuntimeError(f"Chunk upload failed at part {i + 1} (upload_id={upload_id}): {e}") from e
+
+    # Step 3: Complete upload
+    print(f"   Completing upload...", end=" ", flush=True)
+    try:
+        completed = openai_client.uploads.complete(upload_id=upload_id, part_ids=part_ids)
+    except Exception as e:
+        try:
+            openai_client.uploads.cancel(upload_id=upload_id)
+        except Exception:
+            pass
+        raise RuntimeError(f"Upload completion failed (upload_id={upload_id}): {e}") from e
+
+    file_id = completed.file.id if completed.file else None
+    if not file_id:
+        raise RuntimeError(f"Upload completed but no file ID returned (upload_id={upload_id})")
+    print(f"✓ File ID: {file_id}")
+
+    # Step 4: Wait for processing
+    print(f"   Waiting for processing...")
+    for _ in range(120):
+        info = openai_client.files.retrieve(file_id)
+        if info.status == "processed":
+            print(f"   ✅ File ready")
+            return file_id
+        if info.status == "error":
+            details = getattr(info, "status_details", None) or "no details"
+            raise RuntimeError(f"File processing error: {details}")
+        time.sleep(10)
+
+    raise RuntimeError(
+        f"File processing timed out after 20 minutes (file_id={file_id}, "
+        f"last status={info.status}). Check the Azure portal for status."
+    )
 
 
 def get_env(key: str, required: bool = True) -> str:
