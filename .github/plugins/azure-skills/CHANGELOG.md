@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.45
+
+- fix(microsoft-foundry): update integrate toolbox into hosted-agent flow ([#2264](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2264))
+
 ## 1.1.41
 
 - fix: update foundry-agent invoke skill for invocations protocol ([#2154](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2154))
