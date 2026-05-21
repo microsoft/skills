@@ -32,6 +32,7 @@ USE FOR: analyze agent traces, search agent conversations, find failing traces, 
 | "Show me this conversation" / "Trace detail" | [Conversation Detail](references/conversation-detail.md) |
 | "Find eval results for response ID" / "eval scores from traces" | [Eval Correlation](references/eval-correlation.md) |
 | "What KQL do I need?" | [KQL Templates](references/kql-templates.md) |
+| "Auto-detect agent issues" / "Get automated insights" / "What's wrong with my agent?" | [Tracing Insights API](references/tracing-insights-api.md) |
 
 ## Before Starting — Resolve App Insights Connection
 
