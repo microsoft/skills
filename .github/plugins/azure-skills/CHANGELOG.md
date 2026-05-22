@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.47
+
+- feat(azure-diagnostics/inspektor-gadget): Use correct filter for tcpdump gadget ([#2292](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2292))
+
+## 1.1.46
+
+- feat(microsoft-foundry): add Tracing Insights API skill for automated anomaly detection ([#2276](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2276))
+
+## 1.1.45
+
+- fix(microsoft-foundry): update integrate toolbox into hosted-agent flow ([#2264](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2264))
+
 ## 1.1.41
 
 - fix: update foundry-agent invoke skill for invocations protocol ([#2154](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2154))

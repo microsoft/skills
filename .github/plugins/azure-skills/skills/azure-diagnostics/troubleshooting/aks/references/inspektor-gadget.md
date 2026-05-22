@@ -63,11 +63,11 @@ Outputs raw pcap-ng data. Pipe to `tcpdump` for readable output:
 kubectl debug --profile=sysadmin node/<node-name> --attach --quiet \
   --image=mcr.microsoft.com/oss/v2/inspektor-gadget/ig:<ig-version> \
   -- ig run tcpdump:<ig-version> -o pcap-ng --k8s-namespace <ns> --k8s-podname <pod> \
-     --timeout 30 --filter "port 80" \
+     --timeout 30 --pf "port 80" \
   | tcpdump -nvr -
 ```
 
-Use `--filter "<expr>"` for tcpdump filters (e.g., `port 80`, `host 10.0.0.1`). Output must be `-o pcap-ng` (not `-o json`).
+Use `--pf "<expr>"` for tcpdump filters (e.g., `port 80`, `host 10.0.0.1`). Output must be `-o pcap-ng` (not `-o json`).
 
 ### Process & Workload
 
