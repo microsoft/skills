@@ -19,7 +19,7 @@ USE FOR: analyze agent traces, search agent conversations, find failing traces, 
 | Related skills | `troubleshoot` (hosted-agent logs), `eval-datasets` (trace harvesting) |
 | Preferred query tool | `monitor_resource_log_query` (Azure MCP) - use for App Insights KQL queries |
 | OTel conventions | [GenAI Spans](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-spans/), [Agent Spans](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-agent-spans/) |
-| Local metadata | selected `.foundry/agent-metadata*.yaml` file |
+| Local metadata | selected `.foundry/agent-metadata*.yaml` overlay/cache file |
 
 ## Entry Points
 
@@ -36,9 +36,9 @@ USE FOR: analyze agent traces, search agent conversations, find failing traces, 
 
 ## Before Starting — Resolve App Insights Connection
 
-1. Resolve the target agent root, selected metadata file, and environment from `.foundry/agent-metadata*.yaml`.
-2. Check `environments.<env>.observability.applicationInsightsConnectionString` or `environments.<env>.observability.applicationInsightsResourceId` in the selected metadata file.
-3. If observability settings are missing, use `project_connection_list` to discover App Insights linked to the Foundry project, then persist the chosen resource back to `environments.<env>.observability` in the selected metadata file before querying.
+1. Resolve the target agent root, environment, effective deployment context, and selected metadata overlay using [Common Project Context Resolution](../../SKILL.md#agent-common-project-context-resolution).
+2. In azd projects, prefer App Insights values from `azd env get-values`; otherwise check `environments.<env>.observability.applicationInsightsConnectionString` or `environments.<env>.observability.applicationInsightsResourceId` in the selected metadata file.
+3. If observability settings are missing, use `project_connection_list` to discover App Insights linked to the Foundry project, then persist the chosen resource back to `environments.<env>.observability` only when azd cannot provide it.
 4. Confirm the selected App Insights resource and environment with the user before querying.
 5. Use **`monitor_resource_log_query`** (Azure MCP tool) to execute KQL queries against the App Insights resource. This is preferred over delegating to the `azure-kusto` skill. Pass the App Insights resource ID and the KQL query directly.
 

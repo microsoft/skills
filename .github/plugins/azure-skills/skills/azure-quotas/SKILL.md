@@ -4,7 +4,7 @@ description: "Check/manage Azure quotas and usage across providers. For deployme
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 
@@ -96,35 +96,53 @@ Invoke this skill when:
 
 > **📖 Detailed mapping examples and workflow:** See [commands.md - Resource Name Mapping](./references/commands.md#resource-name-mapping)
 
+## Scripts
+
+Pre-built scripts handle quota extension installation, usage queries, and capacity calculation. Use these instead of constructing commands manually. A single call returns limits, usage, and available capacity.
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `scripts/check-quota.ps1` | Returns limit, usage, and available capacity for all quotas (or a single quota when resource name is provided) | Primary script for quota checks |
+| `scripts/check-quota.sh` | Same as above (bash) | Primary script for quota checks |
+
 ## Core Workflows
 
 ### Workflow 1: Check Quota for a Specific Resource
 
-**Scenario:** Verify quota limit and current usage before deployment
+**Scenario:** Verify quota limits and current usage before deployment
 
+Run the script with the resource provider and region. It returns a table of **all** quotas with their limit, current usage, and available capacity in a single call:
+
+```powershell
+.\scripts\check-quota.ps1 -ResourceProvider <provider> -Region <region>
+```
 ```bash
-# 1. Install quota extension (if not already installed)
-az extension add --name quota
-
-# 2. List all quotas for the provider to find the quota resource name
-az quota list \
-  --scope /subscriptions/<subscription-id>/providers/Microsoft.Compute/locations/eastus
-
-# 3. Show quota limit for a specific resource
-az quota show \
-  --resource-name standardDSv3Family \
-  --scope /subscriptions/<subscription-id>/providers/Microsoft.Compute/locations/eastus
-
-# 4. Show current usage
-az quota usage show \
-  --resource-name standardDSv3Family \
-  --scope /subscriptions/<subscription-id>/providers/Microsoft.Compute/locations/eastus
+./scripts/check-quota.sh <provider> <region>
 ```
 
-**Example Output Analysis:**
-- Quota limit: 350 vCPUs
-- Current usage: 50 vCPUs
-- Available capacity: 300 vCPUs (350 - 50)
+To check a single resource, add the resource name:
+
+```powershell
+.\scripts\check-quota.ps1 -ResourceProvider <provider> -Region <region> -ResourceName <resource-name>
+```
+```bash
+./scripts/check-quota.sh <provider> <region> <resource-name>
+```
+
+**Example:**
+
+```powershell
+.\scripts\check-quota.ps1 -ResourceProvider Microsoft.Compute -Region eastus
+```
+
+**Example Output:**
+
+| Resource | Region | Limit | Usage | Available |
+|----------|--------|-------|-------|-----------|
+| cores | eastus | 100 | 50 | 50 |
+| standardDSv3Family | eastus | 350 | 50 | 300 |
+| virtualMachines | eastus | 25000 | 5 | 24995 |
+| ... | ... | ... | ... | ... |
 
 > **📖 See also:** [az quota show](./references/commands.md#az-quota-show), [az quota usage show](./references/commands.md#az-quota-usage-show)
 

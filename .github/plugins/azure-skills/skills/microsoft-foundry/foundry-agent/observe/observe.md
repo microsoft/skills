@@ -15,7 +15,7 @@ USE FOR: evaluate my agent, run an eval, test my agent, check agent quality, run
 | MCP server | `azure` |
 | Key MCP tools | `evaluation_suite_generation_job_create`, `evaluation_suite_generation_job_get`, `evaluation_suite_get`, `data_generation_job_create`, `evaluator_generation_job_create`, `evaluation_agent_batch_eval_create`, `evaluation_comparison_create`, `evaluation_get`, `prompt_optimize`, `agent_update`, `continuous_eval_create`, `continuous_eval_get`, `continuous_eval_delete` |
 | Prerequisite | Agent deployed and running (use [deploy skill](../deploy/deploy.md)) |
-| Local cache | selected `.foundry/agent-metadata*.yaml` file, `.foundry/evaluators/`, `.foundry/datasets/`, `.foundry/results/` |
+| Local cache | selected `.foundry/agent-metadata*.yaml` overlay, `.foundry/suites/`, `.foundry/evaluators/`, `.foundry/datasets/`, `.foundry/results/`; `eval.yaml` can provide local eval intent |
 
 ## Entry Points
 
@@ -30,15 +30,16 @@ USE FOR: evaluate my agent, run an eval, test my agent, check agent quality, run
 | "Set up CI/CD evals" | [Step 6: CI/CD & Monitoring](references/cicd-monitoring.md) |
 | "Enable continuous monitoring" / "Set up production monitoring" / "Evaluation results dropping" | [Continuous Eval](references/continuous-eval.md) |
 
-> ⚠️ **Important:** Before running any evaluation (Step 2), always resolve the selected agent root, metadata file, and environment, then inspect that metadata file plus `.foundry/evaluators/` and `.foundry/datasets/` in that root only. If the selected suite has `suiteName`, confirm it with `evaluation_suite_get`; otherwise use the legacy dataset/evaluator metadata. If cache is missing, stale, or the user wants to refresh it, route through [Step 1: Auto-Setup](references/deploy-and-setup.md) first — even if the user only asked to "evaluate." Do **not** merge `.foundry` cache or source context from sibling agent folders or sibling metadata files.
+> ⚠️ **Important:** Before running any evaluation (Step 2), always resolve the selected agent root, environment, effective deployment context, and metadata overlay file. In azd projects, derive project endpoint and deployed agent identity from `azd env get-values`; use metadata for synced suite/cache refs and explicit overrides. Inspect `.foundry/evaluators/`, `.foundry/datasets/`, `.foundry/suites/`, and matching `eval.yaml` in that root only. If the selected suite has `suiteName`, confirm it with `evaluation_suite_get`; otherwise use verified eval.yaml or legacy dataset/evaluator metadata. If cache is missing, stale, or the user wants to refresh it, route through [Step 1: Auto-Setup](references/deploy-and-setup.md) first — even if the user only asked to "evaluate." Do **not** merge `.foundry` cache or source context from sibling agent folders or sibling metadata files.
 
 ## Before Starting — Detect Current State
 
-1. Resolve the target agent root, selected metadata file, and environment from `.foundry/agent-metadata*.yaml`.
-2. Use `agent_get` and `agent_container_status_get` to verify the environment's agent exists and is running.
-3. Inspect the selected environment's `evaluationSuites[]` plus cached files under `.foundry/evaluators/` and `.foundry/datasets/` in the selected agent root only. If a suite has `suiteName`, call `evaluation_suite_get` to verify the remote suite/version before running it. If the metadata still uses older `testSuites[]` or legacy `testCases[]`, normalize that list to evaluation suites first using the shared migration rule.
-4. Use `evaluation_get` to check for existing eval runs.
-5. Jump to the appropriate entry point.
+1. Resolve the target agent root, selected environment, effective deployment context, and selected metadata overlay file using [Common Project Context Resolution](../../SKILL.md#agent-common-project-context-resolution).
+2. In azd projects, prefer azd env values for project endpoint and deployed agent name/version; if metadata disagrees, stop and ask which source is authoritative.
+3. Use `agent_get` and `agent_container_status_get` to verify the environment's agent exists and is running.
+4. Inspect the selected environment's `evaluationSuites[]`, cached files under `.foundry/suites/`, `.foundry/evaluators/`, and `.foundry/datasets/`, plus `eval.yaml` in the selected agent root only. If a suite has `suiteName`, call `evaluation_suite_get` to verify the remote suite/version before running it. If `eval.yaml` exists, verify/register its dataset and evaluator references before treating it as a synced Foundry suite. If the metadata still uses older `testSuites[]` or legacy `testCases[]`, normalize that list to evaluation suites first using the shared migration rule.
+5. Use `evaluation_get` to check for existing eval runs.
+6. Jump to the appropriate entry point.
 
 ## Loop Overview
 
@@ -58,17 +59,17 @@ USE FOR: evaluate my agent, run an eval, test my agent, check agent quality, run
 
 ## Behavioral Rules
 
-1. **Keep context visible.** Restate the selected agent root, metadata file, and environment in setup, evaluation, and result summaries.
+1. **Keep context visible.** Restate the selected agent root, environment, metadata overlay file, and primary deployment context source (azd or metadata) in setup, evaluation, and result summaries.
 2. **Stay inside the selected agent root.** Once the agent root is resolved, inspect only that folder's `.foundry/` cache and source tree when suggesting tools, datasets, evaluators, or prompt optimizations. Do not merge sibling agent folders.
-3. **Reuse cache before regenerating.** Prefer existing `evaluationSuites[]` entries with valid `suiteName`/`suiteVersion`, `.foundry/evaluators/`, and `.foundry/datasets/` when they match the active environment. Ask before refreshing or overwriting them.
+3. **Reuse cache before regenerating.** Prefer existing `evaluationSuites[]` entries with valid `suiteName`/`suiteVersion`, `.foundry/evaluators/`, `.foundry/datasets/`, and matching verified `eval.yaml` local config when they match the active environment. Ask before refreshing or overwriting them.
 4. **Start with smoke suites.** Run evaluation suites tagged `tier=smoke` before broader `tier=regression` or `tier=coverage` suites unless the user explicitly chooses otherwise.
 5. **Auto-poll in background.** After creating eval runs, suite generation jobs, data generation jobs, evaluator generation jobs, or starting containers, poll in a background terminal or background task. Only surface terminal status or actionable failures.
 6. **Confirm before changes.** Show diff/summary before modifying agent code, refreshing cache, or deploying. Wait for sign-off.
 7. **Prompt for next steps.** After each step, present options. Never assume the path forward.
 8. **Write scripts to files.** Python scripts go in `scripts/` - no inline code blocks.
-9. **Persist eval artifacts.** Save local artifacts to `.foundry/evaluators/`, `.foundry/datasets/`, and `.foundry/results/` for version tracking and comparison.
+9. **Persist eval artifacts.** Save local artifacts to `.foundry/suites/`, `.foundry/evaluators/`, `.foundry/datasets/`, and `.foundry/results/` for version tracking and comparison. Do not copy azd-owned deployment values into metadata when azd resolves them.
 10. **Migrate legacy metadata on write.** If the selected environment still uses older `testSuites[]` or legacy `testCases[]`, treat that list as the suite source for the current run, then rewrite that environment to `evaluationSuites[]` on the next metadata update. Preserve dataset/evaluator fields and map `priority` to `tags.tier` only when `tags.tier` is missing.
-11. **Use suite generation first.** Prefer `evaluation_suite_generation_job_create` for complete post-deploy setup. Poll with `evaluation_suite_generation_job_get` in the background, inspect the result with `evaluation_suite_get`, and persist `suiteName`, `suiteVersion`, `generationJobId`, and local artifact paths.
+11. **Use verified eval.yaml or suite generation first.** When matching `eval.yaml` exists, verify/register its dataset and evaluator refs before generating a brand-new suite. Otherwise prefer `evaluation_suite_generation_job_create` for complete post-deploy setup. Poll with `evaluation_suite_generation_job_get` in the background, inspect the result with `evaluation_suite_get`, and persist `suiteName`, `suiteVersion`, `generationJobId`, and local artifact paths.
 12. **Fallback explicitly.** If suite/data/evaluator generation fails or returns incomplete artifacts, explain the failure and fall back to the manual evaluator + dataset suggestion flow. Mark metadata with `generationSource: manual-fallback`.
 13. **Use agent-target batch eval for runs.** Use `evaluation_agent_batch_eval_create` for batch evaluation, even when setup generated an evaluation suite. Treat `suiteName` as setup/review metadata and call `evaluation_suite_get` only to resolve dataset/evaluator references.
 14. **Use exact eval parameter names.** Use `evaluationId` only on `evaluation_agent_batch_eval_create` calls that group runs; use `evalId` on `evaluation_get` and `evaluation_comparison_create`; use `evalRunId` for a specific run lookup.

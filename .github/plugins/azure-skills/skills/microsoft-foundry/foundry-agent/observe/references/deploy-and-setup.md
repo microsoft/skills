@@ -8,28 +8,29 @@ After deployment, immediately prepare a Foundry evaluation suite and local refer
 
 ### 1. Resolve Context
 
-Use `agent_get` (or local `agent.yaml`) plus the selected `.foundry/agent-metadata*.yaml` file to resolve:
+Use [Common Project Context Resolution](../../../SKILL.md#agent-common-project-context-resolution) to compute effective context. In azd projects, prefer `azd env get-values` for deployment context and use the selected `.foundry/agent-metadata*.yaml` file only as an overlay/cache. Use `agent_get`, local `agent.yaml`, and matching `eval.yaml` as needed to resolve:
 
 | Value | Source |
 |-------|--------|
-| `projectEndpoint` | selected environment |
-| `agentName` / `agentVersion` | selected environment and `agent_get` |
-| `suiteName` | `<agent-name>-smoke` unless user provided one |
+| `projectEndpoint` | azd env, then metadata override |
+| `agentName` / `agentVersion` | azd agent vars, then metadata/`agent_get` |
+| `suiteName` | verified `eval.yaml` name or `<agent-name>-smoke` unless user provided one |
 | generation deployment | `model_deployment_get`; choose a chat-completions deployment |
 
 Do not assume `gpt-4o` exists.
 
 ### 2. Reuse or Refresh Cache
 
-Inspect `.foundry/evaluators/`, `.foundry/datasets/`, and the selected environment's `evaluationSuites[]` in the selected agent root only. Do **not** merge sibling agent folders.
+Inspect `.foundry/suites/`, `.foundry/evaluators/`, `.foundry/datasets/`, matching `eval.yaml`, and the selected environment's `evaluationSuites[]` in the selected agent root only. Do **not** merge sibling agent folders.
 
 - **Suite metadata has `suiteName` and current cache** -> call `evaluation_suite_get` to verify the remote suite, then reuse it.
+- **`eval.yaml` exists and matches the selected agent** -> verify its `dataset_file`, `evaluators[]`, and optional `name` remotely or register them before persisting a synced suite entry.
 - **Cache is missing/stale or user asks refresh** -> generate a new suite after confirming any overwrite.
 - **Legacy entry without `suiteName`** -> keep it as legacy fallback metadata unless the user approves generating a new suite.
 
 ### 3. Generate Suite
 
-Read [Evaluation Suite Generation](evaluation-suite-generation.md), then call:
+Read [Evaluation Suite Generation](evaluation-suite-generation.md). If the user selected existing `eval.yaml`, follow the local eval.yaml verification/registration path there before creating a generated suite. Otherwise call:
 
 ```text
 evaluation_suite_generation_job_create(
@@ -65,7 +66,7 @@ If the job result exposes only remote names/versions, fetch metadata with `evalu
 
 ### 5. Update Metadata
 
-Write only the selected metadata file and selected environment. Persist evaluation suites with:
+Write only the selected metadata file and selected environment. In azd projects, persist only non-derivable overlay/cache state; do not copy azd-owned project endpoint, agent name/version, ACR, or observability values. Persist evaluation suites with:
 
 - `id`, `tags`, `suiteName`, `suiteVersion`
 - `generationJobId`, `generationSource` (`synthetic`, `traces`, or `manual-fallback`)

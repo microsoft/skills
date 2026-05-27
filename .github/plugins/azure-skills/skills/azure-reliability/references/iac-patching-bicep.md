@@ -53,13 +53,14 @@ If the project uses **Azure Verified Modules** (`br/public:avm/res/...`), the pa
 
 ## Per-service Bicep patches
 
-The patches for compute (zone redundancy on the Function App plan, health check path) live in the per-service references because the SKU rules and ARM types differ:
+The patches for compute (zone redundancy on the App Service plan or Function App plan, health check path) live in the per-service references because the SKU rules and ARM types differ:
 
 | Service | Reference |
 |---|---|
+| Azure App Service | [services/app-service/reliability.md](services/app-service/reliability.md) |
 | Azure Functions | [services/functions/reliability.md](services/functions/reliability.md) |
 
-> Azure App Service and Azure Container Apps per-service Bicep patches are planned for a future version of this skill.
+> Azure Container Apps per-service Bicep patches are planned for a future version of this skill.
 
 The one truly cross-service patch — **storage** — lives below.
 

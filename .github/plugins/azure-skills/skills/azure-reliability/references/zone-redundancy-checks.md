@@ -8,9 +8,10 @@ This file covers **platform-level discovery and concepts**. For service-specific
 
 | Service | Reference |
 |---|---|
+| Azure App Service | [services/app-service/reliability.md](services/app-service/reliability.md) |
 | Azure Functions | [services/functions/reliability.md](services/functions/reliability.md) |
 
-> Azure App Service (non-Functions sites) and Azure Container Apps deep-dive references are planned for a future version of this skill. The discovery query below still surfaces those resources — just don't dispatch to a per-service reference for them yet.
+> Azure Container Apps deep-dive references are planned for a future version of this skill. The discovery query below still surfaces those resources — just don't dispatch to a per-service reference for them yet.
 
 ## Discovery: Find All Non-Zone-Redundant Compute
 
@@ -31,7 +32,7 @@ Resources
 
 For each row in the result, dispatch to the matching service reference:
 - `microsoft.web/serverfarms` with `kind contains 'functionapp'` → Functions reference
-- `microsoft.web/serverfarms` (other kinds) → _planned (App Service)_ — surface in the discovery summary, do not deep-dive
+- `microsoft.web/serverfarms` (other kinds) → App Service reference
 - `microsoft.app/managedenvironments` → _planned (Container Apps)_ — surface in the discovery summary, do not deep-dive
 
 ## Regions Supporting Availability Zones
@@ -52,4 +53,4 @@ Common regions with AZ support across Functions, App Service, and Container Apps
 
 ## Reporting
 
-For the assessment table's `Zone redundancy — compute` row, the per-service references define exactly what `🟢 ON / 🟡 PARTIAL / 🔴 OFF` mean for that service (e.g. ZR + minimum instance count for Premium Functions). Only Functions has a per-service reference in this skill version; App Service and Container Apps support is planned.
+For the assessment table's `Zone redundancy — compute` row, the per-service references define exactly what `🟢 ON / 🟡 PARTIAL / 🔴 OFF` mean for that service (e.g. ZR + minimum instance count for App Service, Premium Functions). Only App Service and Functions have a per-service reference in this skill version; Container Apps support is planned.

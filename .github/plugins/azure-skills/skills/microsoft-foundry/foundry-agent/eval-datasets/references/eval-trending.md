@@ -5,7 +5,7 @@ Track evaluation metrics across multiple runs and versions to visualize improvem
 ## Prerequisites
 
 - At least 2 evaluation runs in the same evaluation group (same `evaluationId` when created)
-- Project endpoint and selected environment available in the selected `.foundry/agent-metadata*.yaml` file
+- Project endpoint and selected environment resolved from azd or the selected metadata overlay
 
 > ⚠️ **Eval-group immutability:** Trend a group only when its evaluator set and thresholds stayed fixed across runs. If either changed, start a new evaluation group and track that history separately.
 

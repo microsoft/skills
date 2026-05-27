@@ -32,7 +32,7 @@ DO NOT USE FOR: running a one-off batch evaluation (use [observe](../observe.md)
 
 ## Before Starting — Detect Current State
 
-1. Resolve the target agent root and environment from `.foundry/agent-metadata.yaml` using the [Project Context Resolution](../../../SKILL.md#agent-project-context-resolution) workflow.
+1. Resolve the target agent root and environment using the [Common Project Context Resolution](../../../SKILL.md#agent-common-project-context-resolution) workflow.
 2. Extract `projectEndpoint` and `agentName` from the selected environment. If not available in metadata, use `ask_user` to collect them.
 3. Use `agent_get` to verify the agent exists and note its kind (prompt or hosted).
 4. Use `continuous_eval_get` to check for existing continuous evaluation configuration.

@@ -9,11 +9,11 @@ Hosted agents access Foundry-managed tools through a **Toolbox MCP endpoint**. U
 | Property | Value |
 |----------|-------|
 | **Toolbox Docs** | https://learn.microsoft.com/azure/foundry/agents/how-to/tools/toolbox |
-| **Default Sample (Python)** | https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/toolbox/maf |
+| **Default Sample (Python)** | https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/agent-framework/responses/04-foundry-toolbox |
 | **Python Hosted Agent — `responses`** | https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/responses |
 | **Python Hosted Agent — `invocations`** | https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/invocations |
-| **C# (.NET) Samples** | https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/csharp/toolbox |
-| **Supported Tool Types & Auth** | https://github.com/microsoft-foundry/foundry-samples/blob/main/samples/python/toolbox/SUPPORTED_TOOLBOX_TOOLS.md |
+| **C# (.NET) Samples** | https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/csharp/hosted-agents/agent-framework/foundry-toolbox-server-side |
+| **Supported Tool Types & Auth** | https://learn.microsoft.com/azure/foundry/agents/how-to/tools/toolbox#configure-tools |
 
 ## Resolve Toolbox Endpoint
 
@@ -39,9 +39,8 @@ The sample repo provides integration patterns for both Python and C#. Read the s
 
 | Sample | Framework | Protocol | When to use |
 |--------|-----------|----------|-------------|
-| [`toolbox/maf/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/toolbox/maf) — recommended | Agent Framework (MAF) | Responses | **Default choice** |
+| [`agent-framework/responses/04-foundry-toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/agent-framework/responses/04-foundry-toolbox) — recommended | Agent Framework (MAF) | Responses | **Default choice** |
 | [`bring-your-own/responses/langgraph-toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/responses/langgraph-toolbox) | LangGraph (BYO) | Responses | LangGraph hosted agent with toolbox |
-| [`toolbox/copilot-sdk/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/toolbox/copilot-sdk) | GitHub Copilot SDK | Responses | Copilot SDK with toolbox tools |
 | [`bring-your-own/responses/bring-your-own-toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/responses/bring-your-own-toolbox) | Generic MCP (BYO) | Responses | Raw `httpx` MCP client — works with any framework |
 | [`bring-your-own/invocations/toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/invocations/toolbox) | Generic MCP (BYO) | Invocations | Toolbox via Invocations protocol |
 
@@ -49,7 +48,7 @@ The sample repo provides integration patterns for both Python and C#. Read the s
 
 | Sample | Description |
 |--------|-------------|
-| [`csharp/toolbox/maf/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/csharp/toolbox/maf) — recommended | Agent Framework agent with toolbox MCP (Responses protocol) |
+| [`csharp/hosted-agents/agent-framework/foundry-toolbox-server-side/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/csharp/hosted-agents/agent-framework/foundry-toolbox-server-side) — recommended | Agent Framework agent with toolbox MCP (Responses protocol) |
 
 **Notes:** (apply to all patterns, both Python and C#):
 - Auth: Inject a bearer token with scope `https://ai.azure.com/.default` on every request (Python: `httpx.Auth` subclass; C#: `DefaultAzureCredential` + `BearerTokenAuthenticationPolicy`).

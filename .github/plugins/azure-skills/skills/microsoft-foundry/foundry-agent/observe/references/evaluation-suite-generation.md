@@ -4,14 +4,16 @@ Use generated suites as the preferred setup path for deployed agents. The suite 
 
 ## Step 1: Ask the User Which Source to Use (MANDATORY)
 
-> ⚠️ **Do not call `evaluation_suite_generation_job_create` without asking the user first.** The generation source materially changes the suite's coverage and cost. Use `ask_user` / `askQuestions` with these two options:
+> ⚠️ **Do not call `evaluation_suite_generation_job_create` without asking the user first.** The generation source materially changes the suite's coverage and cost. Use `ask_user` / `askQuestions` with these options:
 >
 > - **(a) Current agent code/definition** — synthetic Q&A generated from the agent's instructions and tool definitions. Best for brand-new or recently changed agents with no production traffic.
 > - **(b) Historical traces** — sampled from real conversations. **Default lookback: last 3 days (`maxTraces` ~50).** Best for deployed agents with traffic, since the suite reflects real user intents and edge cases.
+> - **(c) Existing eval.yaml** — local dataset/evaluator intent from the selected agent root. Best when azd AI agent eval configuration already exists.
 >
-> **Default selection rule:** If the agent has traces in the last 3 days (check via `trace` skill or `evaluation_agent_traces_batch_eval_create` lookback probe), recommend (b); otherwise recommend (a). Always let the user override.
+> **Default selection rule:** If `eval.yaml` exists and `agent.name` matches the selected agent, recommend (c). Otherwise, if the agent has traces in the last 3 days (check via `trace` skill or `evaluation_agent_traces_batch_eval_create` lookback probe), recommend (b); otherwise recommend (a). Always let the user override.
 
 If the user picks (b), compute `traceStartTime` and `traceEndTime` as unix seconds for the chosen window (default `now - 3*86400` to `now`).
+If the user picks (c), do not assume a Foundry suite exists. Verify or register the local dataset and evaluators first as described below.
 
 ## Step 2: Create and Poll
 
@@ -43,6 +45,17 @@ Poll with `evaluation_suite_generation_job_get(projectEndpoint, jobId)` until th
 > The background poll may stop before terminal state only when: (a) the user explicitly tells you to stop polling, (b) the job has been `in_progress` for >30 minutes (treat as stuck and surface the job ID), or (c) polling errors repeatedly (surface the error). Leave the in-flight `generationJobId` recorded in metadata so a later turn can resume polling.
 >
 > When the background poll reaches `succeeded`, continue by calling `evaluation_suite_get` and then cache/update metadata before producing the completion summary. When it reaches `failed` or `canceled`, surface the terminal status and route to fallback.
+
+## Existing eval.yaml Source
+
+Use this path when the selected agent root has `eval.yaml` and the user chooses it:
+
+1. Parse `agent.name`, `dataset_file`, `evaluators[]`, `name`, `options.eval_model`, `options.pass_threshold`, `max_samples`, `trace_days`, and `generation_instruction`.
+2. Verify `agent.name` matches the effective selected agent from azd/metadata. If it differs, stop and ask which target is authoritative.
+3. Confirm the `dataset_file` exists under the selected agent root. Treat it as a local seed dataset until `evaluation_dataset_create` or a remote lookup succeeds.
+4. For each evaluator name, call `evaluator_catalog_get` before treating it as remote. If missing, ask whether to create/register it or generate a new adaptive evaluator.
+5. If `name` is populated, call `evaluation_suite_get` before storing it as `suiteName`. If no suite exists, either create/register a reviewed suite or persist a local-draft entry without `suiteName`.
+6. Persist only synced remote refs and local cache paths to `.foundry/agent-metadata*.yaml` with `generationSource: eval-yaml`; do not copy azd-owned deployment context into metadata.
 
 ## Cache Artifacts Locally
 

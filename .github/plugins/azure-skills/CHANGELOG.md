@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.53
+
+- feature: Move quota workflow to a script ([#2360](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2360))
+
+## 1.1.52
+
+- fix: toolbox skill invocation and foundry samples path ([#2389](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2389))
+
+## 1.1.51
+
+- feat: support direct code deployment ([#2362](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2362))
+
 ## 1.1.47
 
 - feat(azure-diagnostics/inspektor-gadget): Use correct filter for tcpdump gadget ([#2292](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2292))

@@ -18,7 +18,7 @@ USE FOR: create dataset from traces, harvest traces into dataset, build test dat
 | Key Foundry MCP tools | `data_generation_job_create`, `data_generation_job_get`, `evaluation_dataset_create`, `evaluation_dataset_get`, `evaluation_dataset_versions_get`, `evaluation_suite_create`, `evaluation_suite_get`, `evaluation_get`, `evaluation_comparison_create`, `evaluation_comparison_get` |
 | Storage tools | `project_connection_list` (discover `AzureStorageAccount` connection), `project_connection_create` (add storage connection) |
 | Azure services | Application Insights (via `monitor_resource_log_query`), Azure Blob Storage (dataset sync) |
-| Prerequisites | Agent deployed, selected `.foundry/agent-metadata*.yaml` file available, App Insights connected |
+| Prerequisites | Agent deployed, effective context resolved from azd or metadata overlay, App Insights connected |
 | Local cache | `.foundry/datasets/`, `.foundry/results/`, `.foundry/evaluators/` |
 
 ## Entry Points
@@ -39,9 +39,9 @@ USE FOR: create dataset from traces, harvest traces into dataset, build test dat
 
 ## Before Starting — Detect Current State
 
-1. Resolve the target agent root, selected metadata file, and environment from `.foundry/agent-metadata*.yaml`.
-2. Confirm the selected environment's `projectEndpoint`, `agentName`, and observability settings.
-3. Check `.foundry/datasets/`, `.foundry/results/`, and `.foundry/datasets/manifest.json` in the selected agent root only.
+1. Resolve the target agent root, environment, effective deployment context, and selected metadata overlay using [Common Project Context Resolution](../../SKILL.md#agent-common-project-context-resolution).
+2. Confirm the selected environment's `projectEndpoint`, `agentName`, and observability settings from azd first, then metadata overrides.
+3. Check `.foundry/datasets/`, `.foundry/results/`, `.foundry/datasets/manifest.json`, and `eval.yaml` in the selected agent root only.
 4. Check whether `evaluation_dataset_get` returns server-side datasets for the same environment and whether `evaluationSuites[]` contains `suiteName`/`suiteVersion` references.
 5. Route to the appropriate entry point based on user intent.
 
@@ -86,9 +86,9 @@ Each cycle makes the test suite harder and more representative. Production failu
 | Curated/refined dataset | `<agent-name>-curated` | `v<N>` | `.foundry/datasets/<agent-name>-curated-v<N>.jsonl` | `curated` |
 | Production-ready dataset | `<agent-name>-prod` | `v<N>` | `.foundry/datasets/<agent-name>-prod-v<N>.jsonl` | `prod` |
 
-Here `<agent-name>` means the selected environment's `environments.<env>.agentName` from the selected metadata file. If that deployed agent name already includes the environment (for example, `support-agent-dev`), do **not** append the environment key a second time.
+Here `<agent-name>` means the effective selected Foundry agent name from azd or metadata. If that deployed agent name already includes the environment (for example, `support-agent-dev`), do **not** append the environment key a second time.
 
-Local dataset filenames must start with the selected Foundry agent name (`environments.<env>.agentName` in the selected metadata file). Put stage and version suffixes **after** that prefix so cache files sort and group by agent first.
+Local dataset filenames must start with the effective selected Foundry agent name. Put stage and version suffixes **after** that prefix so cache files sort and group by agent first.
 
 Keep the Foundry dataset name stable across versions. Store the version only in `datasetVersion` (or manifest `version`) using the `v<N>` format, while local filenames keep the `-v<N>` suffix for cache readability.
 

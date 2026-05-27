@@ -5,7 +5,7 @@ Search agent traces at the conversation level. Returns summaries grouped by conv
 ## Prerequisites
 
 - App Insights resource resolved (see [trace.md](../trace.md) Before Starting)
-- Selected agent root, metadata file, and environment confirmed from `.foundry/agent-metadata*.yaml`
+- Selected agent root, environment, effective context source, and metadata overlay confirmed
 - Time range confirmed with user (default: last 24 hours)
 
 ## Search by Conversation ID

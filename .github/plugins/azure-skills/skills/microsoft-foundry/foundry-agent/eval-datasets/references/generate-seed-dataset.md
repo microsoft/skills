@@ -39,7 +39,7 @@ Collect the agent's full context from `agent_get` or local `agent.yaml` in the s
 - **Agent name** — from the selected metadata file
 - **Instructions** — the system prompt / instructions field
 - **Tools** — list of tools with names, descriptions, and parameter schemas
-- **Protocols** — supported protocols (responses, a2a, mcp)
+- **Protocols** — supported protocols (e.g. `responses`, `invocations`, `invocations_ws`, `a2a`, `mcp`)
 - **Example messages** — from `agent.yaml` metadata if available
 
 ## Step 2 — Generate Test Queries

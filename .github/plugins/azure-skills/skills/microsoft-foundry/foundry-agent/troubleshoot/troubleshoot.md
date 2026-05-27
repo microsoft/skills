@@ -32,7 +32,7 @@ Troubleshoot and debug Foundry agents by collecting hosted-agent session logs, d
 
 ### Step 1: Collect Agent Information
 
-Use the project endpoint and agent name from the project context (see Common: Project Context Resolution). Ask the user only for values not already resolved:
+Use the project endpoint and agent name from the project context (see [Common Project Context Resolution](../../SKILL.md#agent-common-project-context-resolution)). Ask the user only for values not already resolved:
 - **Project endpoint** — AI Foundry project endpoint URL
 - **Agent name** — Name of the agent to troubleshoot
 
@@ -45,6 +45,8 @@ Use `agent_get` with `projectEndpoint` and `agentName` to retrieve the agent def
 ### Step 3: Retrieve Logs (Hosted Agents Only)
 
 Hosted-agent logs are scoped to individual **sessions** (sandbox instances).
+
+> ℹ️ **`invocations_ws` agents:** the `sessionId` used by these REST endpoints is the **client-supplied `agent_session_id`** that the WebSocket client put on the upgrade URL — not a value issued by `session_create`. If the user has the WS client logs, pull the `agent_session_id` from there and pass it as `sessionId` below. See the [invocations-ws skill](../invocations-ws/invocations-ws.md) for the WS URL contract.
 
 1. **Check agent version status** — Use `agent_get` to verify the agent version status is `active`. If it is not active, the agent may still be provisioning or may have failed to become active.
 
