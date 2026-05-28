@@ -32,21 +32,6 @@ containers:
 
 ---
 
-## `safeguard-no-privilege-escalation` — Disable privilege escalation
-
-**Before:**
-```yaml
-securityContext: {}
-```
-
-**After:**
-```yaml
-securityContext:
-  allowPrivilegeEscalation: false
-```
-
----
-
 ## `safeguard-container-capabilities` — Drop all capabilities
 
 **Before:**
@@ -61,7 +46,6 @@ securityContext:
 securityContext:
   capabilities:
     drop: ["ALL"]
-  allowPrivilegeEscalation: false
 ```
 
 > ⚠️ **Warning:** If the app genuinely requires `NET_ADMIN` or similar, it is **incompatible** with AKS Automatic. Do not silently drop — explain the incompatibility and suggest redesign.
@@ -83,6 +67,27 @@ spec:
   securityContext:
     seccompProfile:
       type: RuntimeDefault
+  containers:
+    - name: web
+```
+
+---
+
+## `safeguard-allowed-seccomp-profiles` — Remove 'Unconfined' seccomp profile
+
+**Before:**
+```yaml
+spec:
+  securityContext:
+    seccompProfile:
+      type: Unconfined
+  containers:
+    - name: web
+```
+
+**After:**
+```yaml
+spec:
   containers:
     - name: web
 ```
@@ -166,6 +171,43 @@ readinessProbe:
     port: 50051
   initialDelaySeconds: 5
   periodSeconds: 10
+```
+
+---
+
+## `safeguard-host-probes` — Remove host field in probes and lifecycle hooks
+
+**Before:**
+```yaml
+spec:
+  containers:
+  - name: my-container
+    image: nginx:v1.2.3
+    livenessProbe:
+      httpGet:
+        host: "my-host"
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 20
+      failureThreshold: 3
+```
+
+**After:**
+Remove the `host` field
+Example:
+```yaml
+spec:
+  containers:
+  - name: my-container
+    image: nginx:v1.2.3
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 20
+      failureThreshold: 3
 ```
 
 ---

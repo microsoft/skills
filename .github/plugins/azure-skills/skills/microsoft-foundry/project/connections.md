@@ -49,7 +49,7 @@ Python and C# SDKs resolve this automatically from the connection name.
 
 | Role | Scope | Permission |
 |------|-------|------------|
-| **Azure AI Project Manager** | Project | Create/manage project connections |
+| **Foundry Project Manager** | Project | Create/manage project connections |
 | **Contributor** or **Owner** | Subscription/RG | Create Bing/Search resources, get keys |
 
 ## Troubleshooting
@@ -57,5 +57,5 @@ Python and C# SDKs resolve this automatically from the connection name.
 | Error | Cause | Fix |
 |-------|-------|-----|
 | `Connection not found` | Name mismatch or wrong project | Use `project_connection_list` to find the correct `connectionName` |
-| `Unauthorized` creating connection | Missing Azure AI Project Manager role | Assign role on the Foundry project |
+| `Unauthorized` creating connection | Missing Foundry Project Manager role | Assign role on the Foundry project |
 | `Invalid connection ID format` | Using name instead of full resource ID | Use `project_connection_get` to resolve the full ID |

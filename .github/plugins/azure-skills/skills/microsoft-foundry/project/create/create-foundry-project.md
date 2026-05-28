@@ -32,10 +32,10 @@ If multiple subscriptions, ask which to use, then `az account set --subscription
 **3. Role permissions:**
 
 ```bash
-az role assignment list --assignee "$(az ad signed-in-user show --query id -o tsv)" --query "[?contains(roleDefinitionName, 'Owner') || contains(roleDefinitionName, 'Contributor') || contains(roleDefinitionName, 'Azure AI')].{Role:roleDefinitionName, Scope:scope}" -o table
+az role assignment list --assignee "$(az ad signed-in-user show --query id -o tsv)" --query "[?contains(roleDefinitionName, 'Owner') || contains(roleDefinitionName, 'Contributor') || contains(roleDefinitionName, 'Foundry')].{Role:roleDefinitionName, Scope:scope}" -o table
 ```
 
-Requires Owner, Contributor, or Azure AI Owner. If insufficient — STOP, request elevated access from admin.
+Requires Owner, Contributor, or Foundry Owner. If insufficient — STOP, request elevated access from admin.
 
 **4. Azure Developer CLI** — `azd version`. If missing: https://aka.ms/azure-dev/install
 
@@ -120,7 +120,7 @@ Capture `AZURE_AI_PROJECT_ID`, `AZURE_AI_PROJECT_ENDPOINT`, and `AZURE_RESOURCE_
 | `azd: command not found` | Install from https://aka.ms/azure-dev/install |
 | `ERROR: Failed to authenticate` | Run `azd auth login`; verify subscription with `az account list` |
 | `environment name '' is invalid` | Name must be alphanumeric + hyphens only |
-| `ERROR: Insufficient permissions` | Request Contributor or Azure AI Owner role from admin |
+| `ERROR: Insufficient permissions` | Request Contributor or Foundry Owner role from admin |
 | Region not supported for hosted agents | Use `azd config set defaults.location northcentralus` |
 | Provisioning timeout | Check region availability, verify connectivity, retry `azd provision` |
 

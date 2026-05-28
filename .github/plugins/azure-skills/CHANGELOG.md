@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.59
+
+- feat(azure-kubernetes): Update constraint spec references to match what Deployment Safeguards enforces ([#1976](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/1976))
+
 ## 1.1.53
 
 - feature: Move quota workflow to a script ([#2360](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2360))

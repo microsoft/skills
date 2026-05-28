@@ -59,11 +59,11 @@ az role assignment create \
   --scope /subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.CognitiveServices/accounts/<ai-account-name>
 ```
 
-Assign `Azure AI User` at the **project** scope (data-plane — required for `agents/read`, `agents/write`):
+Assign `Foundry User` at the **project** scope (data-plane — required for `agents/read`, `agents/write`):
 
 ```bash
 az role assignment create \
-  --role "Azure AI User" \
+  --role "53ca6127-db72-4b80-b1b0-d745d6d5456d" \ # Foundry User
   --assignee <your-object-id-or-email> \
   --scope /subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.CognitiveServices/accounts/<ai-account-name>/projects/<project-name>
 ```

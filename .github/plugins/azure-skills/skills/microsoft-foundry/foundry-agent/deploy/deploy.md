@@ -197,13 +197,13 @@ Capture the per-agent identity from the agent creation response, then retrieve t
 For a newly deployed hosted agent, before invocation testing, first check whether the per-agent identity and project-level agent identity already have the minimum RBAC required for invocation.
 
 Required role assignment:
-- `Azure AI User`
+- `Foundry User`
 
 Required scope: the Cognitive Services account, not the project.
 
 Check existing assignments before creating any new assignment. If the required role assignment is missing for either identity, assign it before invocation testing.
 
-If the current user account does not have permission to create a missing role assignment, stop the deployment workflow here. Explain to the user that hosted-agent invocation requires `Azure AI User` on the per-agent identity and project-level agent identity at the Cognitive Services account scope, and the deployment cannot be treated as complete until someone with RBAC assignment permission grants the missing role.
+If the current user account does not have permission to create a missing role assignment, stop the deployment workflow here. Explain to the user that hosted-agent invocation requires `Foundry User` on the per-agent identity and project-level agent identity at the Cognitive Services account scope, and the deployment cannot be treated as complete until someone with RBAC assignment permission grants the missing role.
 
 After this RBAC check is complete, read and follow the [invoke skill](../invoke/invoke.md) to send a test message and verify the agent responds correctly. DO NOT SKIP reading the invoke skill — it contains important information about required hosted-agent session handling.
 
@@ -467,9 +467,9 @@ Use `agent_get` without `agentName` to list all agents, or with `agentName` to g
 | ACR build log crash | `UnicodeEncodeError` when `az acr build` streams remote logs | The remote build continues independently — do not assume failure. Get the `<run-id>` from the earlier `az acr build` output and check status with `az acr task show-run -r <acr-name> --run-id <run-id> --query status`. |
 | Agent creation failed | Invalid definition or missing required fields | Use `agent_definition_schema_get` to verify schema, check all required fields |
 | Hosted agent not running after creation | Provisioning failed or the image is not usable | Verify ACR image path, check cpu/memory values, confirm ACR permissions, then inspect hosted-agent logs with the troubleshoot skill |
-| Role assignment failed | The required invocation RBAC was not granted | Stop the deployment workflow and explain that hosted-agent invocation requires `Azure AI User` on the per-agent identity and project-level agent identity at the Cognitive Services account scope |
-| Invocation test failed after deployment | Missing or incorrect invocation RBAC for the per-agent identity or project-level agent identity | Check whether `Azure AI User` is assigned to the per-agent identity and project-level agent identity at the Cognitive Services account scope; assign missing role assignments, then retry invocation |
-| Permission denied | Insufficient Foundry project permissions | Verify Azure AI Owner or Contributor role on the project |
+| Role assignment failed | The required invocation RBAC was not granted | Stop the deployment workflow and explain that hosted-agent invocation requires `Foundry User` on the per-agent identity and project-level agent identity at the Cognitive Services account scope |
+| Invocation test failed after deployment | Missing or incorrect invocation RBAC for the per-agent identity or project-level agent identity | Check whether `Foundry User` is assigned to the per-agent identity and project-level agent identity at the Cognitive Services account scope; assign missing role assignments, then retry invocation |
+| Permission denied | Insufficient Foundry project permissions | Verify Foundry Owner or Contributor role on the project |
 | Schema fetch failed | Invalid project endpoint | Verify project endpoint URL format: `https://<resource>.services.ai.azure.com/api/projects/<project>` |
 
 ## Non-Interactive / YOLO Mode

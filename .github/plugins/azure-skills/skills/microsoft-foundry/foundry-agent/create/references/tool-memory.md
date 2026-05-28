@@ -31,12 +31,12 @@ If no embedding model exists, use `foundry_models_deploy` MCP tool with:
 
 | Role | Scope | Purpose |
 |------|-------|---------|
-| **Azure AI User** | AI Services resource | Assigned to project managed identity |
+| **Foundry User** | AI Services resource | Assigned to project managed identity |
 | **System-assigned managed identity** | Project | Must be enabled on the project |
 
 **Setup steps:**
 1. In Azure portal → project → **Resource Management** → **Identity** → enable system-assigned managed identity
-2. On the AI Services resource → **Access control (IAM)** → assign **Azure AI User** to the project managed identity
+2. On the AI Services resource → **Access control (IAM)** → assign **Foundry User** to the project managed identity
 
 ## Workflow
 

@@ -214,7 +214,7 @@ result = evaluate(
 print(f"Results: {result['studio_url']}")
 ```
 
-> 💡 **Tip:** Continuous evaluation requires project managed identity with **Azure AI User** role and Application Insights connected to the project.
+> 💡 **Tip:** Continuous evaluation requires project managed identity with **Foundry User** role and Application Insights connected to the project.
 
 ## Knowledge Index Operations (MCP)
 
