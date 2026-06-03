@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "M365 Copilot Eval CLI JSON Output",
+  "description": "Compact schema for JSON files written by runevals --output. Output is eval-document compatible and contains evaluated items with sparse score objects.",
+  "type": "object",
+  "required": ["schemaVersion", "items"],
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "evaluatedAt": { "type": "string" },
+        "agentId": { "type": "string" },
+        "agentName": { "type": "string" },
+        "cliVersion": { "type": "string" }
+      }
+    },
+    "default_evaluators": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/singleTurnOutput" },
+          { "$ref": "#/$defs/multiTurnOutput" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "singleTurnOutput": {
+      "type": "object",
+      "required": ["prompt"],
+      "additionalProperties": true,
+      "properties": {
+        "prompt": { "type": "string" },
+        "response": { "type": "string" },
+        "expected_response": { "type": "string" },
+        "context": { "type": "string" },
+        "evaluators": { "type": "object", "additionalProperties": true },
+        "evaluators_mode": { "enum": ["extend", "replace"] },
+        "scores": { "$ref": "#/$defs/scoreMap" }
+      },
+      "not": {
+        "required": ["turns"]
+      }
+    },
+    "multiTurnOutput": {
+      "type": "object",
+      "required": ["turns"],
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "conversation_id": { "type": "string" },
+        "turns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "prompt": { "type": "string" },
+              "response": { "type": "string" },
+              "expected_response": { "type": "string" },
+              "scores": { "$ref": "#/$defs/scoreMap" }
+            }
+          }
+        },
+        "summary": { "type": "object", "additionalProperties": true }
+      },
+      "not": {
+        "required": ["prompt"]
+      }
+    },
+    "scoreMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "relevance": { "$ref": "#/$defs/llmScore" },
+        "coherence": { "$ref": "#/$defs/llmScore" },
+        "groundedness": { "$ref": "#/$defs/llmScore" },
+        "similarity": { "$ref": "#/$defs/llmScore" },
+        "citations": { "$ref": "#/$defs/citationScore" },
+        "exactMatch": { "$ref": "#/$defs/matchScore" },
+        "partialMatch": { "$ref": "#/$defs/matchScore" }
+      }
+    },
+    "llmScore": {
+      "type": "object",
+      "required": ["score", "result", "threshold"],
+      "additionalProperties": true,
+      "properties": {
+        "score": { "type": "number", "minimum": 1, "maximum": 5 },
+        "result": { "enum": ["pass", "fail"] },
+        "threshold": { "type": "number" }
+      }
+    },
+    "citationScore": {
+      "type": "object",
+      "required": ["count", "result", "threshold"],
+      "additionalProperties": true,
+      "properties": {
+        "count": { "type": "number", "minimum": 0 },
+        "result": { "enum": ["pass", "fail"] },
+        "threshold": { "type": "number", "minimum": 0 }
+      }
+    },
+    "matchScore": {
+      "type": "object",
+      "required": ["score", "result", "threshold"],
+      "additionalProperties": true,
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "result": { "enum": ["pass", "fail"] },
+        "threshold": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,484 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/microsoft/M365-Copilot-Agent-Evals/refs/heads/main/schema/v1/eval-document.schema.json",
+  "title": "M365 Copilot Eval Document",
+  "description": "Schema for evaluation documents used by M365 Copilot Agent Evals CLI. Supports single-turn and multi-turn evaluations.",
+  "type": "object",
+  "required": ["schemaVersion", "items"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "JSON Schema URI for editor validation support"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "SemVer string identifying the schema version this document conforms to (e.g., '1.0.0')",
+      "examples": ["1.0.0", "1.1.0", "1.2.0"]
+    },
+    "metadata": {
+      "$ref": "#/$defs/DocumentMetadata"
+    },
+    "default_evaluators": {
+      "$ref": "#/$defs/EvaluatorMap",
+      "description": "File-level default evaluators (overrides system defaults)"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Array of evaluation items: single-turn evaluations or multi-turn threads",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/SingleTurnEvaluation" },
+          { "$ref": "#/$defs/MultiTurnThread" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "DocumentMetadata": {
+      "type": "object",
+      "description": "Optional metadata about the evaluation document",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for the evaluation set"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what this evaluation set tests"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the document was created"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Author or system that created the document"
+        },
+        "evaluatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when evaluation was performed"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for categorization and filtering"
+        },
+        "agentId": {
+          "type": "string",
+          "description": "M365 Agent ID this evaluation targets"
+        },
+        "agentName": {
+          "type": "string",
+          "description": "Name of the M365 agent this evaluation targets"
+        },
+        "cliVersion": {
+          "type": "string",
+          "description": "Version of the M365 Copilot Agent Evals CLI that produced this document"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Extension point for custom metadata. Use reverse-domain notation for field names."
+        }
+      }
+    },
+    "SingleTurnEvaluation": {
+      "type": "object",
+      "description": "A standalone single-turn prompt-response evaluation",
+      "required": ["prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The input prompt to evaluate"
+        },
+        "expected_response": {
+          "type": "string",
+          "description": "Expected or ideal response for comparison during evaluation"
+        },
+        "response": {
+          "type": "string",
+          "description": "Actual response from the agent"
+        },
+        "context": {
+          "type": "string",
+          "description": "Additional context for grounding evaluation"
+        },
+        "evaluators": {
+          "$ref": "#/$defs/EvaluatorMap",
+          "description": "Per-prompt evaluator overrides"
+        },
+        "evaluators_mode": {
+          "type": "string",
+          "enum": ["extend", "replace"],
+          "default": "extend",
+          "description": "How per-prompt evaluators combine with defaults"
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "description": "Citations included in the response"
+        },
+        "scores": {
+          "$ref": "#/$defs/ScoreCollection"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Extension point for custom item-level fields"
+        }
+      },
+      "not": {
+        "required": ["turns"]
+      }
+    },
+    "MultiTurnThread": {
+      "type": "object",
+      "description": "A multi-turn conversation thread with ordered turns sharing conversation context",
+      "required": ["turns"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for the thread"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what this thread tests"
+        },
+        "turns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/Turn" },
+          "description": "Ordered array of conversation turns"
+        },
+        "conversation_id": {
+          "type": "string",
+          "description": "Unique identifier for this conversation thread"
+        },
+        "summary": {
+          "$ref": "#/$defs/ThreadSummary",
+          "description": "Aggregate statistics for the thread"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Extension point for custom thread-level fields"
+        }
+      },
+      "not": {
+        "required": ["prompt"]
+      }
+    },
+    "Turn": {
+      "type": "object",
+      "description": "A single turn within a multi-turn thread",
+      "required": ["prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The user message for this turn"
+        },
+        "expected_response": {
+          "type": "string",
+          "description": "Expected agent response for this turn"
+        },
+        "response": {
+          "type": "string",
+          "description": "Actual agent response"
+        },
+        "context": {
+          "type": "string",
+          "description": "Additional context for grounding evaluation"
+        },
+        "evaluators": {
+          "$ref": "#/$defs/EvaluatorMap",
+          "description": "Per-turn evaluator overrides"
+        },
+        "evaluators_mode": {
+          "type": "string",
+          "enum": ["extend", "replace"],
+          "default": "extend",
+          "description": "How per-turn evaluators combine with defaults"
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "description": "Citations included in the response"
+        },
+        "scores": {
+          "$ref": "#/$defs/ScoreCollection"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pass", "fail", "error"],
+          "description": "Overall status of this turn"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if status is 'error'"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Extension point for custom turn-level fields"
+        }
+      }
+    },
+    "ThreadSummary": {
+      "type": "object",
+      "description": "Aggregate statistics for a thread",
+      "required": ["turns_total", "turns_passed", "turns_failed", "overall_status"],
+      "additionalProperties": false,
+      "properties": {
+        "turns_total": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total number of turns executed"
+        },
+        "turns_passed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of turns where all evaluators passed"
+        },
+        "turns_failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of turns where any evaluator failed"
+        },
+        "overall_status": {
+          "type": "string",
+          "enum": ["pass", "partial", "fail"],
+          "description": "pass: all turns passed, partial: some failed, fail: all failed or error"
+        }
+      }
+    },
+    "ScoreCollection": {
+      "type": "object",
+      "description": "Collection of evaluation scores for an item",
+      "additionalProperties": true,
+      "properties": {
+        "relevance": {
+          "$ref": "#/$defs/EvalScore",
+          "description": "Relevance score (1-5)"
+        },
+        "coherence": {
+          "$ref": "#/$defs/EvalScore",
+          "description": "Coherence score (1-5)"
+        },
+        "groundedness": {
+          "$ref": "#/$defs/EvalScore",
+          "description": "Groundedness score (1-5)"
+        },
+        "similarity": {
+          "$ref": "#/$defs/EvalScore",
+          "description": "Similarity score (1-5)"
+        },
+        "citations": {
+          "$ref": "#/$defs/CitationScore",
+          "description": "Citation evaluation results"
+        },
+        "exactMatch": {
+          "$ref": "#/$defs/ExactMatchScore",
+          "description": "Exact match evaluation result"
+        },
+        "partialMatch": {
+          "$ref": "#/$defs/PartialMatchScore",
+          "description": "Partial match evaluation result"
+        }
+      }
+    },
+    "EvalScore": {
+      "type": "object",
+      "description": "Standard evaluation score (1-5 scale)",
+      "required": ["score", "result", "threshold"],
+      "additionalProperties": true,
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Numeric score from 1.0 (worst) to 5.0 (best)"
+        },
+        "result": {
+          "type": "string",
+          "enum": ["pass", "fail"],
+          "description": "Pass/fail result based on threshold comparison"
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Threshold used for pass/fail determination"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation of why this score was assigned"
+        },
+        "evaluator": {
+          "type": "string",
+          "description": "Name or identifier of the evaluator that produced this score"
+        }
+      }
+    },
+    "CitationScore": {
+      "type": "object",
+      "description": "Citation-specific evaluation score",
+      "required": ["count", "result", "threshold"],
+      "additionalProperties": true,
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of citations found in the response"
+        },
+        "result": {
+          "type": "string",
+          "enum": ["pass", "fail"],
+          "description": "Pass/fail result based on citation count vs threshold"
+        },
+        "threshold": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum required number of citations for pass"
+        },
+        "format": {
+          "type": "string",
+          "description": "Citation format detected. Known values: 'oai_unicode', 'bracket', 'mixed'. Additional formats may be added.",
+          "examples": ["oai_unicode", "bracket", "mixed"]
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "description": "Parsed citation objects"
+        }
+      }
+    },
+    "ExactMatchScore": {
+      "type": "object",
+      "description": "Exact match evaluation result",
+      "required": ["match", "result"],
+      "additionalProperties": true,
+      "properties": {
+        "match": {
+          "type": "boolean",
+          "description": "Whether response exactly matches expected_response (trimmed; case-insensitive by default)"
+        },
+        "result": {
+          "type": "string",
+          "enum": ["pass", "fail"],
+          "description": "Pass when match is true, fail otherwise"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation of the match result"
+        }
+      }
+    },
+    "PartialMatchScore": {
+      "type": "object",
+      "description": "Partial match evaluation result",
+      "required": ["score", "result", "threshold"],
+      "additionalProperties": true,
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Match score from 0.0 (no match) to 1.0 (full match)"
+        },
+        "result": {
+          "type": "string",
+          "enum": ["pass", "fail"],
+          "description": "Pass/fail based on score vs threshold"
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum score required for pass (default: 0.5)"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation of the match result"
+        }
+      }
+    },
+    "EvaluatorMap": {
+      "type": "object",
+      "description": "Map of evaluator names to their configuration options",
+      "propertyNames": {
+        "enum": ["Relevance", "Coherence", "Groundedness", "Similarity", "Citations", "ExactMatch", "PartialMatch"]
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/EvaluatorOptions"
+      }
+    },
+    "EvaluatorOptions": {
+      "type": "object",
+      "description": "Evaluator configuration options. Use empty object {} for defaults.",
+      "additionalProperties": false,
+      "properties": {
+        "threshold": {
+          "type": "number",
+          "description": "Pass/fail threshold. Range depends on evaluator type: 1-5 for LLM evaluators (default: 3), >= 1 integer for Citations (min citation count, default: 1), 0.0-1.0 for PartialMatch (min match ratio, default: 0.5). Validated per-evaluator at runtime."
+        },
+        "citation_format": {
+          "type": "string",
+          "examples": ["oai_unicode", "bracket", "mixed"],
+          "description": "Citation format for detection. 'oai_unicode': new OAI unicode format, 'bracket': legacy [^i^] bracket format, 'mixed': auto-detect both formats. Default: oai_unicode."
+        },
+        "case_sensitive": {
+          "type": "boolean",
+          "default": false,
+          "description": "Case-sensitive matching for ExactMatch/PartialMatch"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Evaluator-specific configuration"
+        }
+      }
+    },
+    "Citation": {
+      "type": "object",
+      "description": "A single citation reference",
+      "required": ["index"],
+      "additionalProperties": true,
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Citation index (1-based)"
+        },
+        "text": {
+          "type": "string",
+          "description": "The cited text"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source reference (URL, document name, etc.)"
+        }
+      }
+    }
+  }
+}
