@@ -205,7 +205,7 @@ var client = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=.
 // AFTER
 var client = new BlobServiceClient(
     new Uri("https://mystorageaccount.blob.core.windows.net"),
-    new ManagedIdentityCredential());
+    new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
 ```
 
 ### Azure Service Bus
@@ -217,7 +217,7 @@ var client = new ServiceBusClient("Endpoint=sb://...;SharedAccessKeyName=...;Sha
 // AFTER
 var client = new ServiceBusClient(
     "my-namespace.servicebus.windows.net",
-    new ManagedIdentityCredential());
+    new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
 ```
 
 ### Azure Cosmos DB
@@ -229,7 +229,7 @@ var client = new CosmosClient("https://myaccount.documents.azure.com:443/", "pri
 // AFTER
 var client = new CosmosClient(
     "https://myaccount.documents.azure.com:443/",
-    new ManagedIdentityCredential());
+    new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned));
 ```
 
 ---
@@ -279,7 +279,7 @@ BlobServiceClient client = new BlobServiceClientBuilder()
     .buildClient();
 
 // AFTER
-TokenCredential credential = new ManagedIdentityCredentialBuilder().build();
+ManagedIdentityCredential credential = new ManagedIdentityCredentialBuilder().build();
 BlobServiceClient client = new BlobServiceClientBuilder()
     .endpoint("https://mystorageaccount.blob.core.windows.net")
     .credential(credential)
@@ -294,7 +294,7 @@ ServiceBusClientBuilder builder = new ServiceBusClientBuilder()
     .connectionString("Endpoint=sb://...;SharedAccessKeyName=...;SharedAccessKey=...");
 
 // AFTER
-TokenCredential credential = new ManagedIdentityCredentialBuilder().build();
+ManagedIdentityCredential credential = new ManagedIdentityCredentialBuilder().build();
 ServiceBusClientBuilder builder = new ServiceBusClientBuilder()
     .fullyQualifiedNamespace("my-namespace.servicebus.windows.net")
     .credential(credential);

@@ -101,7 +101,7 @@ client = ServiceClient(endpoint, credential=credential)
 
 ```csharp
 // C# — production
-var credential = new ManagedIdentityCredential();  // system-assigned
+var credential = new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned);  // system-assigned
 // var credential = new ManagedIdentityCredential(ManagedIdentityId.FromUserAssignedClientId("<user-assigned-mi-client-id>"));  // user-assigned
 var client = new ServiceClient(new Uri(endpoint), credential);
 ```
@@ -130,7 +130,7 @@ const client = new ServiceClient(endpoint, credential);
 ```python
 # Python — local dev only
 from azure.identity import DefaultAzureCredential
-credential = DefaultAzureCredential()
+credential = DefaultAzureCredential(require_envvar=True)
 client = ServiceClient(endpoint, credential=credential)
 ```
 

@@ -26,7 +26,7 @@ client = BlobServiceClient(
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
-credential = DefaultAzureCredential()
+credential = DefaultAzureCredential(require_envvar=True)
 client = BlobServiceClient(
     account_url="https://mystorageaccount.blob.core.windows.net",
     credential=credential
