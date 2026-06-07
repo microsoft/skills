@@ -1,0 +1,268 @@
+# Test scenarios for azure-cli-patterns skill evaluation
+# Each scenario tests a specific Azure CLI usage pattern
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: service_principal_auth
+    prompt: |
+      Write a bash script that logs into Azure using a service principal
+      for a CI/CD pipeline, sets the subscription, and creates a resource group.
+    expected_patterns:
+      - "az login --service-principal"
+      - "AZURE_CLIENT_ID"
+      - "AZURE_CLIENT_SECRET"
+      - "AZURE_TENANT_ID"
+      - "az account set"
+      - "az group create"
+    forbidden_patterns:
+      - "az login\\s*$"
+      - "password.*=.*[\"'][A-Za-z0-9]"
+    tags:
+      - authentication
+      - ci-cd
+    mock_response: |
+      #!/bin/bash
+      set -euo pipefail
+
+      az login --service-principal \
+        --username "$AZURE_CLIENT_ID" \
+        --password "$AZURE_CLIENT_SECRET" \
+        --tenant "$AZURE_TENANT_ID"
+
+      az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+      az group create \
+        --name "$RESOURCE_GROUP" \
+        --location "$LOCATION" \
+        --output none
+
+  - name: query_and_filter_output
+    prompt: |
+      Show how to use Azure CLI --query parameter with JMESPath to:
+      1. Get a storage account key into a shell variable
+      2. List only running VMs with their names and resource groups in table format
+    expected_patterns:
+      - "--query"
+      - "--output tsv"
+      - "az storage account keys list"
+      - "az vm list"
+      - "powerState"
+    forbidden_patterns:
+      - "jq "
+      - "| grep"
+    tags:
+      - query
+      - output
+    mock_response: |
+      #!/bin/bash
+      set -euo pipefail
+
+      # Get storage account key into a variable
+      STORAGE_KEY=$(az storage account keys list \
+        --account-name "$STORAGE_ACCOUNT" \
+        --resource-group "$RESOURCE_GROUP" \
+        --query "[0].value" --output tsv)
+
+      # List running VMs with name and resource group
+      az vm list \
+        --query "[?powerState=='VM running'].{Name:name, ResourceGroup:resourceGroup}" \
+        --output table
+
+  - name: idempotent_script
+    prompt: |
+      Write an idempotent bash script that creates a storage account only if
+      it doesn't already exist. The script should be safe to run multiple times
+      without errors.
+    expected_patterns:
+      - "set -euo pipefail"
+      - "az storage account show"
+      - "az storage account create"
+      - "if !"
+    forbidden_patterns:
+      - "az login\\s*$"
+    tags:
+      - scripting
+      - idempotent
+    mock_response: |
+      #!/bin/bash
+      set -euo pipefail
+
+      RESOURCE_GROUP="${RESOURCE_GROUP:-myapp-rg}"
+      STORAGE_ACCOUNT="${STORAGE_ACCOUNT:-myappstorage}"
+      LOCATION="${LOCATION:-eastus}"
+
+      # Create resource group (idempotent by default)
+      az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
+
+      # Create storage account only if it doesn't exist
+      if ! az storage account show --name "$STORAGE_ACCOUNT" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
+        echo "Creating storage account: $STORAGE_ACCOUNT"
+        az storage account create \
+          --name "$STORAGE_ACCOUNT" \
+          --resource-group "$RESOURCE_GROUP" \
+          --sku Standard_LRS \
+          --kind StorageV2 \
+          --output none
+      else
+        echo "Storage account already exists: $STORAGE_ACCOUNT"
+      fi
+
+  - name: batch_operations
+    prompt: |
+      Write a script that stops all running VMs in a resource group using
+      batch operations. Don't wait for each one to stop before starting the next.
+    expected_patterns:
+      - "az vm list"
+      - "--query"
+      - "--output tsv"
+      - "--no-wait"
+      - "xargs"
+    forbidden_patterns:
+      - "az vm stop --resource-group.*--name.*\n.*az vm stop"
+    tags:
+      - batch
+      - performance
+    mock_response: |
+      #!/bin/bash
+      set -euo pipefail
+
+      RESOURCE_GROUP="${1:-myRG}"
+
+      echo "Stopping all running VMs in $RESOURCE_GROUP..."
+
+      az vm list \
+        --resource-group "$RESOURCE_GROUP" \
+        --query "[?powerState=='VM running'].id" \
+        --output tsv | \
+        xargs -I {} az vm stop --ids {} --no-wait
+
+      echo "Stop commands issued. Use 'az vm wait' to poll for completion."
+
+  - name: deployment_with_whatif
+    prompt: |
+      Write a script that deploys a Bicep template to Azure. Include a what-if
+      check before the actual deployment, and give the deployment a unique name.
+    expected_patterns:
+      - "az deployment group what-if"
+      - "az deployment group create"
+      - "--template-file"
+      - "--name"
+      - "date"
+    forbidden_patterns:
+      - "az login\\s*$"
+    tags:
+      - deployment
+      - bicep
+    mock_response: |
+      #!/bin/bash
+      set -euo pipefail
+
+      RESOURCE_GROUP="${RESOURCE_GROUP:-myapp-rg}"
+      TEMPLATE_FILE="${TEMPLATE_FILE:-main.bicep}"
+      ENVIRONMENT="${ENVIRONMENT:-prod}"
+      DEPLOYMENT_NAME="deploy-$(date +%Y%m%d-%H%M%S)"
+
+      echo "Running what-if analysis..."
+      az deployment group what-if \
+        --resource-group "$RESOURCE_GROUP" \
+        --template-file "$TEMPLATE_FILE" \
+        --parameters environment="$ENVIRONMENT"
+
+      echo "Deploying $TEMPLATE_FILE as $DEPLOYMENT_NAME..."
+      az deployment group create \
+        --resource-group "$RESOURCE_GROUP" \
+        --template-file "$TEMPLATE_FILE" \
+        --parameters environment="$ENVIRONMENT" \
+        --name "$DEPLOYMENT_NAME"
+
+  - name: aks_cluster_management
+    prompt: |
+      Write a script that creates an AKS cluster with managed identity,
+      gets the credentials, and checks the cluster health.
+    expected_patterns:
+      - "az aks create"
+      - "--enable-managed-identity"
+      - "az aks get-credentials"
+      - "--resource-group"
+    forbidden_patterns:
+      - "--service-principal"
+      - "password.*=.*[\"'][A-Za-z0-9]"
+    tags:
+      - aks
+      - compute
+    mock_response: |
+      #!/bin/bash
+      set -euo pipefail
+
+      RESOURCE_GROUP="${RESOURCE_GROUP:-myapp-rg}"
+      CLUSTER_NAME="${CLUSTER_NAME:-myaks}"
+      LOCATION="${LOCATION:-eastus}"
+      NODE_COUNT="${NODE_COUNT:-3}"
+
+      # Create resource group
+      az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
+
+      # Create AKS cluster with managed identity
+      az aks create \
+        --resource-group "$RESOURCE_GROUP" \
+        --name "$CLUSTER_NAME" \
+        --node-count "$NODE_COUNT" \
+        --enable-managed-identity \
+        --generate-ssh-keys \
+        --output none
+
+      # Get credentials for kubectl
+      az aks get-credentials \
+        --resource-group "$RESOURCE_GROUP" \
+        --name "$CLUSTER_NAME" \
+        --overwrite-existing
+
+      # Check cluster health
+      az aks show \
+        --resource-group "$RESOURCE_GROUP" \
+        --name "$CLUSTER_NAME" \
+        --query "{Status:provisioningState, PowerState:powerState.code, Nodes:agentPoolProfiles[0].count}" \
+        --output table
+
+  - name: error_handling_cleanup
+    prompt: |
+      Write a bash script with proper error handling that creates resources
+      and cleans up on failure. Use a trap for cleanup.
+    expected_patterns:
+      - "set -euo pipefail"
+      - "trap"
+      - "cleanup"
+      - "trap cleanup EXIT"
+    forbidden_patterns:
+      - "az login\\s*$"
+    tags:
+      - scripting
+      - error-handling
+    mock_response: |
+      #!/bin/bash
+      set -euo pipefail
+
+      RESOURCE_GROUP="temp-rg-$(date +%s)"
+      LOCATION="eastus"
+
+      cleanup() {
+        echo "Cleaning up resource group: $RESOURCE_GROUP"
+        az group delete --name "$RESOURCE_GROUP" --yes --no-wait 2>/dev/null || true
+      }
+      trap cleanup EXIT
+
+      echo "Creating resource group: $RESOURCE_GROUP"
+      az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
+
+      echo "Creating storage account..."
+      az storage account create \
+        --name "tempstore$(date +%s)" \
+        --resource-group "$RESOURCE_GROUP" \
+        --sku Standard_LRS \
+        --output none
+
+      echo "Operations complete. Cleaning up..."

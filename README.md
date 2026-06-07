@@ -12,7 +12,7 @@ Skills, custom agents, AGENTS.md templates, and MCP configurations for AI coding
 
 > **Blog post:** [Context-Driven Development: Agent Skills for Microsoft Foundry and Azure](https://devblogs.microsoft.com/all-things-azure/context-driven-development-agent-skills-for-microsoft-foundry-and-azure/)
 
-> **🔍 Skill Explorer:** [Browse all 174 skills with 1-click install](https://microsoft.github.io/skills/)
+> **🔍 Skill Explorer:** [Browse all 175 skills with 1-click install](https://microsoft.github.io/skills/)
 
 ## Quick Start
 
@@ -70,11 +70,11 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ## Skill Catalog
 
-> 174 skills across language plugins — see [skill catalog](#skill-catalog) below for the full breakdown
+> 175 skills across language plugins — see [skill catalog](#skill-catalog) below for the full breakdown
 
 | Language | Count | Suffix |
 |----------|-------|--------|
-| [Core](#core) | 10 | — |
+| [Core](#core) | 11 | — |
 | [Foundry (Language-Agnostic)](#foundry-language-agnostic) | 11 | — |
 | [Python](#python) | 39 | `-py` |
 | [.NET](#net) | 28 | `-dotnet` |
@@ -86,10 +86,11 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ### Core
 
-> 10 skills — tooling, infrastructure, language-agnostic
+> 11 skills — tooling, infrastructure, language-agnostic
 
 | Skill | Description |
 |-------|-------------|
+| [azure-cli-patterns](.github/skills/azure-cli-patterns/) | Azure CLI best practices for scripting, automation, and resource management. Authentication, JMESPath queries, idempotent scripts, CI/CD integration. |
 | [cloud-solution-architect](.github/skills/cloud-solution-architect/) | Design well-architected Azure cloud systems. Architecture styles, 44 design patterns, technology choices, mission-critical design, WAF pillars. |
 | [copilot-sdk](.github/skills/copilot-sdk/) | Build applications powered by GitHub Copilot using the Copilot SDK. Session management, custom tools, streaming, hooks, MCP servers, BYOK, deployment patterns. |
 | [entra-agent-id](.github/skills/entra-agent-id/) | Microsoft Entra Agent ID (preview) — create OAuth2-capable AI agent identities via Microsoft Graph beta API. Blueprints, BlueprintPrincipals, permissions, WIF. |
