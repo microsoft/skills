@@ -11,7 +11,7 @@
 .github/plugins/azure-skills/            @microsoft/ghcp4a
 
 # Azure Identity SDK skills
-.github/plugins/*/skills/azure-identity-*/SKILL.md      @scottaddie
+.github/plugins/*/skills/azure-identity-*/SKILL.md      @g2vinay
 
 # Community-contributed skill: Microsoft Entra Agent ID
 .github/skills/entra-agent-id/           @ArLucaID @rbinrais @thegovind
