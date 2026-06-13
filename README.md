@@ -22,14 +22,15 @@ npx skills add microsoft/skills
 
 Select the skills you need from the wizard. Skills are installed to your chosen agent's directory (e.g., `.github/skills/` for GitHub Copilot) and symlinked if you use multiple agents.
 
+
+<details>
+<summary>Alternative installation methods</summary>
+
 **On .NET 10 or later?** `dnx` ships with the .NET 10 SDK and runs [`skillz`](https://www.nuget.org/packages/skillz), which is like `skills` but natively a .NET tool, no Node.js required:
 
 ```bash
 dnx skillz add microsoft/skills
 ```
-
-<details>
-<summary>Alternative installation methods</summary>
 
 **Manual installation (git clone)**
 
