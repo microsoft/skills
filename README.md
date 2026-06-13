@@ -22,7 +22,6 @@ npx skills add microsoft/skills
 
 Select the skills you need from the wizard. Skills are installed to your chosen agent's directory (e.g., `.github/skills/` for GitHub Copilot) and symlinked if you use multiple agents.
 
-
 <details>
 <summary>Alternative installation methods</summary>
 
