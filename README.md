@@ -25,7 +25,7 @@ Select the skills you need from the wizard. Skills are installed to your chosen 
 <details>
 <summary>Alternative installation methods</summary>
 
-**On .NET 10 or later?** `dnx` ships with the .NET 10 SDK and runs [`skillz`](https://www.nuget.org/packages/skillz), which is like `skills` but natively a .NET tool, no Node.js required:
+**On .NET 10 or later?** `dnx` ships with the .NET SDK and runs [`skillz`](https://www.nuget.org/packages/skillz), which is like `skills` but natively a .NET tool, no Node.js required:
 
 ```bash
 dnx skillz add microsoft/skills
