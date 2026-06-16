@@ -1,0 +1,380 @@
+# yaml-language-server: $schema=https://json.schemastore.org/any.json
+# Test scenarios for azure-storage-blob-dotnet skill evaluation
+# Each scenario tests a specific usage pattern against acceptance criteria
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  # BlobServiceClient with DefaultAzureCredential
+  - name: blob_service_client_default_credential
+    prompt: |
+      Create a BlobServiceClient using DefaultAzureCredential with the
+      account URL read from an environment variable.
+    expected_patterns:
+      - "BlobServiceClient"
+      - "DefaultAzureCredential"
+      - 'new Uri\('
+      - "Environment.GetEnvironmentVariable"
+      - "AZURE_STORAGE_ACCOUNT_URL"
+    forbidden_patterns:
+      - "AccountKey="
+      - 'Microsoft\.Azure\.Storage'
+    tags:
+      - authentication
+      - client
+    mock_response: |
+      using Azure.Identity;
+      using Azure.Storage.Blobs;
+
+      string accountUrl = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL")
+          ?? throw new InvalidOperationException("AZURE_STORAGE_ACCOUNT_URL not set");
+
+      var serviceClient = new BlobServiceClient(new Uri(accountUrl), new DefaultAzureCredential());
+
+  # BlobContainerClient and BlobClient
+  - name: container_and_blob_clients
+    prompt: |
+      From a BlobServiceClient, get a BlobContainerClient and a BlobClient
+      for a blob inside a virtual directory.
+    expected_patterns:
+      - "BlobContainerClient"
+      - "BlobClient"
+      - "GetBlobContainerClient"
+      - "GetBlobClient"
+    forbidden_patterns:
+      - "AccountKey="
+    tags:
+      - client
+      - hierarchy
+    mock_response: |
+      using Azure.Identity;
+      using Azure.Storage.Blobs;
+
+      var serviceClient = new BlobServiceClient(
+          new Uri(Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL")),
+          new DefaultAzureCredential());
+
+      BlobContainerClient containerClient = serviceClient.GetBlobContainerClient("mycontainer");
+      BlobClient blobClient = containerClient.GetBlobClient("folder/myfile.txt");
+
+  # Upload operations
+  - name: upload_operations
+    prompt: |
+      Show different upload methods: BinaryData string, local file path,
+      and a stream, all with the overwrite flag.
+    expected_patterns:
+      - "UploadAsync"
+      - "BinaryData.FromString"
+      - "overwrite: true"
+      - "File.OpenRead"
+    forbidden_patterns:
+      - 'UploadAsync\(stream\);'
+    tags:
+      - upload
+      - crud
+    mock_response: |
+      using Azure.Storage.Blobs;
+
+      // Upload string content
+      await blobClient.UploadAsync(BinaryData.FromString("Hello, Azure Blob Storage!"), overwrite: true);
+
+      // Upload from a local file
+      await blobClient.UploadAsync("path/to/local/file.txt", overwrite: true);
+
+      // Upload from a stream
+      await using FileStream stream = File.OpenRead("largefile.bin");
+      await blobClient.UploadAsync(stream, overwrite: true);
+
+  # Upload with headers and metadata
+  - name: upload_with_options
+    prompt: |
+      Upload a blob with custom HTTP headers (Content-Type, Cache-Control)
+      and metadata using BlobUploadOptions.
+    expected_patterns:
+      - "BlobUploadOptions"
+      - "BlobHttpHeaders"
+      - "ContentType"
+      - "Metadata"
+      - "UploadAsync"
+    forbidden_patterns: []
+    tags:
+      - upload
+      - metadata
+    mock_response: |
+      using Azure.Storage.Blobs;
+      using Azure.Storage.Blobs.Models;
+
+      var options = new BlobUploadOptions
+      {
+          HttpHeaders = new BlobHttpHeaders
+          {
+              ContentType = "application/json",
+              CacheControl = "max-age=3600"
+          },
+          Metadata = new Dictionary<string, string>
+          {
+              ["author"] = "john",
+              ["version"] = "1.0"
+          }
+      };
+
+      await using FileStream stream = File.OpenRead("data.json");
+      await blobClient.UploadAsync(stream, options);
+
+  # Download operations
+  - name: download_operations
+    prompt: |
+      Show downloading a blob into memory with DownloadContentAsync and to a
+      local file with DownloadToAsync.
+    expected_patterns:
+      - "DownloadContentAsync"
+      - "DownloadToAsync"
+      - "BlobDownloadResult"
+      - "Content.ToString"
+    forbidden_patterns: []
+    tags:
+      - download
+      - crud
+    mock_response: |
+      using Azure.Storage.Blobs.Models;
+
+      // Download content into memory (small blobs)
+      BlobDownloadResult result = await blobClient.DownloadContentAsync();
+      string text = result.Content.ToString();
+
+      // Download to a local file
+      await blobClient.DownloadToAsync("path/to/downloaded/file.txt");
+
+  # Download with streaming
+  - name: download_streaming
+    prompt: |
+      Download a large blob using a stream for memory-efficient processing.
+    expected_patterns:
+      - "DownloadStreamingAsync"
+      - "BlobDownloadStreamingResult"
+      - "CopyToAsync"
+    forbidden_patterns:
+      - "DownloadContentAsync"
+    tags:
+      - download
+      - streaming
+    mock_response: |
+      using Azure.Storage.Blobs.Models;
+
+      BlobDownloadStreamingResult download = await blobClient.DownloadStreamingAsync();
+      await using Stream source = download.Content;
+      await using FileStream destination = File.Create("large-download.bin");
+      await source.CopyToAsync(destination);
+
+  # List blobs
+  - name: list_blobs
+    prompt: |
+      List blobs in a container, including prefix filtering and hierarchical
+      listing of virtual directories.
+    expected_patterns:
+      - "GetBlobsAsync"
+      - "GetBlobsByHierarchyAsync"
+      - "prefix:"
+      - "delimiter:"
+      - "IsPrefix"
+    forbidden_patterns: []
+    tags:
+      - list
+      - query
+    mock_response: |
+      using Azure.Storage.Blobs.Models;
+
+      // List all blobs
+      await foreach (BlobItem blob in containerClient.GetBlobsAsync())
+      {
+          Console.WriteLine($"Blob: {blob.Name}, Size: {blob.Properties.ContentLength}");
+      }
+
+      // List by hierarchy (directories)
+      await foreach (BlobHierarchyItem item in
+          containerClient.GetBlobsByHierarchyAsync(prefix: "data/", delimiter: "/"))
+      {
+          if (item.IsPrefix)
+              Console.WriteLine($"Directory: {item.Prefix}");
+          else
+              Console.WriteLine($"Blob: {item.Blob.Name}");
+      }
+
+  # User delegation SAS (Entra ID)
+  - name: generate_user_delegation_sas
+    prompt: |
+      Generate a user delegation SAS for a blob with read permission and a
+      one-day expiry, using Entra ID (no account key).
+    expected_patterns:
+      - "GetUserDelegationKeyAsync"
+      - "BlobSasBuilder"
+      - "BlobSasPermissions.Read"
+      - "ToSasQueryParameters"
+      - "BlobUriBuilder"
+    forbidden_patterns:
+      - "AccountKey="
+      - "StorageSharedKeyCredential"
+    tags:
+      - sas
+      - security
+    mock_response: |
+      using Azure.Storage.Blobs.Models;
+      using Azure.Storage.Sas;
+
+      UserDelegationKey delegationKey = await serviceClient.GetUserDelegationKeyAsync(
+          DateTimeOffset.UtcNow,
+          DateTimeOffset.UtcNow.AddDays(1));
+
+      var sasBuilder = new BlobSasBuilder(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddDays(1))
+      {
+          BlobContainerName = containerClient.Name,
+          BlobName = "myblob.txt",
+          Resource = "b"
+      };
+
+      var uriBuilder = new BlobUriBuilder(blobClient.Uri)
+      {
+          Sas = sasBuilder.ToSasQueryParameters(delegationKey, serviceClient.AccountName)
+      };
+
+      Uri sasUri = uriBuilder.ToUri();
+
+  # Error handling
+  - name: blob_error_handling
+    prompt: |
+      Handle RequestFailedException for a download, branching on status codes
+      for not found, conflict, and access denied.
+    expected_patterns:
+      - "RequestFailedException"
+      - "ex.Status"
+      - "ErrorCode"
+      - "404"
+      - "409"
+      - "403"
+    forbidden_patterns:
+      - 'catch \(Exception'
+    tags:
+      - error-handling
+    mock_response: |
+      using Azure;
+      using Azure.Storage.Blobs.Models;
+
+      try
+      {
+          BlobDownloadResult result = await blobClient.DownloadContentAsync();
+      }
+      catch (RequestFailedException ex)
+      {
+          switch (ex.Status)
+          {
+              case 404:
+                  Console.Error.WriteLine($"Blob not found. ErrorCode: {ex.ErrorCode}");
+                  break;
+              case 409:
+                  Console.Error.WriteLine($"Conflict. ErrorCode: {ex.ErrorCode}");
+                  throw;
+              case 403:
+                  Console.Error.WriteLine($"Access denied. ErrorCode: {ex.ErrorCode}");
+                  throw;
+              default:
+                  Console.Error.WriteLine($"Error {ex.Status}: {ex.Message}");
+                  throw;
+          }
+      }
+
+  # Blob properties and metadata
+  - name: blob_properties_metadata
+    prompt: |
+      Get blob properties and set custom metadata and HTTP headers on a blob.
+    expected_patterns:
+      - "GetPropertiesAsync"
+      - "SetMetadataAsync"
+      - "SetHttpHeadersAsync"
+      - "BlobProperties"
+      - "ContentLength"
+    forbidden_patterns: []
+    tags:
+      - metadata
+      - properties
+    mock_response: |
+      using Azure.Storage.Blobs.Models;
+
+      BlobProperties properties = await blobClient.GetPropertiesAsync();
+      Console.WriteLine($"Size: {properties.ContentLength}");
+      Console.WriteLine($"Content-Type: {properties.ContentType}");
+      Console.WriteLine($"Last Modified: {properties.LastModified}");
+
+      var metadata = new Dictionary<string, string>
+      {
+          ["processed"] = "true",
+          ["version"] = "2.0"
+      };
+      await blobClient.SetMetadataAsync(metadata);
+
+      await blobClient.SetHttpHeadersAsync(new BlobHttpHeaders
+      {
+          ContentType = "application/octet-stream",
+          CacheControl = "max-age=86400"
+      });
+
+  # Blob leasing
+  - name: blob_leasing
+    prompt: |
+      Acquire a lease on a blob to prevent concurrent modification, perform an
+      operation, then release the lease.
+    expected_patterns:
+      - "GetBlobLeaseClient"
+      - "BlobLeaseClient"
+      - "AcquireAsync"
+      - "ReleaseAsync"
+    forbidden_patterns: []
+    tags:
+      - leasing
+      - concurrency
+    mock_response: |
+      using Azure.Storage.Blobs.Models;
+      using Azure.Storage.Blobs.Specialized;
+
+      BlobLeaseClient leaseClient = blobClient.GetBlobLeaseClient();
+
+      BlobLease lease = await leaseClient.AcquireAsync(TimeSpan.FromSeconds(60));
+      try
+      {
+          await blobClient.UploadAsync(BinaryData.FromString("Updated content"), overwrite: true);
+          await leaseClient.RenewAsync();
+      }
+      finally
+      {
+          await leaseClient.ReleaseAsync();
+      }
+
+  # Delete and copy
+  - name: delete_and_copy
+    prompt: |
+      Delete a blob idempotently, and copy a blob from a source URI using both
+      async and synchronous copy.
+    expected_patterns:
+      - "DeleteIfExistsAsync"
+      - "StartCopyFromUriAsync"
+      - "WaitForCompletionAsync"
+      - "SyncCopyFromUriAsync"
+    forbidden_patterns:
+      - 'blobClient\.DeleteAsync\(\);'
+    tags:
+      - delete
+      - copy
+    mock_response: |
+      using Azure.Storage.Blobs.Models;
+
+      // Idempotent delete
+      await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+
+      // Async copy (large blobs or cross-account)
+      CopyFromUriOperation operation = await destBlobClient.StartCopyFromUriAsync(sourceBlobUri);
+      await operation.WaitForCompletionAsync();
+
+      // Synchronous copy from URL (same account, smaller blobs)
+      await destBlobClient.SyncCopyFromUriAsync(sourceBlobUri);

@@ -187,13 +187,13 @@ A result **passes** if it has no error-severity findings.
 
 ## Test Coverage
 
-**123 skills with 1114 test scenarios**
+**124 skills with 1126 test scenarios**
 
 | Language | Skills | Scenarios |
 |----------|--------|-----------|
 | Core | 5 | 51 |
 | Python | 41 | 333 |
-| .NET | 28 | 286 |
+| .NET | 29 | 298 |
 | TypeScript | 23 | 249 |
 | Java | 26 | 195 |
 

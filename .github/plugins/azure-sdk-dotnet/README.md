@@ -1,6 +1,6 @@
 # azure-sdk-dotnet
 
-Azure SDK patterns and best practices for .NET developers. Covers 29 skills spanning AI, resource management, identity, messaging, and Key Vault libraries.
+Azure SDK patterns and best practices for .NET developers. Covers 30 skills spanning AI, resource management, identity, messaging, storage, and Key Vault libraries.
 
 ## Install
 
@@ -43,5 +43,6 @@ npx skills add microsoft/skills --skill azure-sdk-dotnet
 | `azure-search-documents-dotnet` | AI Search |
 | `azure-security-keyvault-keys-dotnet` | Key Vault Keys |
 | `azure-servicebus-dotnet` | Service Bus |
+| `azure-storage-blob-dotnet` | Blob Storage |
 | `m365-agents-dotnet` | M365 Agents SDK |
 | `microsoft-azure-webjobs-extensions-authentication-events-dotnet` | Auth Events Extension |

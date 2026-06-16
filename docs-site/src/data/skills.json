@@ -903,6 +903,13 @@
     "path": ".github/plugins/azure-skills/skills/azure-storage"
   },
   {
+    "name": "azure-storage-blob-dotnet",
+    "description": "Azure Storage Blob SDK for .NET. Client library for storing and managing unstructured data (files, images, backups, logs) in Azure Blob Storage. Use for uploading, downloading, streaming, listing, copying, and deleting blobs, managing containers, generating SAS tokens, and setting blob properties/metadata. Triggers: \"Azure Blob Storage .NET\", \"BlobServiceClient\", \"BlobContainerClient\", \"BlobClient\", \"upload download blob C#\", \"Azure.Storage.Blobs\", \"SAS token blob\", \"blob streaming\", \"block blob\".\n",
+    "lang": "dotnet",
+    "category": "data",
+    "path": ".github/plugins/azure-sdk-dotnet/skills/azure-storage-blob-dotnet"
+  },
+  {
     "name": "azure-storage-blob-java",
     "description": "Build blob storage applications with Azure Storage Blob SDK for Java. Use when uploading, downloading, or managing files in Azure Blob Storage, working with containers, or implementing streaming data operations.",
     "lang": "java",
