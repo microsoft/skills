@@ -59,7 +59,7 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 | Resource | Description |
 |----------|-------------|
-| **[174 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
+| **[175 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
 | **[Plugins](#plugins)** | Installable plugin packages (deep-wiki, azure-skills and more) |
 | **[Custom Agents](#agents)** | Role-specific agents (backend, frontend, infrastructure, planner) |
 | **[AGENTS.md](AGENTS.md)** | Template for configuring agent behavior in your projects |
@@ -70,14 +70,14 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ## Skill Catalog
 
-> 174 skills across language plugins — see [skill catalog](#skill-catalog) below for the full breakdown
+> 175 skills across language plugins — see [skill catalog](#skill-catalog) below for the full breakdown
 
 | Language | Count | Suffix |
 |----------|-------|--------|
 | [Core](#core) | 10 | — |
 | [Foundry (Language-Agnostic)](#foundry-language-agnostic) | 11 | — |
 | [Python](#python) | 39 | `-py` |
-| [.NET](#net) | 28 | `-dotnet` |
+| [.NET](#net) | 29 | `-dotnet` |
 | [TypeScript](#typescript) | 25 | `-ts` |
 | [Java](#java) | 25 | `-java` |
 | [Rust](#rust) | 7 | `-rust` |
@@ -241,7 +241,7 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ### .NET
 
-> 29 skills • suffix: `-dotnet`
+> 30 skills • suffix: `-dotnet`
 
 <details>
 <summary><strong>Foundry & AI</strong> (6 skills)</summary>
@@ -267,10 +267,11 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 </details>
 
 <details>
-<summary><strong>Data & Storage</strong> (6 skills)</summary>
+<summary><strong>Data & Storage</strong> (7 skills)</summary>
 
 | Skill | Description |
 |-------|-------------|
+| [azure-storage-blob-dotnet](.github/plugins/azure-sdk-dotnet/skills/azure-storage-blob-dotnet/) | Blob Storage — upload, download, streaming, SAS tokens, containers. |
 | [azure-mgmt-fabric-dotnet](.github/plugins/azure-sdk-dotnet/skills/azure-mgmt-fabric-dotnet/) | Fabric ARM — provision, scale, suspend/resume Fabric capacities. |
 | [azure-resource-manager-cosmosdb-dotnet](.github/plugins/azure-sdk-dotnet/skills/azure-resource-manager-cosmosdb-dotnet/) | Cosmos DB ARM — create accounts, databases, containers, RBAC. |
 | [azure-resource-manager-mysql-dotnet](.github/plugins/azure-sdk-dotnet/skills/azure-resource-manager-mysql-dotnet/) | MySQL Flexible Server — servers, databases, firewall, HA. |
@@ -653,13 +654,13 @@ pnpm test
 
 ### Test Coverage Summary
 
-**128 skills with 1158 test scenarios** — all skills have acceptance criteria and test scenarios.
+**129 skills with 1170 test scenarios** — all skills have acceptance criteria and test scenarios.
 
 | Language | Skills | Scenarios | Top Skills by Scenarios |
 |----------|--------|-----------|-------------------------|
 | Core | 7 | 72 | `copilot-sdk` (11), `podcast-generation` (8), `skill-creator` (8) |
 | Python | 41 | 331 | `azure-ai-projects-py` (12), `pydantic-models-py` (12), `azure-ai-translation-text-py` (11) |
-| .NET | 29 | 290 | `azure-resource-manager-sql-dotnet` (14), `azure-resource-manager-redis-dotnet` (14), `azure-servicebus-dotnet` (13) |
+| .NET | 30 | 302 | `azure-resource-manager-sql-dotnet` (14), `azure-resource-manager-redis-dotnet` (14), `azure-servicebus-dotnet` (13) |
 | TypeScript | 25 | 270 | `azure-storage-blob-ts` (17), `azure-servicebus-ts` (14), `aspire-ts` (13) |
 | Java | 26 | 195 | `azure-storage-blob-java` (12), `azure-identity-java` (12), `azure-data-tables-java` (11) |
 

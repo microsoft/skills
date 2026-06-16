@@ -172,7 +172,7 @@ npx skills add microsoft/skills
 |----------|--------|--------|----------|
 | **Core** | 6 | — | `mcp-builder`, `skill-creator`, `copilot-sdk` |
 | **Python** | 41 | `-py` | `azure-ai-projects-py`, `azure-cosmos-py`, `azure-ai-ml-py` |
-| **.NET** | 29 | `-dotnet` | `azure-ai-projects-dotnet`, `azure-resource-manager-cosmosdb-dotnet`, `azure-security-keyvault-keys-dotnet` |
+| **.NET** | 30 | `-dotnet` | `azure-ai-projects-dotnet`, `azure-storage-blob-dotnet`, `azure-security-keyvault-keys-dotnet` |
 | **TypeScript** | 25 | `-ts` | `azure-ai-projects-ts`, `azure-storage-blob-ts`, `aspire-ts` |
 | **Java** | 26 | `-java` | `azure-ai-projects-java`, `azure-cosmos-java`, `azure-eventhub-java` |
 

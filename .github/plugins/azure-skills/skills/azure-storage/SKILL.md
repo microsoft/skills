@@ -87,7 +87,7 @@ For deep documentation on specific services:
 
 For building applications with Azure Storage SDKs, see the condensed guides:
 
-- **Blob Storage**: [Python](references/sdk/azure-storage-blob-py.md) | [TypeScript](references/sdk/azure-storage-blob-ts.md) | [Java](references/sdk/azure-storage-blob-java.md) | [Rust](references/sdk/azure-storage-blob-rust.md)
+- **Blob Storage**: [Python](references/sdk/azure-storage-blob-py.md) | [TypeScript](references/sdk/azure-storage-blob-ts.md) | [Java](references/sdk/azure-storage-blob-java.md) | [.NET](references/sdk/azure-storage-blob-dotnet.md) | [Rust](references/sdk/azure-storage-blob-rust.md)
 - **Queue Storage**: [Python](references/sdk/azure-storage-queue-py.md) | [TypeScript](references/sdk/azure-storage-queue-ts.md)
 - **File Shares**: [Python](references/sdk/azure-storage-file-share-py.md) | [TypeScript](references/sdk/azure-storage-file-share-ts.md)
 - **Data Lake**: [Python](references/sdk/azure-storage-file-datalake-py.md)
