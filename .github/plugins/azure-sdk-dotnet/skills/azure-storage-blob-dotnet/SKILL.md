@@ -79,7 +79,7 @@ var serviceClient = new BlobServiceClient(connectionString);
 ### Create Container
 
 ```csharp
-// Create if not exists (idempotent) — returns null if it already exists
+// Throws RequestFailedException (409) if the container already exists
 BlobContainerClient container = await serviceClient.CreateBlobContainerAsync("mycontainer");
 
 // Or from an existing container client
