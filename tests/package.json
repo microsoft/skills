@@ -14,7 +14,7 @@
     "harness:mock": "tsx harness/runner.ts --mock"
   },
   "dependencies": {
-    "@github/copilot-sdk": "^0.1.20",
+    "@github/copilot-sdk": "^0.1.32",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "yaml": "^2.4.5",
