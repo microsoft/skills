@@ -7,6 +7,13 @@
     "path": ".github/plugins/azure-sdk-python/skills/agent-framework-azure-ai-py"
   },
   {
+    "name": "aident-skill",
+    "description": "Use Aident Loadout to connect your AI agents to 1,000+ real-world apps and tools like Gmail, Slack, Linear, Notion, Firecrawl, and Fal, unlock 27,000+ executable actions, and track full audit history so your agents can get real work done reliably.",
+    "lang": "core",
+    "category": "general",
+    "path": ".github/skills/aident-skill"
+  },
+  {
     "name": "airunway-aks-setup",
     "description": "Set up AI Runway on AKS — from bare cluster to running model. Covers cluster verification, controller install, GPU assessment, provider setup, and first deployment. WHEN: \"setup AI Runway\", \"onboard AKS cluster\", \"install AI Runway\", \"airunway setup\", \"deploy model to AKS\", \"GPU inference on AKS\", \"KAITO setup on AKS\", \"run LLM on AKS\", \"vLLM on AKS\", \"set up model serving on AKS\", \"AI Runway controller\".",
     "lang": "core",
