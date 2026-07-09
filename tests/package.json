@@ -21,7 +21,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@microsoft/vally": "^0.6.0",
+    "@microsoft/vally": "^0.7.0",
     "@types/node": "^20.14.0",
     "@vitest/coverage-v8": "^4.1.9",
     "eslint": "^9.5.0",

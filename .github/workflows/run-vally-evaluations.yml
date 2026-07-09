@@ -1,15 +1,15 @@
-name: Vally Evaluation
+name: Vally Workflow Evaluation
 
 on:
   pull_request:
     paths:
       - "tests/scenarios/**/vally/**"
-      - ".github/workflows/vally-evaluation.yml"
+      - ".github/workflows/run-vally-evaluations.yml"
   push:
     branches: [main]
     paths:
       - "tests/scenarios/**/vally/**"
-      - ".github/workflows/vally-evaluation.yml"
+      - ".github/workflows/run-vally-evaluations.yml"
   workflow_dispatch:
     inputs:
       eval_spec:
@@ -29,11 +29,11 @@ permissions:
 jobs:
   vally:
     runs-on: ubuntu-latest
-    #    env:
-    # Authenticates the Copilot CLI process vally spawns (see the
-    # copilot-requests permission note above). GH_TOKEN takes
-    # precedence over GITHUB_TOKEN if both are set.
-    #      GH_TOKEN: ${{ github.token }}
+    env:
+      # Authenticates Copilot CLI and Vally's Copilot SDK evaluator path.
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_COPILOT_API_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,6 +46,9 @@ jobs:
       - name: Install Vally CLI
         run: npm install -g @microsoft/vally-cli@0.6.0
 
+      - name: Install Copilot CLI
+        run: npm install -g @github/copilot
+
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -54,6 +57,16 @@ jobs:
 
       - name: Verify Vally CLI
         run: vally --version
+
+      - name: Verify copilot CLI
+        shell: bash
+        #        env:
+        # Authenticates the Copilot CLI process vally spawns (see the
+        # copilot-requests permission note above). GH_TOKEN takes
+        # precedence over GITHUB_TOKEN if both are set.
+        #          GH_TOKEN: ${{ github.token }}
+        run: |
+          copilot -p "What is the day of the week?"
 
       - name: Resolve eval specs
         id: specs
@@ -100,8 +113,8 @@ jobs:
             else
               find tests/scenarios -type f \( -name 'eval.yaml' -o -name 'eval.yml' \) -path '*/vally/*' | sort -u > "$specs_file"
             fi
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            collect_from_changed_dirs "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" | sort -u > "$specs_file"
+          elif [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ github.event_name }}" = "pull_request_target" ]; then
+            collect_from_changed_dirs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" | sort -u > "$specs_file"
           else
             base_sha="${{ github.event.before }}"
             if [ -z "$base_sha" ] || [ "$base_sha" = '0000000000000000000000000000000000000000' ]; then
@@ -139,6 +152,11 @@ jobs:
 
       - name: Lint Vally eval specs
         if: ${{ steps.specs.outputs.has_specs == 'true' }}
+        #        env:
+        # Authenticates the Copilot CLI process vally spawns (see the
+        # copilot-requests permission note above). GH_TOKEN takes
+        # precedence over GITHUB_TOKEN if both are set.
+        #          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
