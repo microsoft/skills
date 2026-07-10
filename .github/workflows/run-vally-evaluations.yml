@@ -1,7 +1,7 @@
 name: Vally Workflow Evaluation
 
 on:
-  pull_request_target:
+  pull_request:
     paths:
       - "tests/scenarios/**/vally/**"
       - ".github/workflows/run-vally-evaluations.yml"
