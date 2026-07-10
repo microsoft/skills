@@ -67,7 +67,7 @@ if (!baselineVariant || !skillVariant) {
   skillVariant    = skillVariant    ?? (hasSK || runDirs.find(d => d !== baselineVariant) || runDirs[1]);
 }
 
-for (const [label, v] of [['--baseline', baselineVariant], ['--skill', skillVariant]]) {
+for (const v of [baselineVariant, skillVariant]) {
   if (!runDirs.includes(v)) {
     console.error(`Error: variant "${v}" not found. Available: ${runDirs.join(', ')}`);
     process.exit(1);
