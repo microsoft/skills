@@ -44,7 +44,7 @@ jobs:
           node-version: "24"
 
       - name: Install Vally CLI
-        run: npm install -g @microsoft/vally-cli@0.6.0
+        run: npm install -g @microsoft/vally-cli@0.7.0
 
       - name: Install Copilot CLI
         run: npm install -g @github/copilot
