@@ -49,6 +49,9 @@ jobs:
       - name: Install Copilot CLI
         run: npm install -g @github/copilot
 
+      - name: Install Copilot CLI
+        run: npm install -g @github/copilot
+
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
