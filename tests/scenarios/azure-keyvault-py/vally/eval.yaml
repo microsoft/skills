@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 30m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: secret_crud_basic
     prompt: |-
@@ -51,7 +52,6 @@ stimuli:
         name: Idiomatic Python quality
         weight: 1
         config:
-          model: claude-sonnet-4.6
           prompt: |-
             Evaluate whether the generated Python code is idiomatic.
             Pass only when the code uses Pythonic naming, clear control flow,
@@ -101,7 +101,6 @@ stimuli:
         name: Idiomatic Python quality
         weight: 1
         config:
-          model: claude-sonnet-4.6
           prompt: |-
             Evaluate whether the generated Python code is idiomatic.
             Pass only when the code uses Pythonic naming, clear control flow,

@@ -8,8 +8,7 @@ scoring:
 defaults:
   runs: 1
   timeout: 60m
-  model: claude-sonnet-4.6
-stimuli:
+  model: claude-sonnet-4.6  grader_model: gpt-5.5stimuli:
   - name: rust-crud-blobs
     prompt: |
       Write a Rust program named rust-blob that performs the following blob storage operations:

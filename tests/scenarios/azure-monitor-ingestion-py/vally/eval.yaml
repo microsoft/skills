@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 30m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: sync_basic_upload
     prompt: |-
