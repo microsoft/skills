@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-keyvault-secrets-operations
     prompt: |
@@ -85,7 +86,6 @@ stimuli:
       - type: prompt
         name: "Key Vault secrets completeness"
         config:
-          model: claude-sonnet-4.6
           prompt: |
             - SecretClient creation with vault URL and credential
             - Set secret with SetSecretParameters including value
@@ -165,7 +165,6 @@ stimuli:
       - name: SecretClient Creation
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           SecretClient created via SecretClient::new(vault_url, credential, None)
           Vault URL is vault_name.vault.azure.net in https protocol
@@ -173,7 +172,6 @@ stimuli:
       - name: Secret CRUD Operations
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Set: client.set_secret(name, params.try_into()?, None).await?
           Get: client.get_secret(name, None).await?.into_model()?
@@ -182,7 +180,6 @@ stimuli:
       - name: SetSecretParameters Pattern
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           SetSecretParameters created with value: Some(value.into())
           Content type can be set via content_type: Some("text/plain".into())
@@ -190,7 +187,6 @@ stimuli:
       - name: Listing with Pagination
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           List secrets returns Pager<T> via client.list_secret_properties(None)?
           Iterate with let mut pager = ...; while let Some(secret) = pager.try_next().await?
@@ -199,7 +195,6 @@ stimuli:
       - name: Resource Extraction
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Use ResourceExt trait via secret.resource_id()?
           Returns ResourceId with name and version fields
@@ -207,7 +202,6 @@ stimuli:
       - name: Async Runtime and Error Handling
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Uses #[tokio::main] on main function
           All I/O operations awaited

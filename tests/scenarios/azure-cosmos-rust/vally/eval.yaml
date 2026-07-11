@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-cosmos-crud-operations
     prompt: |
@@ -84,7 +85,6 @@ stimuli:
       - type: prompt
         name: "Cosmos DB CRUD completeness"
         config:
-          model: claude-sonnet-4.6
           prompt: |
             - CosmosClient creation with builder and ProximityTo routing
             - Database and container client navigation
@@ -166,7 +166,7 @@ stimuli:
       - name: CosmosClient Builder Pattern
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
+        model: gpt-5.5
         prompt: >
           CosmosClient created via CosmosClient::builder()
           .build(account, RoutingStrategy::ProximityTo(region)).await?
@@ -175,7 +175,7 @@ stimuli:
       - name: CRUD Operations
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
+        model: gpt-5.5
         prompt: >
           Create: container.create_item(partition_key, id, item, None).await?
           Read: container.read_item(partition_key, id, None).await?
@@ -185,7 +185,7 @@ stimuli:
       - name: Partition Key Management
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
+        model: gpt-5.5
         prompt: >
           Partition key is required parameter in all item operations
           Partition key value passed as string to operations
@@ -194,7 +194,7 @@ stimuli:
       - name: Patch Operations
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
+        model: gpt-5.5
         prompt: >
           Patch operations use PatchInstructions::from(vec![...])
           Operations created with PatchOperation::set(path, value)
@@ -203,7 +203,7 @@ stimuli:
       - name: Response Conversion and Error Handling
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
+        model: gpt-5.5
         prompt: >
           Responses converted with into_model() for deserialization
           Error handling with match and error extraction

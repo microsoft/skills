@@ -8,7 +8,8 @@ scoring:
 defaults:
   runs: 1
   timeout: 60m
-  model: claude-sonnet-4.6  grader_model: gpt-5.5stimuli:
+  model: claude-sonnet-4.6
+  grader_model: gpt-5.5  grader_model: gpt-5.5stimuli:
   - name: rust-identity-credentials
     prompt: |
       Write a Rust program named rust-identity-demo that demonstrates all major credential

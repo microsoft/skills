@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-identity-credentials
     prompt: |
@@ -85,7 +86,6 @@ stimuli:
       - type: prompt
         name: "Identity credential completeness"
         config:
-          model: claude-sonnet-4.6
           prompt: |
             - DeveloperToolsCredential creation and usage
             - ManagedIdentityCredential creation and usage
@@ -164,7 +164,6 @@ stimuli:
       - name: DeveloperToolsCredential
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           DeveloperToolsCredential created via DeveloperToolsCredential::new(None)?
           Attempts Azure CLI (az login) first, then Azure Developer CLI (azd auth login)
@@ -172,7 +171,6 @@ stimuli:
       - name: ManagedIdentityCredential
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           ManagedIdentityCredential created via ManagedIdentityCredential::new(None)?
           System-assigned managed identity for Azure-hosted workloads
@@ -181,7 +179,6 @@ stimuli:
       - name: ClientSecretCredential
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           ClientSecretCredential created with three parameters:
           tenant_id (string), client_id (string), client_secret (string)
@@ -190,7 +187,6 @@ stimuli:
       - name: Credential Cloning
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Credentials are Arc-wrapped and support cloning
           Pass credential.clone() to multiple client constructors
@@ -199,7 +195,6 @@ stimuli:
       - name: TokenCredential Trait
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           All credential types implement TokenCredential trait
           Allows generic code that accepts any credential type
@@ -207,7 +202,6 @@ stimuli:
       - name: Environment Variable Configuration
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           AZURE_TENANT_ID: Tenant ID for service principal auth
           AZURE_CLIENT_ID: Client/application ID
@@ -216,7 +210,6 @@ stimuli:
       - name: Error Handling
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Credential creation returns Result<T, E>
           Missing or invalid credentials generate errors
@@ -225,7 +218,6 @@ stimuli:
       - name: Scenario Documentation
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Code includes comments explaining when each credential is appropriate
           DeveloperToolsCredential for local development

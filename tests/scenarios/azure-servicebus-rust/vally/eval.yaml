@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-servicebus-messaging
     prompt: |
@@ -77,7 +78,6 @@ stimuli:
       - type: prompt
         name: "Service Bus messaging completeness"
         config:
-          model: claude-sonnet-4.6
           prompt: |
             - ServiceBusClient initialization with builder and open()
             - Queue sender/receiver creation
@@ -156,7 +156,6 @@ stimuli:
       - name: ServiceBusClient Builder Pattern
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           ServiceBusClient created via ServiceBusClient::builder()
           .open(namespace, credential).await?
@@ -166,7 +165,6 @@ stimuli:
       - name: Message Operations
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Messages created via Message::from(text) or Message::from(bytes)
           Send via sender.send_message(message, None).await?
@@ -175,7 +173,6 @@ stimuli:
       - name: Message Settlement
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           After processing, call receiver.complete_message(&message, None).await?
           For retriable errors, use receiver.abandon_message(&message, None).await?
@@ -184,7 +181,6 @@ stimuli:
       - name: Queue and Topic Patterns
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Queues demonstrated via create_sender/create_receiver on queue names
           Topics demonstrated via create_sender on topic names

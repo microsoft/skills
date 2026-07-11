@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-queue-operations
     prompt: |
@@ -77,7 +78,6 @@ stimuli:
       - type: prompt
         name: "Queue operations completeness"
         config:
-          model: claude-sonnet-4.6
           prompt: |
             - QueueServiceClient initialization with endpoint URL and credential
             - QueueClient derived from service client
@@ -154,7 +154,6 @@ stimuli:
       - name: QueueServiceClient Construction
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           QueueServiceClient is created via QueueServiceClient::new() with three parameters:
           service_url (Url type), Some(credential), and None for options.
@@ -162,7 +161,6 @@ stimuli:
       - name: Queue Message Operations
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Send messages via queue_client.send_message(message.try_into()?, None).await?.
           Receive messages via queue_client.receive_messages(None).await? returning a response
@@ -172,7 +170,6 @@ stimuli:
       - name: Error Handling
         type: prompt
         weight: 1.0
-        model: claude-sonnet-4.6
         prompt: >
           Queue operations are wrapped in Result-based error handling using ? operator.
           No .unwrap() calls except where failure is impossible.
