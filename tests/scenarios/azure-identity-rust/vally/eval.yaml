@@ -109,31 +109,25 @@ stimuli:
             - No hardcoded secrets in source
           scoring: scale_1_5
 
-      - type: run-command
-        name: "Cargo Check"
+      - name: "Cargo Check"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
+          commands:
+            - command: cargo check
+          emit_in_metadata: true
       - name: Rust Clippy Lints
-        type: run-command
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
-      - type: run-command
-        name: "Cargo Build"
+          commands:
+            - command: cargo clippy -- -D warnings
+          emit_in_metadata: true
+      - name: "Cargo Build"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
 
       - name: Official Azure SDK Crate Selection
         type: rust-cargo-build-failure-check
@@ -163,6 +157,16 @@ stimuli:
           commands:
             - command: cargo +nightly -Zscript .vally/tools/check-no-secrets.rs
           emit_in_metadata: true
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
       - name: DeveloperToolsCredential
         type: prompt
         weight: 1.0

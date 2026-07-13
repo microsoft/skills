@@ -152,6 +152,76 @@ if (-not $evalFiles) {
 
 New-Item -ItemType Directory -Path $resolvedResultsRoot -Force | Out-Null
 
+$customGraderPluginDir = Join-Path $PSScriptRoot "scenarios\_shared\vally\grader-plugins\rust-cargo-build-failure"
+$customGraderSource = Join-Path $customGraderPluginDir "index.ts"
+$customGraderPackage = Join-Path $customGraderPluginDir "package.json"
+$customGraderTsConfig = Join-Path $customGraderPluginDir "tsconfig.json"
+$customGraderDistEntry = Join-Path $customGraderPluginDir "dist\index.js"
+
+$requiresRustCustomGrader = $false
+foreach ($eval in $evalFiles) {
+    $match = Select-String -Path $eval.FullName -Pattern 'type:\s*rust-cargo-build-failure-check' -CaseSensitive:$false -ErrorAction SilentlyContinue
+    if ($match) {
+        $requiresRustCustomGrader = $true
+        break
+    }
+}
+
+if ($requiresRustCustomGrader) {
+    if (-not (Test-Path $customGraderPluginDir)) {
+        Write-Error "Custom grader plugin directory not found: $customGraderPluginDir"
+        exit 1
+    }
+
+    $customGraderRebuildReasons = @()
+    if (-not (Test-Path $customGraderDistEntry)) {
+        $customGraderRebuildReasons += "dist/index.js is missing"
+    }
+    else {
+        $distTime = (Get-Item $customGraderDistEntry).LastWriteTimeUtc
+        foreach ($sourcePath in @($customGraderSource, $customGraderTsConfig, $customGraderPackage)) {
+            if (Test-Path $sourcePath) {
+                $sourceTime = (Get-Item $sourcePath).LastWriteTimeUtc
+                if ($sourceTime -gt $distTime) {
+                    $customGraderRebuildReasons += "$(Split-Path -Leaf $sourcePath) is newer than dist/index.js"
+                }
+            }
+        }
+    }
+
+    if ($customGraderRebuildReasons.Count -gt 0) {
+        Write-Host "Custom grader plugin rebuild required: $($customGraderRebuildReasons -join '; ')"
+
+        $buildOutput = $null
+        $buildExitCode = 1
+
+        $pnpmCmd = Get-Command pnpm -ErrorAction SilentlyContinue
+        if ($pnpmCmd) {
+            Write-Host "Rebuilding custom grader plugin via pnpm exec tsc..."
+            $buildOutput = & pnpm --dir $PSScriptRoot exec tsc --project $customGraderTsConfig 2>&1
+            $buildExitCode = $LASTEXITCODE
+        }
+        else {
+            Write-Host "pnpm not found; rebuilding custom grader plugin via npx tsc..."
+            $buildOutput = & npx tsc --project $customGraderTsConfig 2>&1
+            $buildExitCode = $LASTEXITCODE
+        }
+
+        if ($buildExitCode -ne 0 -or -not (Test-Path $customGraderDistEntry)) {
+            if ($buildOutput) {
+                $buildOutput | ForEach-Object { Write-Error $_ }
+            }
+            Write-Error "Failed to build custom grader plugin at $customGraderPluginDir"
+            exit 1
+        }
+
+        Write-Host "Custom grader plugin rebuilt successfully."
+    }
+    else {
+        Write-Host "Custom grader plugin is up to date."
+    }
+}
+
 $results = @()
 
 foreach ($evalFile in $evalFiles) {
@@ -166,6 +236,7 @@ foreach ($evalFile in $evalFiles) {
 
     $start = Get-Date
     $npxArgs = @("vally", "eval", "--eval-spec", $evalFile.FullName, "--output-dir", $scenarioOutDir, "--workers", "$Workers")
+    if ($requiresRustCustomGrader) { $npxArgs += @("--grader-plugin", $customGraderPluginDir) }
     if ($JUnit) { $npxArgs += "--junit" }
 
     & npx @npxArgs

@@ -98,32 +98,25 @@ stimuli:
             - Error handling for queue operations
           scoring: scale_1_5
 
-      - type: run-command
-        name: "Build Application"
+      - name: "Build Application"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
-          stderr_contains: "Finished"
-      - type: run-command
-        name: "Check Application"
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
+      - name: "Check Application"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
+          commands:
+            - command: cargo check
+          emit_in_metadata: true
       - name: Rust Clippy Lints
-        type: run-command
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
+          commands:
+            - command: cargo clippy -- -D warnings
+          emit_in_metadata: true
       - name: Official Azure SDK Crate Selection
         type: rust-cargo-build-failure-check
         weight: 1.0
@@ -152,6 +145,16 @@ stimuli:
           commands:
             - command: cargo +nightly -Zscript .vally/tools/check-no-secrets.rs
           emit_in_metadata: true
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
 
       - name: QueueServiceClient Construction
         type: prompt
