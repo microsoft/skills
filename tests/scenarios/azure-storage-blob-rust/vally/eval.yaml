@@ -95,32 +95,26 @@ stimuli:
           scoring: scale_1_5
 
       - name: Official Azure SDK Crate Selection
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-azure-crates.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-azure-crates.rs
+          emit_in_metadata: true
       - name: TokenCredential Authentication
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-token-credential.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-token-credential.rs
+          emit_in_metadata: true
       - name: Async-First with Tokio Runtime
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-async-runtime.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-async-runtime.rs
+          emit_in_metadata: true
       - name: Idiomatic Error Handling
         type: prompt
         weight: 1.0
@@ -190,14 +184,12 @@ stimuli:
           Parameters that are only used for URL construction borrow
           rather than own the data.
       - name: No Hardcoded Secrets
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-no-secrets.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-no-secrets.rs
+          emit_in_metadata: true
       - name: Rust Cargo Trajectory Build Failure
         type: rust-cargo-build-failure-check
         weight: 1.0
