@@ -46,12 +46,6 @@ jobs:
       - name: Install Vally CLI
         run: npm install -g @microsoft/vally-cli@0.7.0
 
-      - name: Install Copilot CLI
-        run: npm install -g @github/copilot
-
-      - name: Install Copilot CLI
-        run: npm install -g @github/copilot
-
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -60,16 +54,6 @@ jobs:
 
       - name: Verify Vally CLI
         run: vally --version
-
-      - name: Verify copilot CLI
-        shell: bash
-        #        env:
-        # Authenticates the Copilot CLI process vally spawns (see the
-        # copilot-requests permission note above). GH_TOKEN takes
-        # precedence over GITHUB_TOKEN if both are set.
-        #          GH_TOKEN: ${{ github.token }}
-        run: |
-          copilot -p "What is the day of the week?"
 
       - name: Resolve eval specs
         id: specs
@@ -155,11 +139,6 @@ jobs:
 
       - name: Lint Vally eval specs
         if: ${{ steps.specs.outputs.has_specs == 'true' }}
-        #        env:
-        # Authenticates the Copilot CLI process vally spawns (see the
-        # copilot-requests permission note above). GH_TOKEN takes
-        # precedence over GITHUB_TOKEN if both are set.
-        #          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
@@ -172,8 +151,13 @@ jobs:
               --strict
           done
 
+      - name: Skipping Vally evaluations (fork PR)
+        if: ${{ steps.specs.outputs.has_specs == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          echo "::notice::Skipping Vally evaluations on fork PR from ${{ github.event.pull_request.head.repo.full_name }}. Evaluation runs only on PRs targeting the main repository."
+
       - name: Run Vally evaluations
-        if: ${{ steps.specs.outputs.has_specs == 'true' }}
+        if: ${{ steps.specs.outputs.has_specs == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         shell: bash
         run: |
           set -euo pipefail
@@ -190,11 +174,6 @@ jobs:
           vally eval "${args[@]}" \
             --grader-plugin "$GITHUB_WORKSPACE/tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure" \
             --junit --output-dir vally-results --workers 2
-
-      #      - name: Skip eval when token is unavailable
-      #        if: ${{ steps.specs.outputs.has_specs == 'true' && env.GH_TOKEN == '' }}
-      #        run: |
-      #          echo "::warning::GH_TOKEN secret is not available. Skipping vally eval run and keeping lint-only validation."
 
       - name: Upload Vally artifacts
         if: always()
