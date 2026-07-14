@@ -9,7 +9,8 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
-  grader_model: gpt-5.5  grader_model: gpt-5.5stimuli:
+  grader_model: gpt-5.5
+stimuli:
   - name: rust-keyvault-certificates-operations
     prompt: |
       Write a Rust program named rust-keyvault-certs that demonstrates X.509 certificate
