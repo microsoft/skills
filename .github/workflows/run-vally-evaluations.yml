@@ -151,10 +151,15 @@ jobs:
               --strict
           done
 
-      - name: Skipping Vally evaluations (fork PR)
+      - name: Vally PR scope notice (same-repo)
+        if: ${{ steps.specs.outputs.has_specs == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          echo "::notice::Running Vally evaluations for same-repo PR from ${{ github.event.pull_request.head.repo.full_name }}."
+
+      - name: Vally PR scope notice (cross-repo)
         if: ${{ steps.specs.outputs.has_specs == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: |
-          echo "::notice::Skipping Vally evaluations on fork PR from ${{ github.event.pull_request.head.repo.full_name }}. Evaluation runs only on PRs targeting the main repository."
+          echo "::notice::Skipping Vally evaluations for cross-repo PR from ${{ github.event.pull_request.head.repo.full_name }} to ${{ github.repository }}. Evaluation runs only on same-repo PRs and non-PR events."
 
       - name: Run Vally evaluations
         if: ${{ steps.specs.outputs.has_specs == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
