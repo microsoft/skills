@@ -204,7 +204,7 @@ Every Python Azure SDK skill MUST open its `## Authentication & Lifecycle` secti
 
 > **🔑 Two rules apply to every code sample below:**
 >
-> 1. **Prefer `DefaultAzureCredential`.** It works locally (Azure CLI / VS Code / Developer CLI) and in Azure (managed identity, workload identity) with no code change. Avoid connection strings, account/API keys — they bypass Entra audit and rotation.
+> 1. **Prefer `DefaultAzureCredential` for local development.** It works as-is with Azure CLI / VS Code / Developer CLI. For production, either constrain `DefaultAzureCredential` to production-safe credentials or use a specific credential directly. Avoid connection strings, account/API keys — they bypass Entra audit and rotation.
 >    - Local dev: `DefaultAzureCredential` works as-is.
 >    - Production: set `AZURE_TOKEN_CREDENTIALS=prod` (or `AZURE_TOKEN_CREDENTIALS=<specific_credential>`) to constrain the credential chain to production-safe credentials.
 > 2. **Wrap every client in a context manager** so HTTP transports, sockets, and token caches are released deterministically:
@@ -625,7 +625,7 @@ AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used i
 
 > **🔑 Two rules apply to every code sample below:**
 >
-> 1. **Prefer `DefaultAzureCredential`.** It works locally (Azure CLI / VS Code / Developer CLI) and in Azure (managed identity, workload identity) with no code change. Avoid connection strings, account/API keys — they bypass Entra audit and rotation.
+> 1. **Prefer `DefaultAzureCredential` for local development.** It works as-is with Azure CLI / VS Code / Developer CLI. For production, either constrain `DefaultAzureCredential` to production-safe credentials or use a specific credential directly. Avoid connection strings, account/API keys — they bypass Entra audit and rotation.
 >    - Local dev: `DefaultAzureCredential` works as-is.
 >    - Production: set `AZURE_TOKEN_CREDENTIALS=prod` (or `AZURE_TOKEN_CREDENTIALS=<specific_credential>`) to constrain the credential chain to production-safe credentials.
 > 2. **Wrap every client in a context manager** so HTTP transports, sockets, and token caches are released deterministically:
@@ -1019,20 +1019,13 @@ After creating the skill:
    - Update test coverage summary (line ~622: `**N skills with N test scenarios**`)
    - Update test coverage table — update skill count, scenario count, and top skills for the language
 
-2. **Regenerate GitHub Pages data** — Run the extraction script to update the docs site
+2. **Regenerate GitHub Pages data** — Run the extraction script and rebuild the docs site from one scoped directory change
 
    ```bash
-   cd docs-site && npx tsx scripts/extract-skills.ts
+   (cd docs-site && npx tsx scripts/extract-skills.ts && npm run build)
    ```
 
-   This updates `docs-site/src/data/skills.json` which feeds the Astro-based docs site.
-   Then rebuild the docs site:
-
-   ```bash
-   cd docs-site && npm run build
-   ```
-
-   This outputs to `docs/` which is served by GitHub Pages.
+   This updates `docs-site/src/data/skills.json` which feeds the Astro-based docs site, then rebuilds the site into `docs/`, which is served by GitHub Pages.
 
 3. **Verify AGENTS.md** — Ensure the skill count is accurate
 
