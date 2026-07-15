@@ -233,3 +233,10 @@ asyncio.run(datalake_operations())
 8. **Use `get_paths` with `recursive=True`** for full directory listing
 9. **Set metadata** for custom file attributes
 10. **Consider Blob API** for simple object storage use cases
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

@@ -193,3 +193,10 @@ with EventGridPublisherClient(
 7. **Use async client** for high-throughput scenarios
 8. **Handle retries** — Event Grid has built-in retry
 9. **Set appropriate event types** for routing and filtering
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

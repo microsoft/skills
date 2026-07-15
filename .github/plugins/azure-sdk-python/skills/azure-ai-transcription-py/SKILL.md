@@ -24,12 +24,21 @@ pip install azure-ai-transcription
 
 ```bash
 TRANSCRIPTION_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-TRANSCRIPTION_KEY=<your-key>
+TRANSCRIPTION_KEY=<your-key>  # Required for all auth paths (this SDK currently uses key auth)
 ```
 
-## Authentication
+## Authentication & Lifecycle
 
-Use subscription key authentication (DefaultAzureCredential is not supported for this client):
+> **🔑 Two rules apply to every code sample below:**
+>
+> 1. **This SDK currently requires API-key authentication.** `DefaultAzureCredential`/Entra ID isn't available for this client yet, so use `TRANSCRIPTION_KEY` from environment variables (never hardcoded in code).
+> 2. **Wrap every client in a context manager** so HTTP transports and sockets are released deterministically:
+>    - Sync: `with <Client>(...) as client:`
+>    - Async: `async with <Client>(...) as client:`
+>
+> Snippets may abbreviate this setup, but production code should always follow both rules.
+
+Use subscription key authentication:
 
 ```python
 import os
@@ -88,3 +97,10 @@ with TranscriptionClient(
 6. **Specify language** to improve recognition accuracy
 7. **Handle streaming backpressure** for real-time transcription
 8. **Close transcription sessions** when complete
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

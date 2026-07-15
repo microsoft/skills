@@ -60,3 +60,9 @@ class MyInDB(MyResponse):
 1. Create models in `src/backend/app/models/`
 2. Export from `src/backend/app/models/__init__.py`
 3. Add corresponding TypeScript types
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |

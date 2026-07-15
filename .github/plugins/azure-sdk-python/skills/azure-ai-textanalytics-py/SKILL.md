@@ -252,3 +252,10 @@ async def analyze():
 5. **Use async client** for high-throughput scenarios
 6. **Handle document errors** — results list may contain errors for some docs
 7. **Specify language** when known to improve accuracy
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

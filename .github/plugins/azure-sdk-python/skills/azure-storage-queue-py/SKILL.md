@@ -237,3 +237,10 @@ with QueueClient(
 8. **Use `peek_messages`** for monitoring without affecting queue
 9. **Set `time_to_live`** to prevent stale messages
 10. **Consider Service Bus** for advanced features (sessions, topics)
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |
