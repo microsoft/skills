@@ -25,8 +25,8 @@ exporter = AzureMonitorTraceExporter(
 Use `ApplicationInsightsSampler` for consistent sampling:
 
 ```python
+from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.sampling import ParentBasedTraceIdRatio
 from azure.monitor.opentelemetry.exporter import ApplicationInsightsSampler
 
 # Sample 10% of traces
