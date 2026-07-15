@@ -72,8 +72,8 @@ authentication:
 ```python
 from azure.ai.translation.text import TextTranslationClient
 
-# Languages endpoint requires no credential; omit auth for this lookup
-text_client = TextTranslationClient()
+# Languages endpoint requires no credential; default endpoint is https://api.cognitive.microsofttranslator.com
+text_client = TextTranslationClient()  # no credential needed for this call
 result = text_client.get_supported_languages()
 
 # result.translation is a dict: BCP 47 code -> TranslationLanguage
