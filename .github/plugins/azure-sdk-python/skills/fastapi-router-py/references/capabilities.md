@@ -1,6 +1,6 @@
 # fastapi-router-py capability coverage
 
-**SDK/package**: `fastapi-router-py`
+**SDK/package**: `fastapi`
 
 This reference captures additional non-hero capabilities and API breadth so the main `SKILL.md` can stay focused on copy/paste hero flows.
 

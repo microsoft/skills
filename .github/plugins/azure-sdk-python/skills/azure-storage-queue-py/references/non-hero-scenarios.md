@@ -64,20 +64,19 @@ from azure.storage.queue.aio import QueueServiceClient, QueueClient
 from azure.identity.aio import DefaultAzureCredential
 
 async def queue_operations():
-    credential = DefaultAzureCredential()
-    
-    async with QueueClient(
-        account_url="https://<account>.queue.core.windows.net",
-        queue_name="myqueue",
-        credential=credential
-    ) as client:
-        # Send
-        await client.send_message("Async message")
-        
-        # Receive
-        async for message in client.receive_messages():
-            print(message.content)
-            await client.delete_message(message)
+    async with DefaultAzureCredential() as credential:
+        async with QueueClient(
+            account_url="https://<account>.queue.core.windows.net",
+            queue_name="myqueue",
+            credential=credential
+        ) as client:
+            # Send
+            await client.send_message("Async message")
+
+            # Receive
+            async for message in client.receive_messages():
+                print(message.content)
+                await client.delete_message(message)
 
 import asyncio
 asyncio.run(queue_operations())

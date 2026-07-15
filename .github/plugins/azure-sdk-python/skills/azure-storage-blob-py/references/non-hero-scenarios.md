@@ -38,9 +38,10 @@ async def upload_async():
 
 # Download async
 async def download_async():
-    async with BlobServiceClient(account_url, credential=credential) as client:
-        blob_client = client.get_blob_client("mycontainer", "sample.txt")
-        
-        stream = await blob_client.download_blob()
-        data = await stream.readall()
+    async with DefaultAzureCredential() as credential:
+        async with BlobServiceClient(account_url, credential=credential) as client:
+            blob_client = client.get_blob_client("mycontainer", "sample.txt")
+
+            stream = await blob_client.download_blob()
+            data = await stream.readall()
 ```

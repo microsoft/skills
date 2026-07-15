@@ -104,8 +104,8 @@ configure_azure_monitor(
 from azure.monitor.opentelemetry import configure_azure_monitor
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 
-# Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
-credential = DefaultAzureCredential(require_envvar=True)
+# Local dev: DefaultAzureCredential. In production, set AZURE_TOKEN_CREDENTIALS=prod or use a specific credential.
+credential = DefaultAzureCredential()
 # Or use a specific credential directly in production:
 # See https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#credential-classes
 # credential = ManagedIdentityCredential()
