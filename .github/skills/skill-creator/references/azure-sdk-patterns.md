@@ -9,14 +9,15 @@ Reference for creating skills that teach agents to write code following official
 ## Table of Contents
 
 1. [Core Principles (All Languages)](#core-principles-all-languages)
-2. [Standard Naming Conventions](#standard-naming-conventions)
-3. [Python Patterns](#python-patterns)
-4. [.NET (C#) Patterns](#net-c-patterns)
-5. [Java Patterns](#java-patterns)
-6. [TypeScript/JavaScript Patterns](#typescriptjavascript-patterns)
-7. [Rust Patterns](#rust-patterns)
-8. [Authentication (All Languages)](#authentication-all-languages)
-9. [Quick Reference Tables](#quick-reference-tables)
+2. [Skill Reference Directory Pattern](#skill-reference-directory-pattern)
+3. [Standard Naming Conventions](#standard-naming-conventions)
+4. [Python Patterns](#python-patterns)
+5. [.NET (C#) Patterns](#net-c-patterns)
+6. [Java Patterns](#java-patterns)
+7. [TypeScript/JavaScript Patterns](#typescriptjavascript-patterns)
+8. [Rust Patterns](#rust-patterns)
+9. [Authentication (All Languages)](#authentication-all-languages)
+10. [Quick Reference Tables](#quick-reference-tables)
 
 ---
 
@@ -33,6 +34,20 @@ Azure SDKs follow five design principles. Skills should reinforce these:
 | **Dependable** | No breaking changes without major version bump |
 
 **Consistency Priority:** Language conventions > Service conventions > Cross-language conventions
+
+---
+
+## Skill Reference Directory Pattern
+
+For Azure SDK skills, keep `SKILL.md` focused on hero flows and use `references/` for overflow details:
+
+- `references/capabilities.md` is an index only: hero scenarios covered in `SKILL.md`, non-hero scenario list, and links to deep-dive reference files.
+- `references/non-hero-scenarios.md` contains concrete non-hero examples intentionally kept out of `SKILL.md`.
+- Additional `references/*.md` files are optional for specialized topics (operation groups, evaluator/tool matrices, migration notes).
+
+Use present-tense guidance in reference files; avoid historical migration notes in user-facing capability indexes.
+
+For Python SDK skills that provide both sync and async clients, present both forms as first-class options. Do not encode a blanket preference for either mode in capability prioritization.
 
 ---
 
