@@ -36,6 +36,7 @@ Avoid blocking indefinitely on long-running batch jobs:
 
 ```python
 import os
+import time
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
@@ -49,7 +50,6 @@ with TranscriptionClient(
         content_urls=["https://<storage>/long-audio.wav"],
     )
     # Poll with an explicit deadline; job.result() does not raise on timeout
-    import time
     deadline = time.monotonic() + 300
     while not job.done():
         if time.monotonic() > deadline:
