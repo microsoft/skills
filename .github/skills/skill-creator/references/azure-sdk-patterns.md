@@ -41,7 +41,7 @@ Azure SDKs follow five design principles. Skills should reinforce these:
 
 For Azure SDK skills, keep `SKILL.md` focused on hero flows and use `references/` for overflow details:
 
-- `references/capabilities.md` is an index only: hero scenarios covered in `SKILL.md`, non-hero scenario list, and links to deep-dive reference files.
+- `references/capabilities.md` is an index only: each hero scenario plus where it is covered (`SKILL.md` or a bundled reference), the non-hero scenario list, and links to deep-dive reference files.
 - `references/non-hero-scenarios.md` contains concrete non-hero examples intentionally kept out of `SKILL.md`.
 - Additional `references/*.md` files are optional for specialized topics (operation groups, evaluator/tool matrices, migration notes).
 

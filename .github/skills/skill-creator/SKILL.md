@@ -407,7 +407,7 @@ Use a token counter or model playground to measure each section. Compare to the 
 - [ ] `name` matches `.github/skills/<name>/SKILL.md`
 - [ ] `description` includes trigger keywords
 - [ ] `description` is concise (~200 chars is a good target; schema max is 1,024 chars)
-- [ ] Optional `benchmark_tokens_*` and `benchmark_quality_*` metadata fields included (flat strings under `metadata`)
+- [ ] If included, optional `benchmark_tokens_*` and `benchmark_quality_*` metadata fields are flat strings under `metadata`
 
 **4b. Authentication guidance validation** (critical for all credentials):
 
@@ -517,18 +517,11 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 
 6. **Always verify package versions using crates.io.** Before using a package, check its version on [crates.io](https://crates.io/) to ensure you are using a stable and supported release.
 
-### Example Effective Skills (Benchmark These)
+### Example Effective Skills (Benchmark Only Structure-Compliant Skills)
 
-**Study these skills for conciseness, focus, and efficiency.** Your new skills should match this profile or explicitly explain why they're larger.
+**Only benchmark Azure SDK skills that already use the required `references/` layout** (`references/capabilities.md` plus `references/non-hero-scenarios.md`). Older skills that predate that structure can still be useful for style ideas, but do not mirror them directly until they are brought into compliance.
 
-| Skill                          | Est. Tokens | Key Pattern to Copy                                              |
-| ------------------------------ | ----------- | ---------------------------------------------------------------- |
-| `azure-keyvault-secrets-rust`  | ~1,400      | CRUD workflow (set/update/delete/list); RBAC table; concise snippets |
-| `azure-identity-rust`          | ~1,400      | Credential-type table as the core structure; 3 short code examples; minimal prose |
-| `azure-cosmos-rust`            | ~1,470      | Client hierarchy table + single CRUD workflow; one code block per operation |
-| `azure-eventhub-rust`          | ~1,475      | Send/receive workflow; key-concepts table; minimal prose         |
-
-**Why these are effective**:
+**A valid benchmark skill should**:
 
 1. Stay at or under the 1,500-token absolute max (see Token Budget Guidelines above)
 2. Cover the hero workflow (CRUD or primary operations), not every feature variant
@@ -536,6 +529,7 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 4. Use tables for API summary (credential types, RBAC roles, client hierarchy)
 5. Link to official docs via `microsoft-docs` MCP instead of duplicating
 6. Move advanced patterns to `/references/`
+7. Include `references/capabilities.md` and `references/non-hero-scenarios.md`
 
 **Before writing your skill**: Ask "Which of these is my use case most similar to?" then mirror that structure.
 
@@ -1080,7 +1074,7 @@ Before finalizing any regenerated skill:
 3. Add/refresh test scenarios so hero flows are validated by harness patterns.
 4. Add at least **one important non-hero scenario** (for example: update/patch, delete/cleanup, export/import, advanced auth mode, paging/filtering, retries/error handling, or LRO monitoring) when supported by the SDK. For Python SDKs that support both sync and async clients, present both forms with equal priority; do not treat either as universally preferred.
 5. For Azure SDK skills, structure `references/` as:
-   - `references/capabilities.md` as a concise index (hero scenarios + links to deeper non-hero references, no historical/migration narration).
+   - `references/capabilities.md` as a concise index that records each hero scenario and where it is covered (`SKILL.md` or a bundled reference), plus links to deeper non-hero references, with no historical/migration narration.
    - `references/non-hero-scenarios.md` for concrete non-hero examples that are intentionally kept out of the main `SKILL.md`.
    - Additional `references/*.md` files for specialized deep-dives (operation groups, tools, evaluator matrices, etc.).
 6. If the SDK has broad operation-group coverage (common in management SDKs), include an operation-group table and explicitly call out which groups are covered in snippets vs. referenced only.
@@ -1277,7 +1271,7 @@ Before completing a skill:
 - [ ] Includes cleanup/delete in examples
 - [ ] References organized by feature (`capabilities.md` index + dedicated deep-dive files)
 - [ ] Hero scenarios from current Learn docs are explicitly covered in snippets and tests
-- [ ] At least one high-value non-hero scenario is included (or explicitly documented as intentionally out of scope)
+- [ ] At least one high-value non-hero scenario is included when the SDK supports a distinct non-hero scenario (otherwise note that no distinct non-hero scenario applies)
 - [ ] For Azure SDK skills, `references/capabilities.md` indexes hero/non-hero coverage and links to dedicated non-hero docs
 - [ ] For Azure SDK skills, `references/non-hero-scenarios.md` contains concrete non-hero examples distinct from hero snippets
 - [ ] For broad SDKs (especially management SDKs), operation-group coverage is explicit (covered in snippets vs. reference-only)
