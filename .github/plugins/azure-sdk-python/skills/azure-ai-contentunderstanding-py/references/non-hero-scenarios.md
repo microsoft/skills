@@ -6,11 +6,11 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 ## Analyze Image
 
 ```python
-from azure.ai.contentunderstanding.models import AnalyzeInput
+from azure.ai.contentunderstanding.models import AnalysisInput
 
 poller = client.begin_analyze(
     analyzer_id="prebuilt-imageSearch",
-    inputs=[AnalyzeInput(url="https://example.com/image.jpg")]
+    inputs=[AnalysisInput(url="https://example.com/image.jpg")]
 )
 result = poller.result()
 content = result.contents[0]
@@ -160,15 +160,15 @@ asyncio.run(analyze_document())
 | `DocumentContent` | PDF, images, Office docs | Pages, tables, figures, paragraphs |
 | `AudioVisualContent` | Audio, video files | Transcript phrases, timing, key frames |
 
-Both derive from `MediaContent` which provides basic info and markdown representation.
+Both derive from `AnalysisContent`, which provides basic information and a markdown representation.
 
 ## Model Imports
 
 ```python
 from azure.ai.contentunderstanding.models import (
-    AnalyzeInput,
-    AnalyzeResult,
-    MediaContentKind,
+    AnalysisInput,
+    AnalysisResult,
+    AnalysisContent,
     DocumentContent,
     AudioVisualContent,
 )

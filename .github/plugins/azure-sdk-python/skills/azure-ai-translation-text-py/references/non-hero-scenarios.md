@@ -27,8 +27,8 @@ Find alternate translations and definitions:
 ```python
 result = client.lookup_dictionary_entries(
     body=["fly"],
-    from_parameter="en",
-    to="es"
+    from_language="en",
+    to_language="es"
 )
 
 for item in result:
@@ -48,8 +48,8 @@ from azure.ai.translation.text.models import DictionaryExampleTextItem
 
 result = client.lookup_dictionary_examples(
     body=[DictionaryExampleTextItem(text="fly", translation="volar")],
-    from_parameter="en",
-    to="es"
+    from_language="en",
+    to_language="es"
 )
 
 for item in result:
@@ -101,7 +101,7 @@ for item in result:
 ```python
 result = client.translate(
     body=["Hello, world!"],
-    to=["de"],
+    to_language=["de"],
     text_type="html",           # "plain" or "html"
     profanity_action="Marked",  # "NoAction", "Deleted", "Marked"
     profanity_marker="Asterisk", # "Asterisk", "Tag"
@@ -132,7 +132,7 @@ async def translate_text():
         ) as client:
             result = await client.translate(
                 body=["Hello, world!"],
-                to=["es"]
+                to_language=["es"]
             )
             print(result[0].translations[0].text)
 ```
