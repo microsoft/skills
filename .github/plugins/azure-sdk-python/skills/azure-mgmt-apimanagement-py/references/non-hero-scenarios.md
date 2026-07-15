@@ -90,6 +90,7 @@ client.api_policy.create_or_update(
 ## Create Named Value (Secret)
 
 ```python
+import os
 from azure.mgmt.apimanagement.models import NamedValueCreateContract
 
 named_value = client.named_value.begin_create_or_update(
@@ -98,7 +99,7 @@ named_value = client.named_value.begin_create_or_update(
     named_value_id="backend-api-key",
     parameters=NamedValueCreateContract(
         display_name="Backend API Key",
-        value="secret-key-value",
+        value=os.environ["BACKEND_API_KEY"],
         secret=True
     )
 ).result()
