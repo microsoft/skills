@@ -508,25 +508,25 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 
 ### Example Effective Skills (Benchmark These)
 
-**Study these 4 skills for conciseness, focus, and efficiency.** Your new skills should match this profile or explicitly explain why they're larger.
+**Study these skills for conciseness, focus, and efficiency.** Your new skills should match this profile or explicitly explain why they're larger.
 
-| Skill                       | Est. Tokens | Tokens Δ    | Quality Δ  | Key Pattern to Copy                                       |
-| --------------------------- | ----------- | ----------- | ---------- | --------------------------------------------------------- |
-| `azure-ai-ml-py`            | ~1,200      | **-39%** ✅ | Maintained | Single workflow: train + register model; concise examples |
-| `azure-ai-textanalytics-py` | ~1,100      | **-39%** ✅ | Maintained | Feature table (5-7 core methods); minimal prose           |
-| `azure-ai-contentsafety-py` | ~1,150      | **-37%** ✅ | Maintained | Compact use-case focus; each example is 1-2 lines         |
-| `azure-appconfiguration-py` | ~1,180      | **-34%** ✅ | Maintained | Strategic link to references; no comprehensive API doc    |
+| Skill                          | Est. Tokens | Key Pattern to Copy                                              |
+| ------------------------------ | ----------- | ---------------------------------------------------------------- |
+| `azure-keyvault-secrets-rust`  | ~1,400      | CRUD workflow (set/update/delete/list); RBAC table; concise snippets |
+| `azure-identity-rust`          | ~1,400      | Credential-type table as the core structure; 3 short code examples; minimal prose |
+| `azure-cosmos-rust`            | ~1,470      | Client hierarchy table + single CRUD workflow; one code block per operation |
+| `azure-storage-queue-rust`     | ~1,700      | Send/receive/peek/delete flow; pagination pattern; RBAC table    |
 
 **Why these are effective**:
 
-1. Stay under 1,200 tokens (core limit)
-2. Show ONE canonical workflow, not 5 variants
+1. Stay under 1,200–1,800 tokens
+2. Cover the hero workflow (CRUD or primary operations), not every feature variant
 3. Show 1-2 examples per concept, not 3-5
-4. Use tables for API summary (not prose descriptions)
+4. Use tables for API summary (credential types, RBAC roles, client hierarchy)
 5. Link to official docs via `microsoft-docs` MCP instead of duplicating
 6. Move advanced patterns to `/references/`
 
-**Before writing your skill**: Ask "Which of these 4 is my use case most similar to?" then mirror that structure.
+**Before writing your skill**: Ask "Which of these is my use case most similar to?" then mirror that structure.
 
 ---
 
