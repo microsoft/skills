@@ -8,12 +8,11 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 ### Create Snapshot
 
 ```python
-from azure.appconfiguration import ConfigurationSnapshot, ConfigurationSettingFilter
+from azure.appconfiguration import ConfigurationSnapshot, ConfigurationSettingsFilter
 
 snapshot = ConfigurationSnapshot(
-    name="v1-snapshot",
     filters=[
-        ConfigurationSettingFilter(key="app:*", label="production")
+        ConfigurationSettingsFilter(key="app:*", label="production")
     ]
 )
 
