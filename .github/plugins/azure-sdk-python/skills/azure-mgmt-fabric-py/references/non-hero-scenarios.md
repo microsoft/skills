@@ -6,13 +6,13 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 ## Update Capacity
 
 ```python
-from azure.mgmt.fabric.models import FabricCapacityUpdate, CapacitySku
+from azure.mgmt.fabric.models import FabricCapacityUpdate, RpSku
 
 updated = client.fabric_capacities.begin_update(
     resource_group_name=resource_group,
     capacity_name=capacity_name,
     properties=FabricCapacityUpdate(
-        sku=CapacitySku(
+        sku=RpSku(
             name="F4",  # Scale up
             tier="Fabric"
         ),
@@ -82,13 +82,11 @@ else:
 ## List Available SKUs
 
 ```python
-skus = client.fabric_capacities.list_skus(
-    resource_group_name=resource_group,
-    capacity_name=capacity_name
-)
+skus = client.fabric_capacities.list_skus()
 
 for sku in skus:
-    print(f"SKU: {sku.name} - Tier: {sku.tier}")
+    locations = ", ".join(sku.locations) if sku.locations else "N/A"
+    print(f"SKU: {sku.name} - Locations: {locations}")
 ```
 
 ## Client Operations

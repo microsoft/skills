@@ -29,6 +29,7 @@ asyncio.run(publish_events())
 For Event Grid Namespaces (pull delivery):
 
 ```python
+from azure.core.messaging import CloudEvent
 from azure.eventgrid import EventGridPublisherClient
 from azure.identity import DefaultAzureCredential
 
@@ -42,5 +43,10 @@ with DefaultAzureCredential() as credential:
         credential=credential,
         namespace_topic=topic_name,
     ) as client:
+        event = CloudEvent(
+            type="MyApp.Events.Test",
+            source="/myapp",
+            data={"message": "hello from namespace"}
+        )
         client.send(event)
 ```

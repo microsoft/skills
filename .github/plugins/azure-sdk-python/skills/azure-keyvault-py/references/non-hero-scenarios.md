@@ -13,7 +13,7 @@ async def get_secret():
     async with DefaultAzureCredential() as credential:
         async with SecretClient(vault_url=vault_url, credential=credential) as client:
             secret = await client.get_secret("my-secret")
-            print(secret.value)
+            print(f"Retrieved secret: {secret.name} (version: {secret.properties.version})")
 
 import asyncio
 asyncio.run(get_secret())

@@ -24,14 +24,14 @@ pip install azure-ai-transcription
 
 ```bash
 TRANSCRIPTION_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-TRANSCRIPTION_KEY=<your-key>  # Required for all auth paths (this SDK currently uses key auth)
+TRANSCRIPTION_KEY=<your-key>  # For key auth; omit when using DefaultAzureCredential/TokenCredential
 ```
 
 ## Authentication & Lifecycle
 
 > **🔑 Two rules apply to every code sample below:**
 >
-> 1. **This SDK currently requires API-key authentication.** `DefaultAzureCredential`/Entra ID isn't available for this client yet, so use `TRANSCRIPTION_KEY` from environment variables (never hardcoded in code).
+> 1. **Two auth modes are supported:** `AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"])` for key-based auth, or `DefaultAzureCredential()` / any `TokenCredential` for Entra ID. Prefer `DefaultAzureCredential` in production; never hardcode credentials in code.
 > 2. **Wrap every client in a context manager** so HTTP transports and sockets are released deterministically:
 >    - Sync: `with <Client>(...) as client:`
 >    - Async: `async with <Client>(...) as client:`
