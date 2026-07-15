@@ -83,6 +83,7 @@ export interface EvaluationResult {
   skillName: string;
   scenario: string;
   generatedCode: string;
+  rawResponse: string;
   findings: Finding[];
   matchedCorrect: string[];
   matchedIncorrect: string[];
@@ -110,7 +111,7 @@ export interface GenerationConfig {
  * Default generation configuration.
  */
 export const DEFAULT_GENERATION_CONFIG: GenerationConfig = {
-  model: "gpt-4",
+  model: "gpt-5.5",
   maxTokens: 2000,
   temperature: 0.3,
   includeSkillContext: true,
@@ -175,7 +176,7 @@ export interface CopilotClient {
     prompt: string,
     skillName: string,
     config?: GenerationConfig,
-    scenarioName?: string
+    scenarioName?: string,
   ): Promise<GenerationResult>;
 }
 
@@ -223,12 +224,13 @@ export function detectLanguage(skillName: string): Language {
 export function createEvaluationResult(
   skillName: string,
   scenario: string,
-  generatedCode: string
+  generatedCode: string,
 ): EvaluationResult {
   return {
     skillName,
     scenario,
     generatedCode,
+    rawResponse: "",
     findings: [],
     matchedCorrect: [],
     matchedIncorrect: [],
@@ -242,7 +244,9 @@ export function createEvaluationResult(
 /**
  * Create an empty code pattern.
  */
-export function createCodePattern(partial: Partial<CodePattern> = {}): CodePattern {
+export function createCodePattern(
+  partial: Partial<CodePattern> = {},
+): CodePattern {
   return {
     code: "",
     language: "python",
@@ -256,7 +260,9 @@ export function createCodePattern(partial: Partial<CodePattern> = {}): CodePatte
 /**
  * Create an empty validation rule.
  */
-export function createValidationRule(partial: Partial<ValidationRule> = {}): ValidationRule {
+export function createValidationRule(
+  partial: Partial<ValidationRule> = {},
+): ValidationRule {
   return {
     name: "",
     description: "",
@@ -274,7 +280,7 @@ export function createValidationRule(partial: Partial<ValidationRule> = {}): Val
  * Create an empty acceptance criteria.
  */
 export function createAcceptanceCriteria(
-  partial: Partial<AcceptanceCriteria> = {}
+  partial: Partial<AcceptanceCriteria> = {},
 ): AcceptanceCriteria {
   return {
     skillName: "",

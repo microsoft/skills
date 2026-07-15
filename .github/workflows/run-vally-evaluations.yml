@@ -1,15 +1,15 @@
-name: Vally Evaluation
+name: Vally Workflow Evaluation
 
 on:
   pull_request:
     paths:
       - "tests/scenarios/**/vally/**"
-      - ".github/workflows/vally-evaluation.yml"
+      - ".github/workflows/run-vally-evaluations.yml"
   push:
     branches: [main]
     paths:
       - "tests/scenarios/**/vally/**"
-      - ".github/workflows/vally-evaluation.yml"
+      - ".github/workflows/run-vally-evaluations.yml"
   workflow_dispatch:
     inputs:
       eval_spec:
@@ -19,13 +19,21 @@ on:
 
 permissions:
   contents: read
+  # eval.yaml's `executor: copilot-sdk` makes vally spawn the real GitHub
+  # Copilot CLI (`@github/copilot`, pulled in transitively via the vally npm
+  # dependency tree -- no extra install step needed) to run each stimulus.
+  # That CLI authenticates via the GH_TOKEN/GITHUB_TOKEN env var, which
+  # requires the GITHUB_TOKEN to carry the "Copilot Requests" permission.
+  copilot-requests: write
 
 jobs:
   vally:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.COPILOT_TOKEN || '' }}
-
+      # Authenticates Copilot CLI and Vally's Copilot SDK evaluator path.
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_COPILOT_API_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,10 +41,16 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install Vally CLI
-        run: npm install -g @microsoft/vally-cli@0.6.0
+        run: npm install -g @microsoft/vally-cli@0.7.0
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
 
       - name: Verify Vally CLI
         run: vally --version
@@ -86,8 +100,8 @@ jobs:
             else
               find tests/scenarios -type f \( -name 'eval.yaml' -o -name 'eval.yml' \) -path '*/vally/*' | sort -u > "$specs_file"
             fi
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            collect_from_changed_dirs "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" | sort -u > "$specs_file"
+          elif [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ github.event_name }}" = "pull_request_target" ]; then
+            collect_from_changed_dirs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" | sort -u > "$specs_file"
           else
             base_sha="${{ github.event.before }}"
             if [ -z "$base_sha" ] || [ "$base_sha" = '0000000000000000000000000000000000000000' ]; then
@@ -137,8 +151,18 @@ jobs:
               --strict
           done
 
+      - name: Vally PR scope notice (same-repo)
+        if: ${{ steps.specs.outputs.has_specs == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          echo "::notice::Running Vally evaluations for same-repo PR from ${{ github.event.pull_request.head.repo.full_name }}."
+
+      - name: Vally PR scope notice (cross-repo)
+        if: ${{ steps.specs.outputs.has_specs == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          echo "::notice::Skipping Vally evaluations for cross-repo PR from ${{ github.event.pull_request.head.repo.full_name }} to ${{ github.repository }}. Evaluation runs only on same-repo PRs and non-PR events."
+
       - name: Run Vally evaluations
-        if: ${{ steps.specs.outputs.has_specs == 'true' && env.GH_TOKEN != '' }}
+        if: ${{ steps.specs.outputs.has_specs == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         shell: bash
         run: |
           set -euo pipefail
@@ -155,11 +179,6 @@ jobs:
           vally eval "${args[@]}" \
             --grader-plugin "$GITHUB_WORKSPACE/tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure" \
             --junit --output-dir vally-results --workers 2
-
-      - name: Skip eval when token is unavailable
-        if: ${{ steps.specs.outputs.has_specs == 'true' && env.GH_TOKEN == '' }}
-        run: |
-          echo "::warning::COPILOT_TOKEN secret is not available. Skipping vally eval run and keeping lint-only validation."
 
       - name: Upload Vally artifacts
         if: always()

@@ -24,9 +24,10 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: tests/pnpm-lock.yaml
 
-      - name: Verify Rust skill links are in sync
+      - name: Verify Skill links are in sync
         run: |
           python .github/scripts/sync_skill_links.py --plugin azure-sdk-rust --check
+          python .github/scripts/sync_skill_links.py --plugin azure-sdk-python --check
 
       - name: Install dependencies
         working-directory: tests
