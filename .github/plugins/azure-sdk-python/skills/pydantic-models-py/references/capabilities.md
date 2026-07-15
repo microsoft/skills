@@ -18,8 +18,8 @@ This reference captures additional non-hero capabilities and API breadth so the 
 
 ## API breadth checklist
 
-- Verify client/auth mode for the environment before coding.
-- Confirm operation-group/method names against current Microsoft Learn API reference.
-- Include cleanup/delete paths for created resources in examples.
-- Prefer idempotent create/update operations where available.
-- Validate paging/LRO/error-handling patterns for production paths.
+- Verify field validators (`@field_validator`) and model validators (`@model_validator`) cover all required constraints.
+- Confirm serialization behavior: use `model_dump(mode="json")` for JSON-safe output and `model_dump(exclude_unset=True)` for partial updates.
+- Include schema generation examples (`model_json_schema()`) when the model drives API contracts or documentation.
+- Prefer `model_validate` over direct construction to ensure validators and coercion run.
+- Validate migration paths from Pydantic v1 (`@validator`, `orm_mode`) to v2 (`@field_validator`, `model_config`) for any code that may need to upgrade.
