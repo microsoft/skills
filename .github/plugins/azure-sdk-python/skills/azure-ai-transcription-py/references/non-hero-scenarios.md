@@ -5,4 +5,106 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 
 ## Operational hardening
 
-Use this section for retries, timeouts, pagination, and cleanup patterns specific to this SDK.
+### Retry Policy
+
+Configure retries for transient failures via `azure-core` retry policy:
+
+```python
+import os
+from azure.ai.transcription import TranscriptionClient
+from azure.core.pipeline.policies import RetryPolicy
+
+retry_policy = RetryPolicy(retry_total=3, retry_backoff_factor=2)
+
+with TranscriptionClient(
+    endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
+    credential=os.environ["TRANSCRIPTION_KEY"],
+    retry_policy=retry_policy,
+) as client:
+    job = client.begin_transcription(
+        name="meeting-transcription",
+        locale="en-US",
+        content_urls=["https://<storage>/audio.wav"],
+    )
+    result = job.result()
+```
+
+### LRO Poll with Timeout
+
+Avoid blocking indefinitely on long-running batch jobs:
+
+```python
+import os
+from azure.ai.transcription import TranscriptionClient
+
+with TranscriptionClient(
+    endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
+    credential=os.environ["TRANSCRIPTION_KEY"],
+) as client:
+    job = client.begin_transcription(
+        name="long-audio",
+        locale="en-US",
+        content_urls=["https://<storage>/long-audio.wav"],
+    )
+    # Raise azure.core.exceptions.OperationTimeoutError if not done within 300 s
+    result = job.result(timeout=300)
+    print(result.status)
+```
+
+### List and Paginate Transcriptions
+
+`list_transcriptions()` returns a lazy iterator; paginate explicitly to avoid loading everything at once:
+
+```python
+import os
+from azure.ai.transcription import TranscriptionClient
+
+with TranscriptionClient(
+    endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
+    credential=os.environ["TRANSCRIPTION_KEY"],
+) as client:
+    page = 0
+    for transcription in client.list_transcriptions():
+        print(f"[{page}] {transcription.name}: {transcription.status}")
+        page += 1
+```
+
+### Delete Completed Transcriptions
+
+Remove completed jobs to keep the account tidy:
+
+```python
+import os
+from azure.ai.transcription import TranscriptionClient
+
+with TranscriptionClient(
+    endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
+    credential=os.environ["TRANSCRIPTION_KEY"],
+) as client:
+    for transcription in client.list_transcriptions():
+        if transcription.status == "Succeeded":
+            client.delete_transcription(transcription.transcription_id)
+```
+
+### Async Batch Transcription
+
+Use the async client for non-blocking workflows:
+
+```python
+import os
+from azure.ai.transcription.aio import TranscriptionClient
+
+async def run_async_transcription():
+    async with TranscriptionClient(
+        endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
+        credential=os.environ["TRANSCRIPTION_KEY"],
+    ) as client:
+        job = await client.begin_transcription(
+            name="async-meeting",
+            locale="en-US",
+            content_urls=["https://<storage>/audio.wav"],
+            diarization_enabled=True,
+        )
+        result = await job.result()
+        print(result.status)
+```
