@@ -24,7 +24,7 @@ pip install azure-ai-transcription
 
 ```bash
 TRANSCRIPTION_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-TRANSCRIPTION_KEY=<your-key>  # For key auth; omit when using DefaultAzureCredential/TokenCredential
+TRANSCRIPTION_KEY=<your-key>  # For key auth; not needed when using DefaultAzureCredential/TokenCredential
 ```
 
 ## Authentication & Lifecycle

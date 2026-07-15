@@ -85,7 +85,7 @@ else:
 skus = client.fabric_capacities.list_skus()
 
 for sku in skus:
-    locations = ", ".join(sku.locations) if sku.locations else "N/A"
+    locations = ", ".join(sku.locations) if sku.locations is not None else "N/A"
     print(f"SKU: {sku.name} - Locations: {locations}")
 ```
 
