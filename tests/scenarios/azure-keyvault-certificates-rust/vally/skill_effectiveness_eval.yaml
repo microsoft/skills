@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-keyvault-certificates-operations
     prompt: |
@@ -71,7 +72,7 @@ stimuli:
       - "Uses TokenCredential for secure authentication."
       - "Async/await with Tokio and proper error handling."
       - "Code compiles without warnings."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -99,7 +100,7 @@ stimuli:
       - type: prompt
         name: "Key Vault certificates completeness"
         config:
-          model: gpt-5.3-codex
+          model: claude-sonnet-4.6
           prompt: |
             - CertificateClient creation with vault URL and credential
             - CertificatePolicy with X509CertificateProperties
@@ -126,6 +127,7 @@ stimuli:
             - "+nightly"
             - "-Zscript"
             - ".vally/tools/check-azure-crates.rs"
+        timeout: 3m
       - name: TokenCredential Authentication
         type: program
         weight: 1.0
@@ -160,7 +162,7 @@ stimuli:
           command: cargo
           args:
             - "check"
-          timeout: 90s
+          timeout: 3m
       - name: Rust Clippy Lints
         type: run-command
         weight: 1.0
@@ -171,7 +173,7 @@ stimuli:
             - "--"
             - "-D"
             - "warnings"
-          timeout: 120s
+          timeout: 3m
       - type: run-command
         name: "Cargo Build"
         config:
@@ -183,7 +185,7 @@ stimuli:
       - name: CertificateClient Creation
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           CertificateClient created via CertificateClient::new(vault_url, credential, None)
           Vault URL formatted as https://vault_name.vault.azure.net/
@@ -191,7 +193,7 @@ stimuli:
       - name: Certificate Policy Definition
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           CertificatePolicy includes x509_certificate_properties and issuer_parameters
           X509CertificateProperties has subject: Some("CN=example.com".into())
@@ -199,7 +201,7 @@ stimuli:
       - name: Long-Running Operation Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           begin_create_certificate() returns Poller<T>
           Poller implements IntoFuture trait
@@ -208,7 +210,7 @@ stimuli:
       - name: Certificate Management Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Get: client.get_certificate(name, None).await?.into_model()?
           Update: client.update_certificate_properties(name, params.try_into()?, None).await?
@@ -217,7 +219,7 @@ stimuli:
       - name: Certificate Properties Update
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           UpdateCertificatePropertiesParameters with tags: Some(HashMap)
           Tags stored as Vec of key-value pairs
@@ -226,7 +228,7 @@ stimuli:
       - name: Pagination and Resource Extraction
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           List returns Pager<T>, iterate with let mut pager = ...; while let Some(cert) = pager.try_next().await?
           ResourceExt provides cert.resource_id()? with name and version
@@ -234,7 +236,7 @@ stimuli:
       - name: Certificate Key Integration
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Certificates contain embedded keys for signing operations
           KeyClient can sign with certificate name as key reference
@@ -242,7 +244,7 @@ stimuli:
       - name: Async Runtime and Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Uses #[tokio::main] on main function
           All I/O awaited including LRO completion

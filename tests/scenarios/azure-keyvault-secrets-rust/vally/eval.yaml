@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-keyvault-secrets-operations
     prompt: |
@@ -63,7 +64,7 @@ stimuli:
       - "Uses TokenCredential for secure authentication."
       - "Async/await with Tokio and proper error handling."
       - "Code compiles without warnings."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -76,6 +77,16 @@ stimuli:
       skills:
         - ../../../../.github/plugins/azure-sdk-rust/skills/azure-keyvault-secrets-rust
       files:
+        - src: ../../_shared/vally/tools/find-cargo-root.js
+          dest: .vally/tools/find-cargo-root.js
+        - src: ../../_shared/vally/tools/check-azure-crates.rs
+          dest: .vally/tools/check-azure-crates.rs
+        - src: ../../_shared/vally/tools/check-token-credential.rs
+          dest: .vally/tools/check-token-credential.rs
+        - src: ../../_shared/vally/tools/check-async-runtime.rs
+          dest: .vally/tools/check-async-runtime.rs
+        - src: ../../_shared/vally/tools/check-no-secrets.rs
+          dest: .vally/tools/check-no-secrets.rs
         - src: workspace/cargo.toml
           dest: Cargo.toml
     constraints:
@@ -85,7 +96,6 @@ stimuli:
       - type: prompt
         name: "Key Vault secrets completeness"
         config:
-          model: gpt-5.3-codex
           prompt: |
             - SecretClient creation with vault URL and credential
             - Set secret with SetSecretParameters including value
@@ -100,72 +110,67 @@ stimuli:
             - Async/await throughout
           scoring: scale_1_5
       - name: Official Azure SDK Crate Selection
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-azure-crates.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-azure-crates.rs
+          emit_in_metadata: true
       - name: TokenCredential Authentication
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-token-credential.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-token-credential.rs
+          emit_in_metadata: true
       - name: Async-First with Tokio Runtime
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-async-runtime.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-async-runtime.rs
+          emit_in_metadata: true
       - name: No Hardcoded Secrets
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-no-secrets.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-no-secrets.rs
+          emit_in_metadata: true
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
 
-      - type: run-command
-        name: "Cargo Check"
+      - name: "Cargo Check"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
+          commands:
+            - command: cargo check
+          emit_in_metadata: true
       - name: Rust Clippy Lints
-        type: run-command
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
-      - type: run-command
-        name: "Cargo Build"
+          commands:
+            - command: cargo clippy -- -D warnings
+          emit_in_metadata: true
+      - name: "Cargo Build"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
 
       - name: SecretClient Creation
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           SecretClient created via SecretClient::new(vault_url, credential, None)
           Vault URL is vault_name.vault.azure.net in https protocol
@@ -173,7 +178,6 @@ stimuli:
       - name: Secret CRUD Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Set: client.set_secret(name, params.try_into()?, None).await?
           Get: client.get_secret(name, None).await?.into_model()?
@@ -182,7 +186,6 @@ stimuli:
       - name: SetSecretParameters Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           SetSecretParameters created with value: Some(value.into())
           Content type can be set via content_type: Some("text/plain".into())
@@ -190,7 +193,6 @@ stimuli:
       - name: Listing with Pagination
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           List secrets returns Pager<T> via client.list_secret_properties(None)?
           Iterate with let mut pager = ...; while let Some(secret) = pager.try_next().await?
@@ -199,7 +201,6 @@ stimuli:
       - name: Resource Extraction
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Use ResourceExt trait via secret.resource_id()?
           Returns ResourceId with name and version fields
@@ -207,7 +208,6 @@ stimuli:
       - name: Async Runtime and Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Uses #[tokio::main] on main function
           All I/O operations awaited

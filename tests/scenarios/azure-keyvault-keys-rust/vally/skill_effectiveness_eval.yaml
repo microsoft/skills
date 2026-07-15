@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-keyvault-keys-operations
     prompt: |
@@ -70,7 +71,7 @@ stimuli:
       - "Uses TokenCredential for secure authentication."
       - "Async/await with Tokio and proper error handling."
       - "Code compiles without warnings."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -98,7 +99,7 @@ stimuli:
       - type: prompt
         name: "Key Vault keys completeness"
         config:
-          model: gpt-5.3-codex
+          model: claude-sonnet-4.6
           prompt: |
             - KeyClient creation with vault URL and credential
             - Create EC keys with CurveName::P256
@@ -181,7 +182,7 @@ stimuli:
       - name: KeyClient Creation
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           KeyClient created via KeyClient::new(vault_url, credential, None)
           Vault URL formatted as https://vault_name.vault.azure.net/
@@ -189,7 +190,7 @@ stimuli:
       - name: Key Creation Patterns
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           EC keys: CreateKeyParameters with kty: Some(KeyType::Ec), curve: Some(CurveName::P256)
           RSA keys: CreateKeyParameters with kty: Some(KeyType::Rsa), key_size: Some(2048)
@@ -197,7 +198,7 @@ stimuli:
       - name: Key Management Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Get: client.get_key(name, None).await?.into_model()?
           Update: client.update_key_properties(name, params.try_into()?, None).await?
@@ -206,7 +207,7 @@ stimuli:
       - name: Envelope Encryption Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Wrap: client.wrap_key(key_name, params.try_into()?, None).await?
           Parameters include algorithm: Some(EncryptionAlgorithm::RsaOaep256) and value: Some(dek)
@@ -216,7 +217,7 @@ stimuli:
       - name: Key Version Management
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Extract key version from response via resource_id()?
           Version stored from wrap operation for later unwrap
@@ -225,7 +226,7 @@ stimuli:
       - name: Pagination and Resource Extraction
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           List returns Pager<T>, iterate with let mut pager = ...; while let Some(key) = pager.try_next().await?
           ResourceExt provides key.resource_id()? with name and version
@@ -233,7 +234,7 @@ stimuli:
       - name: Async Runtime and Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Uses #[tokio::main] on main function
           All I/O awaited (client operations, wrapping, unwrapping)

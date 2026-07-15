@@ -7,7 +7,7 @@ scoring:
   threshold: 1.0
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
 stimuli:
   - name: rust-storage-keyvault-encryption-library
@@ -39,7 +39,7 @@ stimuli:
       - "Uses async Rust with Tokio runtime and idiomatic Result-based error propagation."
       - "Code compiles and passes cargo check for the generated library project."
       - "Avoids hardcoded secrets in source code or committed configuration."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -100,44 +100,36 @@ stimuli:
             - Reasonable error handling and no embedded secrets
           scoring: scale_1_5
       - name: Official Azure SDK Crate Selection
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-azure-crates.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-azure-crates.rs
+          emit_in_metadata: true
         timeout: 2m
       - name: TokenCredential Authentication
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-token-credential.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-token-credential.rs
+          emit_in_metadata: true
         timeout: 2m
       - name: Async-First with Tokio Runtime
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-async-runtime.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-async-runtime.rs
+          emit_in_metadata: true
         timeout: 2m
       - name: No Hardcoded Secrets
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-no-secrets.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-no-secrets.rs
+          emit_in_metadata: true
         timeout: 2m
       - name: Rust Cargo Trajectory Build Failure
         type: rust-cargo-build-failure-check

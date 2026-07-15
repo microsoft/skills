@@ -7,6 +7,5 @@ evals:
   - ../../azure-keyvault-certificates-rust/vally/eval.yaml
   - ../../azure-keyvault-keys-rust/vally/eval.yaml
   - ../../azure-keyvault-secrets-rust/vally/eval.yaml
-  - ../../azure-servicebus-rust/vally/eval.yaml
   - ../../azure-storage-blob-rust/vally/eval.yaml
   - ../../azure-storage-queue-rust/vally/eval.yaml

@@ -10,7 +10,7 @@
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
-        "@microsoft/vally": "^0.6.0",
+        "@microsoft/vally": "^0.7.0",
         "@types/node": "^20.0.0",
         "typescript": "^5.4.5"
     },

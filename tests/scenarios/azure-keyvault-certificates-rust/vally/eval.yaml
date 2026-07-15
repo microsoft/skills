@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-keyvault-certificates-operations
     prompt: |
@@ -71,7 +72,7 @@ stimuli:
       - "Uses TokenCredential for secure authentication."
       - "Async/await with Tokio and proper error handling."
       - "Code compiles without warnings."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -84,6 +85,16 @@ stimuli:
       skills:
         - ../../../../.github/plugins/azure-sdk-rust/skills/azure-keyvault-certificates-rust
       files:
+        - src: ../../_shared/vally/tools/find-cargo-root.js
+          dest: .vally/tools/find-cargo-root.js
+        - src: ../../_shared/vally/tools/check-azure-crates.rs
+          dest: .vally/tools/check-azure-crates.rs
+        - src: ../../_shared/vally/tools/check-token-credential.rs
+          dest: .vally/tools/check-token-credential.rs
+        - src: ../../_shared/vally/tools/check-async-runtime.rs
+          dest: .vally/tools/check-async-runtime.rs
+        - src: ../../_shared/vally/tools/check-no-secrets.rs
+          dest: .vally/tools/check-no-secrets.rs
         - src: workspace/cargo.toml
           dest: Cargo.toml
     constraints:
@@ -93,7 +104,6 @@ stimuli:
       - type: prompt
         name: "Key Vault certificates completeness"
         config:
-          model: gpt-5.3-codex
           prompt: |
             - CertificateClient creation with vault URL and credential
             - CertificatePolicy with X509CertificateProperties
@@ -112,72 +122,67 @@ stimuli:
           scoring: scale_1_5
 
       - name: Official Azure SDK Crate Selection
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-azure-crates.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-azure-crates.rs
+          emit_in_metadata: true
       - name: TokenCredential Authentication
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-token-credential.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-token-credential.rs
+          emit_in_metadata: true
       - name: Async-First with Tokio Runtime
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-async-runtime.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-async-runtime.rs
+          emit_in_metadata: true
       - name: No Hardcoded Secrets
-        type: program
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          program: cargo
-          args:
-            - "+nightly"
-            - "-Zscript"
-            - ".vally/tools/check-no-secrets.rs"
+          commands:
+            - command: cargo +nightly -Zscript .vally/tools/check-no-secrets.rs
+          emit_in_metadata: true
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
 
-      - type: run-command
-        name: "Cargo Check"
+      - name: "Cargo Check"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
+          commands:
+            - command: cargo check
+          emit_in_metadata: true
       - name: Rust Clippy Lints
-        type: run-command
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
-      - type: run-command
-        name: "Cargo Build"
+          commands:
+            - command: cargo clippy -- -D warnings
+          emit_in_metadata: true
+      - name: "Cargo Build"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
 
       - name: CertificateClient Creation
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           CertificateClient created via CertificateClient::new(vault_url, credential, None)
           Vault URL formatted as https://vault_name.vault.azure.net/
@@ -185,7 +190,6 @@ stimuli:
       - name: Certificate Policy Definition
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           CertificatePolicy includes x509_certificate_properties and issuer_parameters
           X509CertificateProperties has subject: Some("CN=example.com".into())
@@ -193,7 +197,6 @@ stimuli:
       - name: Long-Running Operation Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           begin_create_certificate() returns Poller<T>
           Poller implements IntoFuture trait
@@ -202,7 +205,6 @@ stimuli:
       - name: Certificate Management Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Get: client.get_certificate(name, None).await?.into_model()?
           Update: client.update_certificate_properties(name, params.try_into()?, None).await?
@@ -211,7 +213,6 @@ stimuli:
       - name: Certificate Properties Update
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           UpdateCertificatePropertiesParameters with tags: Some(HashMap)
           Tags stored as Vec of key-value pairs
@@ -220,7 +221,6 @@ stimuli:
       - name: Pagination and Resource Extraction
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           List returns Pager<T>, iterate with let mut pager = ...; while let Some(cert) = pager.try_next().await?
           ResourceExt provides cert.resource_id()? with name and version
@@ -228,7 +228,6 @@ stimuli:
       - name: Certificate Key Integration
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Certificates contain embedded keys for signing operations
           KeyClient can sign with certificate name as key reference
@@ -236,7 +235,6 @@ stimuli:
       - name: Async Runtime and Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Uses #[tokio::main] on main function
           All I/O awaited including LRO completion

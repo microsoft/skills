@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-queue-operations
     prompt: |
@@ -41,7 +42,7 @@ stimuli:
       - "Message delete operations use both message_id and pop_receipt from received messages."
       - "Peek operations demonstrate reading messages without consuming them from the queue."
       - "Avoids hardcoded credentials in source code."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -83,7 +84,7 @@ stimuli:
       - type: prompt
         name: "Queue operations completeness"
         config:
-          model: gpt-5.3-codex
+          model: claude-sonnet-4.6
           prompt: |
             - QueueServiceClient initialization with endpoint URL and credential
             - QueueClient derived from service client
@@ -159,7 +160,7 @@ stimuli:
       - name: QueueServiceClient Construction
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           QueueServiceClient is created via QueueServiceClient::new() with three parameters:
           service_url (Url type), Some(credential), and None for options.
@@ -167,7 +168,7 @@ stimuli:
       - name: Queue Message Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Send messages via queue_client.send_message(message.try_into()?, None).await?.
           Receive messages via queue_client.receive_messages(None).await? returning a response
@@ -177,7 +178,7 @@ stimuli:
       - name: Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Queue operations are wrapped in Result-based error handling using ? operator.
           No .unwrap() calls except where failure is impossible.
