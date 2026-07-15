@@ -96,7 +96,7 @@ class AsyncConfigurationClient:
     pass
 ```
 
-### Sync vs Async: Pick One, Don't Mix
+### Sync vs Async: Don't Mix Within a Call Path
 
 **Rule:** Within a single module, script, or code path, use **either** the sync client **or** the async client — never both.
 
@@ -140,7 +140,7 @@ async def run_also_bad():
         await client.agents.get_agent("agent-id")  # credential.get_token() will block
 ```
 
-When writing a skill, pick one model based on the target runtime (FastAPI/async framework → async; scripts/CLIs → sync) and make every example in the skill consistent with that choice.
+When writing a skill, present both sync and async forms as first-class options with equal priority. Do not encode a preference for either mode.
 
 ### Pagination: ItemPaged / AsyncItemPaged
 

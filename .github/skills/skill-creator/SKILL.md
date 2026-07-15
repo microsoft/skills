@@ -449,7 +449,7 @@ Azure SDKs use consistent verbs across all languages:
 
 See `references/azure-sdk-patterns.md` for detailed patterns including:
 
-- **Python**: `ItemPaged`, `LROPoller`, context managers, Sphinx docstrings. Pick **sync or async** for the whole skill and stick with it — never mix. Always show `with` / `async with` context managers first.
+- **Python**: `ItemPaged`, `LROPoller`, context managers, Sphinx docstrings. Present both sync and async forms as first-class options; do not express a preference for either. Do not mix sync and async within a single code example. Always show `with` / `async with` context managers.
 - **.NET**: `Response<T>`, `Pageable<T>`, `Operation<T>`, mocking support
 - **Java**: Builder pattern, `PagedIterable`/`PagedFlux`, Reactor types
 - **TypeScript**: `PagedAsyncIterableIterator`, `AbortSignal`, browser considerations
@@ -467,7 +467,7 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 **Standard wording (Python; adapt for other languages):**
 
 ```markdown
-1. **Pick sync OR async and stay consistent.** Do not mix `azure.xxx` sync clients with `azure.xxx.aio` async clients in the same call path. Choose one mode per module.
+1. **Do not mix sync and async clients in the same call path.** Use either `azure.xxx` sync clients or `azure.xxx.aio` async clients within a single call path — do not combine both. Present both forms with equal priority in the skill itself.
 2. **Always use context managers for clients and async credentials.** Wrap every client in `with Client(...) as client:` (sync) or `async with Client(...) as client:` (async). For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
 3. **Use `DefaultAzureCredential`** for code that runs locally. Use a specific token credential (e.g. `ManagedIdentityCredential`, `WorkloadIdentityCredential`) for code that runs in Azure.
 ```
@@ -486,7 +486,7 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 
 **Enforcement in code examples.** Every code example inside the skill must itself obey both rules, so the skill demonstrates what it prescribes:
 
-- Do not show sync and async calls interleaved in the same example. If you must show both modes, keep the primary example in one mode and isolate the alternative into a single `### Async variant` (or `### Sync variant`) subsection with its own complete example.
+- Do not interleave sync and async calls within a single example. Show each mode in its own complete, self-contained example — a `### Sync` subsection and an `### Async` subsection — giving both equal prominence.
 - Every client instantiation in every example must be wrapped in `with` / `async with`. The only permitted exception is the mandatory Authentication snippet (which illustrates the credential + client construction pattern) and framework lifespan patterns where a client is owned by the app (e.g. FastAPI `lifespan`).
 - When async credentials from `azure.identity.aio` appear in an example, wrap them in `async with credential:` alongside the client.
 
