@@ -119,7 +119,7 @@ Every Azure SDK skill MUST stay within these token limits:
 
 - Exceeding max limit → refactor into `/references/` subdirectories
 - When approaching 500 lines → move entire sections to reference files
-- Annotate with `# Token Count: ~XXXX` at top of completed skill
+- Annotate with `<!-- Token Count: ~XXXX (target: 1100, max: 1500) -->` immediately below the skill's H1
 
 ---
 
@@ -162,9 +162,9 @@ If one pattern handles ~80% of use cases:
    - Batch operations → `/references/batch-operations.md`
    - Error handling → `/references/error-handling.md`
    - Performance tuning → `/references/performance.md`
-   - Alternative workflows → `/references/other-workflows.md`
+   - Alternative workflows → `/references/workflows-comparison.md`
 
-**Example**: Azure Key Vault Secrets (core workflow: retrieve a secret using managed identity). Alternative workflows in `/references/`: API-key auth, certificate auth, service principal auth.
+**Example**: Azure Key Vault Secrets (core workflow: retrieve a secret using managed identity). Alternative authentication workflows in `/references/`: local development with `DefaultAzureCredential`, workload identity, and service-principal credentials (client secret or certificate).
 
 **Case 2: Multiple equally-valid "core workflows"** (e.g., authentication strategies, deployment targets)
 
@@ -398,7 +398,7 @@ Use a token counter or model playground to measure each section. Compare to the 
 
 **3. Example count audit:**
 
-- [ ] 1-2 complete examples in core workflow (not 5+)
+- [ ] 1 complete example per core workflow (up to 2 only when Case 2 documents multiple equally valid workflows)
 - [ ] Feature table includes 3-5 core methods (not comprehensive API)
 - [ ] Max 1 example per best practice bullet
 
@@ -780,7 +780,7 @@ Skills are organized by **language** and **product area** in the `skills/` direc
 3. Validate against anti-patterns checklist (see Anti-Patterns section)
 4. Extract to `/references/` if section exceeds max tokens
 5. Run Vally efficiency validation checklist (see Vally Efficiency Validation)
-6. Update frontmatter with `benchmark_tokens` and `benchmark_quality` metadata
+6. Optionally add `benchmark_tokens` and `benchmark_quality` under the frontmatter's `metadata` mapping
 7. Add token count comment to skill header for future maintenance
 
 **Frontmatter (Enhanced with Benchmarking Metadata):**
@@ -791,15 +791,16 @@ name: azure-service-py
 description: |
   Azure Service SDK for Python. Use for [specific features].
   Triggers: "service name", "create resource", "specific operation".
-benchmark_tokens:
-  estimated: 1180
-  target: 1100
-  max: 1500
-benchmark_quality:
-  single_core_workflow: true
-  examples_focused: true
-  no_prose_bloat: true
-  anti_patterns_checked: true
+metadata:
+  benchmark_tokens:
+    estimated: 1180
+    target: 1100
+    max: 1500
+  benchmark_quality:
+    single_core_workflow: true
+    examples_focused: true
+    no_prose_bloat: true
+    anti_patterns_checked: true
 ---
 ```
 
@@ -1136,7 +1137,7 @@ ls .github/plugins/azure-sdk-python/skills/*/SKILL.md
 2. **For each skill, refresh from authoritative sources**
 
 - Always use `microsoft-docs` MCP first for current Microsoft Learn API guidance.
-- Verify installed package API surface with `pip show <package>` before finalizing snippets.
+- Verify the installed package version with `pip show <package>`, then inspect the installed package or official API reference to verify every symbol and signature used in snippets.
 - For Azure SDK skills, prefer package overview + official SDK repo examples.
 - For non-Azure Python skills in this plugin (for example `fastapi-router-py`, `pydantic-models-py`), keep language-specific best-practice variants and skip Azure-specific auth callouts when lifecycle/auth is not applicable.
 
