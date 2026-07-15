@@ -6,19 +6,19 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 ## Async Client
 
 ```python
+from azure.core.messaging import CloudEvent
 from azure.eventgrid.aio import EventGridPublisherClient
 from azure.identity.aio import DefaultAzureCredential
 
 async def publish_events():
-    credential = DefaultAzureCredential()
-    
-    async with EventGridPublisherClient(endpoint, credential) as client:
-        event = CloudEvent(
-            type="MyApp.Events.Test",
-            source="/myapp",
-            data={"message": "hello"}
-        )
-        await client.send(event)
+    async with DefaultAzureCredential() as credential:
+        async with EventGridPublisherClient(endpoint, credential) as client:
+            event = CloudEvent(
+                type="MyApp.Events.Test",
+                source="/myapp",
+                data={"message": "hello"}
+            )
+            await client.send(event)
 
 import asyncio
 asyncio.run(publish_events())
@@ -36,12 +36,11 @@ from azure.identity import DefaultAzureCredential
 namespace_endpoint = "https://<namespace>.<region>.eventgrid.azure.net"
 topic_name = "my-topic"
 
-with EventGridPublisherClient(
-    endpoint=namespace_endpoint,
-    credential=DefaultAzureCredential()
-) as client:
-    client.send(
-        event,
-        namespace_topic=topic_name
-    )
+with DefaultAzureCredential() as credential:
+    with EventGridPublisherClient(
+        endpoint=namespace_endpoint,
+        credential=credential,
+        namespace_topic=topic_name,
+    ) as client:
+        client.send(event)
 ```

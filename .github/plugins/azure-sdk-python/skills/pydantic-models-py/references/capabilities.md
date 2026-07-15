@@ -1,6 +1,6 @@
 # pydantic-models-py capability coverage
 
-**SDK/package**: `pydantic-models-py`
+**SDK/package**: `pydantic`
 
 This reference captures additional non-hero capabilities and API breadth so the main `SKILL.md` can stay focused on copy/paste hero flows.
 

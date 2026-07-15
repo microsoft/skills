@@ -51,7 +51,7 @@ subscription = client.subscription.create_or_update(
     )
 )
 
-print(f"Subscription key: {subscription.primary_key}")
+print("Subscription created")
 ```
 
 ## Set API Policy

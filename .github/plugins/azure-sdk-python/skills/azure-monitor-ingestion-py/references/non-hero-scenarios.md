@@ -11,15 +11,16 @@ from azure.monitor.ingestion.aio import LogsIngestionClient
 from azure.identity.aio import DefaultAzureCredential
 
 async def upload_logs():
-    async with LogsIngestionClient(
-        endpoint=endpoint,
-        credential=DefaultAzureCredential()
-    ) as client:
-        await client.upload(
-            rule_id=rule_id,
-            stream_name=stream_name,
-            logs=logs
-        )
+    async with DefaultAzureCredential() as credential:
+        async with LogsIngestionClient(
+            endpoint=endpoint,
+            credential=credential
+        ) as client:
+            await client.upload(
+                rule_id=rule_id,
+                stream_name=stream_name,
+                logs=logs
+            )
 
 asyncio.run(upload_logs())
 ```

@@ -136,7 +136,7 @@ keys = client.channels.list_with_keys(
 if hasattr(keys.properties, 'properties'):
     for site in keys.properties.properties.sites:
         print(f"Site: {site.site_name}")
-        print(f"Key: {site.key}")
+        # Use site.key without logging or persisting it.
 ```
 
 ## Bot Connections (OAuth)

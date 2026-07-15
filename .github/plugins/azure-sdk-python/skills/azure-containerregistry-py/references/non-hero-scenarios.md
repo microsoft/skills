@@ -23,18 +23,20 @@ client.delete_tag("my-image", "old-tag")
 
 ```python
 from azure.containerregistry import ContainerRegistryClient
+from azure.identity import DefaultAzureCredential
 
-with ContainerRegistryClient(endpoint, DefaultAzureCredential()) as client:
-    # Download manifest
-    manifest = client.download_manifest("my-image", "latest")
-    print(f"Media type: {manifest.media_type}")
-    print(f"Digest: {manifest.digest}")
+with DefaultAzureCredential() as credential:
+    with ContainerRegistryClient(endpoint, credential) as client:
+        # Download manifest
+        manifest = client.download_manifest("my-image", "latest")
+        print(f"Media type: {manifest.media_type}")
+        print(f"Digest: {manifest.digest}")
 
-    # Download blob
-    blob = client.download_blob("my-image", "sha256:abc123...")
-    with open("layer.tar.gz", "wb") as f:
-        for chunk in blob:
-            f.write(chunk)
+        # Download blob
+        blob = client.download_blob("my-image", "sha256:abc123...")
+        with open("layer.tar.gz", "wb") as f:
+            for chunk in blob:
+                f.write(chunk)
 ```
 
 ## Async Client

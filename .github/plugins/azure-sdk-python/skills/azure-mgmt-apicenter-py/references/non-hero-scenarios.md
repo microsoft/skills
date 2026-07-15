@@ -54,7 +54,7 @@ apis = client.apis.list(
 )
 
 for api in apis:
-    print(f"{api.name}: {api.title} ({api.kind})")
+    print(f"{api.name}: {api.properties.title} ({api.properties.kind})"
 ```
 
 ## Create Environment

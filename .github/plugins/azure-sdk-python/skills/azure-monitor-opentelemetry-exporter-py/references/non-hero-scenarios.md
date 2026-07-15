@@ -9,8 +9,8 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
 
-# Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
-credential = DefaultAzureCredential(require_envvar=True)
+# Local dev: DefaultAzureCredential. In production, set AZURE_TOKEN_CREDENTIALS=prod or use a specific credential.
+credential = DefaultAzureCredential()
 # Or use a specific credential directly in production:
 # See https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#credential-classes
 # credential = ManagedIdentityCredential()
