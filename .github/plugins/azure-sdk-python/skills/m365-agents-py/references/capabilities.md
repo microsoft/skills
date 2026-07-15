@@ -30,7 +30,20 @@ class LocalTokenCache:
     pass
 
 def acquire_token(settings, app_client_id, tenant_id):
-# ... see SKILL.md for the full example
+    pca = PublicClientApplication(
+        client_id=app_client_id,
+        authority=f"https://login.microsoftonline.com/{tenant_id}",
+    )
+
+    token_request = {"scopes": ["https://api.powerplatform.com/.default"]}
+    accounts = pca.get_accounts()
+
+    if accounts:
+        response = pca.acquire_token_silent(token_request["scopes"], account=accounts[0])
+        return response.get("access_token")
+    else:
+        response = pca.acquire_token_interactive(**token_request)
+        return response.get("access_token")
 ```
 
 ## API breadth checklist
