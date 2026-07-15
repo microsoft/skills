@@ -64,44 +64,51 @@ for phrase in content.transcript_phrases:
 Create custom analyzers with field schemas for specialized extraction:
 
 ```python
-# Create custom analyzer
-analyzer = client.create_analyzer(
-    analyzer_id="my-invoice-analyzer",
-    analyzer={
-        "description": "Custom invoice analyzer",
-        "base_analyzer_id": "prebuilt-documentSearch",
-        "field_schema": {
-            "fields": {
-                "vendor_name": {"type": "string"},
-                "invoice_total": {"type": "number"},
-                "line_items": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "description": {"type": "string"},
-                            "amount": {"type": "number"}
-                        }
-                    }
-                }
-            }
-        }
-    }
+from azure.ai.contentunderstanding.models import (
+    AnalysisInput,
+    ContentAnalyzer,
+    ContentFieldDefinition,
+    ContentFieldSchema,
 )
+
+# Create custom analyzer - returns an LRO poller; wait for provisioning to complete
+poller = client.begin_create_analyzer(
+    analyzer_id="my-invoice-analyzer",
+    resource=ContentAnalyzer(
+        description="Custom invoice analyzer",
+        base_analyzer_id="prebuilt-documentSearch",
+        field_schema=ContentFieldSchema(
+            fields={
+                "vendor_name": ContentFieldDefinition(type="string"),
+                "invoice_total": ContentFieldDefinition(type="number"),
+                "line_items": ContentFieldDefinition(
+                    type="array",
+                    item_definition=ContentFieldDefinition(
+                        type="object",
+                        properties={
+                            "description": ContentFieldDefinition(type="string"),
+                            "amount": ContentFieldDefinition(type="number"),
+                        },
+                    ),
+                ),
+            }
+        ),
+    ),
+)
+poller.result()  # wait until analyzer is ready
 
 # Use custom analyzer
-from azure.ai.contentunderstanding.models import AnalyzeInput
-
-poller = client.begin_analyze(
+analyze_poller = client.begin_analyze(
     analyzer_id="my-invoice-analyzer",
-    inputs=[AnalyzeInput(url="https://example.com/invoice.pdf")]
+    inputs=[AnalysisInput(url="https://example.com/invoice.pdf")]
 )
 
-result = poller.result()
+result = analyze_poller.result()
 
-# Access extracted fields
-print(result.fields["vendor_name"])
-print(result.fields["invoice_total"])
+# Access extracted fields from analyzed content
+content = result.contents[0]
+print(content.fields["vendor_name"].value_string)
+print(content.fields["invoice_total"].value_number)
 ```
 
 ## Analyzer Management
