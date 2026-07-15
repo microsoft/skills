@@ -42,11 +42,12 @@ Use subscription key authentication:
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     transcriptions = list(client.list_transcriptions())
 ```
@@ -55,11 +56,12 @@ with TranscriptionClient(
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     job = client.begin_transcription(
         name="meeting-transcription",
@@ -75,11 +77,12 @@ with TranscriptionClient(
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     stream = client.begin_stream_transcription(locale="en-US")
     stream.send_audio_file("audio.wav")

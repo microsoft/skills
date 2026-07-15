@@ -11,6 +11,7 @@ Configure retries for transient failures via `azure-core` retry policy:
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 from azure.core.pipeline.policies import RetryPolicy
 
@@ -18,7 +19,7 @@ retry_policy = RetryPolicy(retry_total=3, retry_backoff_factor=2)
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
     retry_policy=retry_policy,
 ) as client:
     job = client.begin_transcription(
@@ -35,11 +36,12 @@ Avoid blocking indefinitely on long-running batch jobs:
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     job = client.begin_transcription(
         name="long-audio",
@@ -57,11 +59,12 @@ with TranscriptionClient(
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     for index, transcription in enumerate(client.list_transcriptions()):
         print(f"[{index}] {transcription.name}: {transcription.status}")
@@ -73,11 +76,12 @@ Remove completed jobs to keep the account tidy:
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     for transcription in client.list_transcriptions():
         if transcription.status == "Succeeded":
@@ -90,12 +94,13 @@ Use the async client for non-blocking workflows:
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription.aio import TranscriptionClient
 
 async def run_async_transcription():
     async with TranscriptionClient(
         endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-        credential=os.environ["TRANSCRIPTION_KEY"],
+        credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
     ) as client:
         job = await client.begin_transcription(
             name="async-meeting",

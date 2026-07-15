@@ -83,17 +83,23 @@ credential = ClientSecretCredential(
 ```python
 from azure.identity import DefaultAzureCredential, CredentialUnavailableError
 from azure.core.exceptions import ClientAuthenticationError
+import logging
+
+logger = logging.getLogger(__name__)
 
 with DefaultAzureCredential() as credential:
     try:
         token = credential.get_token("https://management.azure.com/.default")
     except CredentialUnavailableError:
-        # No credential in the chain could attempt authentication
-        pass
+        # No credential in the chain could attempt authentication.
+        # Log and re-raise so the caller can surface the configuration issue.
+        logger.error("No credential available — check Azure CLI login or Managed Identity configuration")
+        raise
     except ClientAuthenticationError as e:
-        # Authentication was attempted but failed
-        # e.message contains details from each credential in the chain
-        pass
+        # Authentication was attempted but failed.
+        # e.message contains details from each credential in the chain.
+        logger.error("Authentication failed: %s", e.message)
+        raise
 ```
 
 ## Logging

@@ -33,8 +33,9 @@ for message in messages:
         # Process...
         queue_client.delete_message(message)
     except Exception:
-        # Message becomes visible again after timeout
-        pass
+        # Message becomes visible again after visibility timeout for retry.
+        # Log the failure and re-raise so the caller is aware.
+        raise
 ```
 
 ## Clear Queue

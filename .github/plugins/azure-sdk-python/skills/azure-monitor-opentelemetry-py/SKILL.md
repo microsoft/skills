@@ -245,7 +245,7 @@ configure_azure_monitor(
 ## Best Practices
 
 1. **Pick sync OR async and stay consistent.** Do not mix `azure.xxx` sync clients with `azure.xxx.aio` async clients in the same call path. Choose one mode per module.
-2. **Call `provider.shutdown()` / `flush()` at process exit to flush telemetry — providers are not context managers.**
+2. **Call `provider.shutdown()` / `force_flush()` at process exit to flush telemetry — providers are not context managers.**
 3. **Call configure_azure_monitor() early** — Before importing instrumented libraries
 4. **Use environment variables** for connection string in production
 5. **Set cloud role name** for multi-service applications

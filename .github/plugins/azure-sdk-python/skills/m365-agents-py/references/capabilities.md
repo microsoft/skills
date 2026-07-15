@@ -17,33 +17,60 @@ This reference mirrors the actual capability sections in `SKILL.md` and provides
 
 ```python
 import asyncio
+from os import environ
 from msal import PublicClientApplication
-from microsoft_agents.activity import ActivityTypes, load_configuration_from_env
+from microsoft_agents.activity import ActivityTypes
 from microsoft_agents.copilotstudio.client import (
     ConnectionSettings,
     CopilotClient,
 )
 
-# Token cache (local file for interactive flows)
-class LocalTokenCache:
-    # See samples for full implementation
-    pass
 
-def acquire_token(settings, app_client_id, tenant_id):
+def acquire_token(app_client_id: str, tenant_id: str) -> str:
     pca = PublicClientApplication(
         client_id=app_client_id,
         authority=f"https://login.microsoftonline.com/{tenant_id}",
     )
 
-    token_request = {"scopes": ["https://api.powerplatform.com/.default"]}
+    scopes = ["https://api.powerplatform.com/.default"]
     accounts = pca.get_accounts()
 
     if accounts:
-        response = pca.acquire_token_silent(token_request["scopes"], account=accounts[0])
-        return response.get("access_token")
+        response = pca.acquire_token_silent(scopes, account=accounts[0])
     else:
-        response = pca.acquire_token_interactive(**token_request)
-        return response.get("access_token")
+        response = pca.acquire_token_interactive(scopes=scopes)
+
+    return response["access_token"]
+
+
+async def main() -> None:
+    settings = ConnectionSettings(
+        environment_id=environ["COPILOTSTUDIOAGENT__ENVIRONMENTID"],
+        agent_identifier=environ["COPILOTSTUDIOAGENT__SCHEMANAME"],
+    )
+
+    token = acquire_token(
+        app_client_id=environ["COPILOTSTUDIOAGENT__AGENTAPPID"],
+        tenant_id=environ["COPILOTSTUDIOAGENT__TENANTID"],
+    )
+
+    # CopilotClient does not implement the context manager protocol.
+    copilot_client = CopilotClient(settings, token)
+
+    # Start conversation and collect the opening activity
+    act = copilot_client.start_conversation(True)
+    async for action in act:
+        if action.text:
+            print(action.text)
+
+    # Send a message and iterate replies
+    replies = copilot_client.ask_question("Hello!", action.conversation.id)
+    async for reply in replies:
+        if reply.type == ActivityTypes.message:
+            print(reply.text)
+
+
+asyncio.run(main())
 ```
 
 ## API breadth checklist

@@ -230,7 +230,7 @@ exporter = AzureMonitorTraceExporter(
 ## Best Practices
 
 1. **Pick sync OR async and stay consistent.** Do not mix `azure.xxx` sync clients with `azure.xxx.aio` async clients in the same call path. Choose one mode per module.
-2. **Call `provider.shutdown()` / `flush()` at process exit to flush telemetry — providers are not context managers.**
+2. **Call `provider.shutdown()` / `force_flush()` at process exit to flush telemetry — providers are not context managers.**
 3. **Use BatchSpanProcessor** for production (not SimpleSpanProcessor)
 4. **Use ApplicationInsightsSampler** for consistent sampling across services
 5. **Enable offline storage** for reliability in production

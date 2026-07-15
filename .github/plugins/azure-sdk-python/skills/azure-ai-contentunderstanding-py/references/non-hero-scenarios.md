@@ -6,11 +6,11 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 ## Analyze Image
 
 ```python
-from azure.ai.contentunderstanding.models import AnalysisInput
+from azure.ai.contentunderstanding.models import AnalyzeInput
 
 poller = client.begin_analyze(
     analyzer_id="prebuilt-imageSearch",
-    inputs=[AnalysisInput(url="https://example.com/image.jpg")]
+    inputs=[AnalyzeInput(url="https://example.com/image.jpg")]
 )
 result = poller.result()
 content = result.contents[0]
@@ -65,7 +65,7 @@ Create custom analyzers with field schemas for specialized extraction:
 
 ```python
 from azure.ai.contentunderstanding.models import (
-    AnalysisInput,
+    AnalyzeInput,
     ContentAnalyzer,
     ContentFieldDefinition,
     ContentFieldSchema,
@@ -100,7 +100,7 @@ poller.result()  # wait until analyzer is ready
 # Use custom analyzer
 analyze_poller = client.begin_analyze(
     analyzer_id="my-invoice-analyzer",
-    inputs=[AnalysisInput(url="https://example.com/invoice.pdf")]
+    inputs=[AnalyzeInput(url="https://example.com/invoice.pdf")]
 )
 
 result = analyze_poller.result()
@@ -166,9 +166,8 @@ Both derive from `AnalysisContent`, which provides basic information and a markd
 
 ```python
 from azure.ai.contentunderstanding.models import (
-    AnalysisInput,
-    AnalysisResult,
-    AnalysisContent,
+    AnalyzeInput,
+    AnalyzeResult,
     DocumentContent,
     AudioVisualContent,
 )
