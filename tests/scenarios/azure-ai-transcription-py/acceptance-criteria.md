@@ -54,13 +54,13 @@ from azure.ai.transcription.models import (
 
 ### 1.3 Anti-Patterns (ERRORS)
 
-#### ❌ INCORRECT: Using DefaultAzureCredential
+#### ❌ INCORRECT: Using DefaultAzureCredential when only key auth was supported
 ```python
-# WRONG - TranscriptionClient only supports subscription key auth
+# WRONG - older SDK versions only support subscription key auth
 from azure.identity import DefaultAzureCredential
 client = TranscriptionClient(
     endpoint=endpoint,
-    credential=DefaultAzureCredential()  # This will fail
+    credential=DefaultAzureCredential()  # Fails on older SDK versions
 )
 ```
 

@@ -8,8 +8,10 @@ They cover secondary/advanced patterns typically used after the primary end-to-e
 Convert text from one script to another:
 
 ```python
+from azure.ai.translation.text.models import InputTextItem
+
 result = client.transliterate(
-    body=["konnichiwa"],
+    body=[InputTextItem(text="konnichiwa")],
     language="ja",
     from_script="Latn",  # From Latin script
     to_script="Jpan"      # To Japanese script
@@ -25,8 +27,10 @@ for item in result:
 Find alternate translations and definitions:
 
 ```python
+from azure.ai.translation.text.models import InputTextItem
+
 result = client.lookup_dictionary_entries(
-    body=["fly"],
+    body=[InputTextItem(text="fly")],
     from_language="en",
     to_language="es"
 )
@@ -87,8 +91,10 @@ for code, lang in languages.dictionary.items():
 Identify sentence boundaries:
 
 ```python
+from azure.ai.translation.text.models import InputTextItem
+
 result = client.find_sentence_boundaries(
-    body=["Hello! How are you? I hope you are well."],
+    body=[InputTextItem(text="Hello! How are you? I hope you are well.")],
     language="en"
 )
 
@@ -99,8 +105,10 @@ for item in result:
 ## Translation Options
 
 ```python
+from azure.ai.translation.text.models import InputTextItem
+
 result = client.translate(
-    body=["Hello, world!"],
+    body=[InputTextItem(text="Hello, world!")],
     to_language=["de"],
     text_type="html",           # "plain" or "html"
     profanity_action="Marked",  # "NoAction", "Deleted", "Marked"
@@ -122,6 +130,7 @@ for item in result:
 
 ```python
 from azure.ai.translation.text.aio import TextTranslationClient
+from azure.ai.translation.text.models import InputTextItem
 from azure.identity.aio import DefaultAzureCredential
 
 async def translate_text():
@@ -131,7 +140,7 @@ async def translate_text():
             endpoint=endpoint,
         ) as client:
             result = await client.translate(
-                body=["Hello, world!"],
+                body=[InputTextItem(text="Hello, world!")],
                 to_language=["es"]
             )
             print(result[0].translations[0].text)

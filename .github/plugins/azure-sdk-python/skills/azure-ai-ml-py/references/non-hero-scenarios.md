@@ -36,7 +36,6 @@ ml_client.jobs.stream(returned_job.name)
 
 ```python
 from azure.ai.ml import dsl, Input, Output
-from azure.ai.ml.entities import Pipeline
 
 @dsl.pipeline(
     compute="cpu-cluster",

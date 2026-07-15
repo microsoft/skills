@@ -64,8 +64,8 @@ async def main() -> None:
         if activity.text:
             print(activity.text)
 
-    # Send a message and iterate replies
-    replies = copilot_client.ask_question("Hello!", activity.conversation.id)
+    # Send a message and iterate replies; CopilotClient retains the conversation ID
+    replies = copilot_client.ask_question("Hello!")
     async for reply in replies:
         if reply.type == ActivityTypes.message:
             print(reply.text)

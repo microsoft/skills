@@ -48,8 +48,14 @@ with TranscriptionClient(
         locale="en-US",
         content_urls=["https://<storage>/long-audio.wav"],
     )
-    # Raise azure.core.exceptions.OperationTimeoutError if not done within 300 s
-    result = job.result(timeout=300)
+    # Poll with an explicit deadline; job.result() does not raise on timeout
+    import time
+    deadline = time.monotonic() + 300
+    while not job.done():
+        if time.monotonic() > deadline:
+            raise TimeoutError("Transcription did not complete within 300 s")
+        time.sleep(5)
+    result = job.result()
     print(result.status)
 ```
 

@@ -72,7 +72,7 @@ Remove all connections from a group before deleting it:
 ```python
 # Remove a user from all groups, then close their connections
 client.remove_user_from_all_groups(user_id="user123")
-client.close_all_connections(user_id="user123", reason="Session ended")
+client.close_user_connections(user_id="user123", reason="Session ended")
 ```
 
 ### Short-lived Access Tokens
@@ -89,7 +89,8 @@ token = client.get_client_access_token(
     minutes_to_expire=30,
     groups=["my-group"],
 )
-print(f"Connect URL: {token['url']}")
+# Pass the URL directly to the authorized client — do not log it (it embeds a bearer token)
+connect_url = token["url"]
 ```
 
 ### Async Client

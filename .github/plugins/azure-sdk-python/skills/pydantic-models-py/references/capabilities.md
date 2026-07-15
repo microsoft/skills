@@ -21,5 +21,5 @@ This reference captures additional non-hero capabilities and API breadth so the 
 - Verify field validators (`@field_validator`) and model validators (`@model_validator`) cover all required constraints.
 - Confirm serialization behavior: use `model_dump(mode="json")` for JSON-safe output and `model_dump(exclude_unset=True)` for partial updates.
 - Include schema generation examples (`model_json_schema()`) when the model drives API contracts or documentation.
-- Prefer `model_validate` over direct construction to ensure validators and coercion run.
+- Use `model_validate` when validating an existing dict or object; direct `BaseModel(...)` construction also runs validators and coercion.
 - Ensure new code uses Pydantic v2 patterns (`@field_validator`, `model_config`) rather than deprecated v1 patterns (`@validator`, `orm_mode`).
