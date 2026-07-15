@@ -65,12 +65,20 @@ for fmt in formats:
 
 ## Supported Languages
 
-```python
-# Get supported languages
-languages = client.get_supported_languages()
+`DocumentTranslationClient` does not expose a language discovery method. Use `TextTranslationClient`
+from `azure-ai-translation-text` instead — its `get_supported_languages()` call requires no
+authentication:
 
-for lang in languages:
-    print(f"Language: {lang.name} ({lang.code})")
+```python
+from azure.ai.translation.text import TextTranslationClient
+
+# Languages endpoint requires no credential; omit auth for this lookup
+text_client = TextTranslationClient()
+result = text_client.get_supported_languages()
+
+# result.translation is a dict: BCP 47 code -> TranslationLanguage
+for code, lang in result.translation.items():
+    print(f"Language: {lang.name} ({code})")
 ```
 
 ## Async Client
