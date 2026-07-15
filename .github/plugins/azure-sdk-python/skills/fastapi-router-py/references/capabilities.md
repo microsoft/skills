@@ -18,8 +18,8 @@ This reference captures additional non-hero capabilities and API breadth so the 
 
 ## API breadth checklist
 
-- Verify client/auth mode for the environment before coding.
-- Confirm operation-group/method names against current Microsoft Learn API reference.
-- Include cleanup/delete paths for created resources in examples.
-- Prefer idempotent create/update operations where available.
-- Validate paging/LRO/error-handling patterns for production paths.
+- Verify dependency lifetimes (`Depends` with `yield`) for resources like DB connections and HTTP clients.
+- Confirm request/response validation uses Pydantic models with appropriate field constraints.
+- Include proper error responses with `HTTPException` and correct status codes.
+- Avoid blocking I/O in `async def` endpoints; use `run_in_executor` or a thread-pool for sync calls.
+- Validate middleware, background tasks, and lifespan event patterns for production paths.
