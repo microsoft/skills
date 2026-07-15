@@ -73,11 +73,18 @@ configure_azure_monitor(
 
 ## Disable Specific Instrumentations
 
+Use `instrumentation_options` to selectively enable or disable individual libraries. Libraries not
+listed remain enabled by default:
+
 ```python
 from azure.monitor.opentelemetry import configure_azure_monitor
 
+# Disable Django and psycopg2; leave flask, requests, urllib, urllib3 etc. enabled
 configure_azure_monitor(
-    instrumentations=["flask", "requests"]  # Only enable these
+    instrumentation_options={
+        "django": {"enabled": False},
+        "psycopg2": {"enabled": False},
+    }
 )
 ```
 
@@ -116,13 +123,10 @@ configure_azure_monitor(
 | Django | Traces |
 | FastAPI | Traces |
 | Requests | Traces |
+| urllib | Traces |
 | urllib3 | Traces |
-| httpx | Traces |
-| aiohttp | Traces |
 | psycopg2 | Traces |
-| pymysql | Traces |
-| pymongo | Traces |
-| redis | Traces |
+| Azure SDK | Traces |
 
 ## Configuration Options
 
@@ -132,5 +136,5 @@ configure_azure_monitor(
 | `credential` | Azure credential for AAD auth | None |
 | `sampling_ratio` | Sampling rate (0.0 to 1.0) | 1.0 |
 | `resource` | OpenTelemetry Resource | Auto-detected |
-| `instrumentations` | List of instrumentations to enable | All |
+| `instrumentation_options` | Dict controlling per-library `enabled` flags | All enabled |
 | `enable_live_metrics` | Enable Live Metrics stream | False |
