@@ -187,7 +187,7 @@ Follow this structure (based on existing Azure SDK skills):
 1. **Title** — `# SDK Name`
 2. **Installation** — `pip install`, `npm install`, etc.
 3. **Environment Variables** — Required configuration, with an inline comment explaining when it's required . If using `DefaultAzureCredential`in production,include `AZURE_TOKEN_CREDENTIALS` (set to `prod` or `<specific_credential>`)
-4. **Authentication & Lifecycle** — Use a specific Microsoft Entra Token credential like `ManagedIdentityCredential` or `WorkloadIdentityCredential` for production. `DefaultAzureCredential` is only recommended for local development. To use DefaultAzureCredential in production, set the environment variable `AZURE_TOKEN_CREDENTIALS` to `prod` or the specific target credential. **For Python skills, this section MUST start with the standard callout block** (see [Required Authentication & Lifecycle Callout (Python)](#required-authentication--lifecycle-callout-python) below).
+4. **Authentication & Lifecycle** — For Python skills, prefer `DefaultAzureCredential`: use it as-is for local development, and constrain it for production by setting `AZURE_TOKEN_CREDENTIALS` to `prod` (or a specific target credential name). A specific Microsoft Entra Token credential such as `ManagedIdentityCredential` or `WorkloadIdentityCredential` may be used directly instead. **For Python skills, this section MUST start with the standard callout block** (see [Required Authentication & Lifecycle Callout (Python)](#required-authentication--lifecycle-callout-python) below).
 5. **Core Workflow** — Minimal viable example (per core workflow discipline above)
 6. **Feature Tables** — Clients, methods, tools
 7. **Best Practices** — Numbered list
@@ -380,9 +380,9 @@ let client = BlobServiceClient::new(
 
 ---
 
-### Vally Efficiency Validation (REQUIRED - Phase 2)
+### Efficiency Validation (REQUIRED - Phase 2)
 
-**During authoring, validate skill efficiency against vally framework before publication.**
+**During authoring, validate skill efficiency manually, then run the Vally eval if the skill has one under `tests/scenarios/<skill-name>/vally/`.**
 
 **1. Measure token count:**
 
@@ -398,7 +398,7 @@ Use a token counter or model playground to measure each section. Compare to the 
 
 **3. Example count audit:**
 
-- [ ] 1 complete example per core workflow (up to 2 only when Case 2 documents multiple equally valid workflows)
+- [ ] 1 complete example per core workflow (up to 2 only when Case 2 documents multiple equally valid workflows). For Python SDKs that support both sync and async, the paired sync + async examples for the same core workflow count as one workflow, not two.
 - [ ] Feature table includes 3-5 core methods (not comprehensive API)
 - [ ] Max 1 example per best practice bullet
 
@@ -406,15 +406,26 @@ Use a token counter or model playground to measure each section. Compare to the 
 
 - [ ] `name` matches `.github/skills/<name>/SKILL.md`
 - [ ] `description` includes trigger keywords
-- [ ] `description` is ≤200 chars
-- [ ] Optional `benchmark_tokens` and `benchmark_quality` included
+- [ ] `description` is concise (~200 chars is a good target; schema max is 1,024 chars)
+- [ ] Optional `benchmark_tokens_*` and `benchmark_quality_*` metadata fields included (flat strings under `metadata`)
 
 **4b. Authentication guidance validation** (critical for all credentials):
 
 - [ ] If skill uses Azure Identity credentials, verify guidance against [official credential-chains docs](https://learn.microsoft.com/en-us/azure/developer/python/sdk/authentication/credential-chains#usage-guidance-for-defaultazurecredential)
 - [ ] Development guidance: OK to recommend `DefaultAzureCredential` (supports multiple dev credential types)
-- [ ] Production guidance: Must NOT recommend `DefaultAzureCredential` alone; recommend specific credential (e.g., `ManagedIdentityCredential`)
+- [ ] Production guidance: `DefaultAzureCredential` alone (unconstrained) is not sufficient; require either `AZURE_TOKEN_CREDENTIALS=prod` (or a specific target credential) to constrain the chain, or a specific credential (e.g., `ManagedIdentityCredential`) used directly
 - [ ] Link to `/references/auth-strategies.md` or official docs for production credential selection
+
+**4c. Run Vally lint/eval (if the skill has a spec under `tests/scenarios/<skill-name>/vally/`):**
+
+```bash
+vally lint --eval-spec tests/scenarios/<skill-name>/vally/eval.yaml
+vally eval --eval-spec tests/scenarios/<skill-name>/vally/eval.yaml
+```
+
+- [ ] `vally lint` passes with no errors
+- [ ] `vally eval` passes (no error-severity findings) when `COPILOT_TOKEN` is available; otherwise lint-only is acceptable, matching the [`Vally Evaluation`](../../workflows/vally-evaluation.yml) workflow behavior
+- [ ] Skills without a `vally/` spec skip this step — it is optional per skill, not required for every skill
 
 **5. Spot check:**
 
@@ -515,11 +526,11 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 | `azure-keyvault-secrets-rust`  | ~1,400      | CRUD workflow (set/update/delete/list); RBAC table; concise snippets |
 | `azure-identity-rust`          | ~1,400      | Credential-type table as the core structure; 3 short code examples; minimal prose |
 | `azure-cosmos-rust`            | ~1,470      | Client hierarchy table + single CRUD workflow; one code block per operation |
-| `azure-storage-queue-rust`     | ~1,700      | Send/receive/peek/delete flow; pagination pattern; RBAC table    |
+| `azure-eventhub-rust`          | ~1,475      | Send/receive workflow; key-concepts table; minimal prose         |
 
 **Why these are effective**:
 
-1. Stay under 1,200–1,800 tokens
+1. Stay at or under the 1,500-token absolute max (see Token Budget Guidelines above)
 2. Cover the hero workflow (CRUD or primary operations), not every feature variant
 3. Show 1-2 examples per concept, not 3-5
 4. Use tables for API summary (credential types, RBAC roles, client hierarchy)
@@ -779,8 +790,8 @@ Skills are organized by **language** and **product area** in the `skills/` direc
 2. Compare to Token Budget Guidelines targets
 3. Validate against anti-patterns checklist (see Anti-Patterns section)
 4. Extract to `/references/` if section exceeds max tokens
-5. Run Vally efficiency validation checklist (see Vally Efficiency Validation)
-6. Optionally add `benchmark_tokens` and `benchmark_quality` under the frontmatter's `metadata` mapping
+5. Run Efficiency Validation checklist, including `vally lint`/`vally eval` if the skill has a spec (see Efficiency Validation)
+6. Optionally add `benchmark_tokens_*` and `benchmark_quality_*` fields under the frontmatter's `metadata` mapping (flat string values)
 7. Add token count comment to skill header for future maintenance
 
 **Frontmatter (Enhanced with Benchmarking Metadata):**
@@ -792,24 +803,22 @@ description: |
   Azure Service SDK for Python. Use for [specific features].
   Triggers: "service name", "create resource", "specific operation".
 metadata:
-  benchmark_tokens:
-    estimated: 1180
-    target: 1100
-    max: 1500
-  benchmark_quality:
-    single_core_workflow: true
-    examples_focused: true
-    no_prose_bloat: true
-    anti_patterns_checked: true
+  benchmark_tokens_estimated: "1180"
+  benchmark_tokens_target: "1100"
+  benchmark_tokens_max: "1500"
+  benchmark_quality_single_core_workflow: "true"
+  benchmark_quality_examples_focused: "true"
+  benchmark_quality_no_prose_bloat: "true"
+  benchmark_quality_anti_patterns_checked: "true"
 ---
 ```
 
-**Metadata fields:**
+**Metadata fields:** (all values are strings, per the Agent Skills `metadata` spec — string keys mapped to string values)
 
-- `benchmark_tokens.estimated` — Actual measured token count
-- `benchmark_tokens.target` — Target efficiency (typically 1100)
-- `benchmark_tokens.max` — Absolute ceiling (1500; split if exceeded)
-- `benchmark_quality.*` — Boolean checklist for validation
+- `benchmark_tokens_estimated` — Actual measured token count
+- `benchmark_tokens_target` — Target efficiency (typically 1100)
+- `benchmark_tokens_max` — Absolute ceiling (1500; split if exceeded)
+- `benchmark_quality_*` — Individual anti-pattern checks, each a `"true"`/`"false"` string (e.g., `benchmark_quality_single_core_workflow`)
 
 ### Step 5: Categorize with Symlinks
 
@@ -1084,11 +1093,10 @@ Before finalizing any regenerated skill:
 6. If the SDK has broad operation-group coverage (common in management SDKs), include an operation-group table and explicitly call out which groups are covered in snippets vs. referenced only.
 7. Never claim "full API surface" unless the skill genuinely demonstrates all major operation groups; otherwise state that the skill is optimized for hero workflows plus selected secondary scenarios.
 
-3. **Validate regenerated skill behavior**
+### Regeneration Workflow Step 3: Validate Regenerated Skill Behavior
 
 ```bash
-cd tests
-pnpm harness <skill-name> --mock --verbose
+(cd tests && pnpm harness <skill-name> --mock --verbose)
 ```
 
 If the skill has a Vally scenario, run that eval as well (locally or in CI) before finalizing.
@@ -1108,14 +1116,13 @@ rg -n "Use `cargo add` to manage dependencies, never edit `Cargo.toml` directly|
 
 The regeneration is not complete unless both lines are present in each affected Rust skill.
 
-4. **Regenerate docs artifacts after refresh**
+### Regeneration Workflow Step 4: Regenerate Docs Artifacts After Refresh
 
 ```bash
-cd docs-site && npx tsx scripts/extract-skills.ts
-cd docs-site && npm run build
+(cd docs-site && npx tsx scripts/extract-skills.ts && npm run build)
 ```
 
-5. **Record what changed**
+### Regeneration Workflow Step 5: Record What Changed
 
 In the PR/commit notes, include:
 
@@ -1160,8 +1167,7 @@ ls .github/plugins/azure-sdk-python/skills/*/SKILL.md
 python .github/skills/skill-creator/scripts/quick_validate.py .github/plugins/azure-sdk-python/skills/<skill-name>
 
 # Run Python skill harness in mock mode (all *-py scenarios)
-cd tests
-pwsh ./run-harness-by-language.ps1 -Language py -Mock
+(cd tests && pwsh ./run-harness-by-language.ps1 -Language py -Mock)
 ```
 
 5. **Sync skill links and docs artifacts**
@@ -1172,8 +1178,7 @@ python .github/scripts/sync_skill_links.py --plugin azure-sdk-python --check
 python .github/scripts/sync_skill_links.py --plugin azure-sdk-python --apply
 
 # Refresh docs site data after content changes
-cd docs-site && npx tsx scripts/extract-skills.ts
-cd docs-site && npm run build
+(cd docs-site && npx tsx scripts/extract-skills.ts && npm run build)
 ```
 
 6. **Completion criteria for batch regeneration**
@@ -1269,7 +1274,7 @@ Before completing a skill:
 
 - [ ] User provided SDK package name or documentation URL
 - [ ] Verified SDK patterns via `microsoft-docs` MCP
-- [ ] Verified every snippet's API surface against current Microsoft Learn API reference pages for that SDK
+- [ ] Verified every snippet's API surface against the current official language-specific API reference for that SDK (Microsoft Learn where available, otherwise the upstream SDK repo — see canonical sources above)
 
 **Skill Creation:**
 
