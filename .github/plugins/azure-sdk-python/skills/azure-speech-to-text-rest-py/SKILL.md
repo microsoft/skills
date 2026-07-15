@@ -41,7 +41,7 @@ pip install requests
 
 > **🔑 Two rules apply to every code sample below:**
 >
-> 1. **Two auth modes are supported.** Use a subscription key (`Ocp-Apim-Subscription-Key` header) for quick access, or a Microsoft Entra bearer token (including one acquired with `DefaultAzureCredential`) in an `Authorization: ****** header. Never hardcode credentials in source.
+> 1. **Two auth modes are supported.** Use a subscription key (`Ocp-Apim-Subscription-Key` header) for quick access, or a Microsoft Entra bearer token (including one acquired with `DefaultAzureCredential`) via the `Authorization` request header. Never hardcode credentials in source.
 > 2. **Use context managers for files and HTTP resources** so file handles and network connections are released deterministically:
 >    - Sync: `with open(...) as f:` and (when reusing connections) `with requests.Session() as session:`
 >    - Async: `async with aiohttp.ClientSession() as session:`
