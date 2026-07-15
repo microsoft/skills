@@ -63,10 +63,8 @@ with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
     credential=os.environ["TRANSCRIPTION_KEY"],
 ) as client:
-    page = 0
-    for transcription in client.list_transcriptions():
-        print(f"[{page}] {transcription.name}: {transcription.status}")
-        page += 1
+    for index, transcription in enumerate(client.list_transcriptions()):
+        print(f"[{index}] {transcription.name}: {transcription.status}")
 ```
 
 ### Delete Completed Transcriptions

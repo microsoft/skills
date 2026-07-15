@@ -126,7 +126,9 @@ prediction = result["result"]["prediction"]
 top_intent = prediction["topIntent"]
 
 # Orchestration projects expose the target intent result under the intent name
-intent_result = prediction["intents"].get(top_intent, {})
+intent_result = next(
+    (i for i in prediction["intents"] if i["category"] == top_intent), {}
+)
 target_kind = intent_result.get("targetProjectKind")  # e.g. "Luis" or "Conversation"
 print(f"Routed to: {top_intent} ({target_kind})")
 ```
