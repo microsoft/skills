@@ -54,17 +54,18 @@ async def main() -> None:
         tenant_id=environ["COPILOTSTUDIOAGENT__TENANTID"],
     )
 
-    # CopilotClient does not implement the context manager protocol.
+    # CopilotClient does not implement the context manager protocol; close
+    # any underlying resources explicitly when your application shuts down.
     copilot_client = CopilotClient(settings, token)
 
-    # Start conversation and collect the opening activity
-    act = copilot_client.start_conversation(True)
-    async for action in act:
-        if action.text:
-            print(action.text)
+    # Start conversation and collect the opening activities
+    opening_activities = copilot_client.start_conversation(True)
+    async for activity in opening_activities:
+        if activity.text:
+            print(activity.text)
 
     # Send a message and iterate replies
-    replies = copilot_client.ask_question("Hello!", action.conversation.id)
+    replies = copilot_client.ask_question("Hello!", activity.conversation.id)
     async for reply in replies:
         if reply.type == ActivityTypes.message:
             print(reply.text)
