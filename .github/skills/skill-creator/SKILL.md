@@ -174,7 +174,7 @@ If no single pattern dominates:
 2. Acknowledge other approaches in a `/references/workflows-comparison.md` that explains trade-offs (e.g., "Local dev uses DeveloperToolsCredential; production uses ManagedIdentityCredential")
 3. Do NOT treat valid alternatives as "advanced" — they're equally valid, just different contexts
 
-**Example**: Azure Identity SDK has 8 credential types. Pick `DefaultAzureCredential` for SKILL.md (covers most local + production scenarios). Document `ManagedIdentityCredential`, `WorkloadIdentityCredential`, `AzureCliCredential`, etc. in `/references/credential-types.md` without ranking them.
+**Example**: Azure Identity SDK has 8 credential types. Pick `DefaultAzureCredential` for SKILL.md for local development; for production, direct users to specific credentials (`ManagedIdentityCredential`, `WorkloadIdentityCredential`) or configure `DefaultAzureCredential` with `AZURE_TOKEN_CREDENTIALS=prod`. Document `AzureCliCredential`, etc. in `/references/credential-types.md` without ranking them.
 
 **Decision rule**: If you're unsure, ask: "Would a user choosing the other approach call what I wrote wrong?" If no, both are core workflows—acknowledge both with trade-offs.
 
@@ -449,7 +449,7 @@ Azure SDKs use consistent verbs across all languages:
 
 See `references/azure-sdk-patterns.md` for detailed patterns including:
 
-- **Python**: `ItemPaged`, `LROPoller`, context managers, Sphinx docstrings. Present both sync and async forms as first-class options; do not express a preference for either. Do not mix sync and async within a single code example. Always show `with` / `async with` context managers.
+- **Python**: `ItemPaged`, `LROPoller`, context managers, Sphinx docstrings. When the SDK provides both sync and async clients, present both forms as first-class options; do not express a preference for either. When the SDK is sync-only or async-only, document the available mode only. Do not mix sync and async within a single code example. Always show `with` / `async with` context managers.
 - **.NET**: `Response<T>`, `Pageable<T>`, `Operation<T>`, mocking support
 - **Java**: Builder pattern, `PagedIterable`/`PagedFlux`, Reactor types
 - **TypeScript**: `PagedAsyncIterableIterator`, `AbortSignal`, browser considerations
@@ -467,7 +467,7 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 **Standard wording (Python; adapt for other languages):**
 
 ```markdown
-1. **Do not mix sync and async clients in the same call path.** Use either `azure.xxx` sync clients or `azure.xxx.aio` async clients within a single call path — do not combine both. Present both forms with equal priority in the skill itself.
+1. **Do not mix sync and async clients in the same call path.** Use either `azure.xxx` sync clients or `azure.xxx.aio` async clients within a single call path — do not combine both.
 2. **Always use context managers for clients and async credentials.** Wrap every client in `with Client(...) as client:` (sync) or `async with Client(...) as client:` (async). For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
 3. **Use `DefaultAzureCredential`** for code that runs locally. Use a specific token credential (e.g. `ManagedIdentityCredential`, `WorkloadIdentityCredential`) for code that runs in Azure.
 ```
@@ -486,7 +486,7 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 
 **Enforcement in code examples.** Every code example inside the skill must itself obey both rules, so the skill demonstrates what it prescribes:
 
-- Do not interleave sync and async calls within a single example. Show each mode in its own complete, self-contained example — a `### Sync` subsection and an `### Async` subsection — giving both equal prominence.
+- Do not interleave sync and async calls within a single example. When the SDK provides both sync and async clients, show each mode in its own complete, self-contained example — a `### Sync` subsection and an `### Async` subsection — giving both equal prominence. When the SDK is sync-only or async-only, show only the available mode.
 - Every client instantiation in every example must be wrapped in `with` / `async with`. The only permitted exception is the mandatory Authentication snippet (which illustrates the credential + client construction pattern) and framework lifespan patterns where a client is owned by the app (e.g. FastAPI `lifespan`).
 - When async credentials from `azure.identity.aio` appear in an example, wrap them in `async with credential:` alongside the client.
 
@@ -1054,15 +1054,18 @@ For Azure SDK language skills, use official upstream source docs and examples as
 
 ### API Surface Parity Gate (required for every regenerated skill)
 
-Treat Microsoft Learn API reference as the contract for every snippet in the regenerated skill.
+Use the language-specific authoritative source as the contract for every snippet in the regenerated skill:
+
+- **Python, .NET, Java, TypeScript, Go**: Treat the current Microsoft Learn API reference as the contract.
+- **Rust**: Treat the official SDK repository (`https://github.com/Azure/azure-sdk-for-rust`) and crates.io documentation as the contract; Rust packages do not have Learn API-reference pages.
 
 Before finalizing any regenerated skill:
 
 1. Identify each SDK type/method shown in snippets (clients, operation groups, model constructors, enum members, long-running methods like `begin_*`).
-2. Verify each symbol and signature against current Microsoft Learn API reference pages for that package.
-3. If Learn shows a different shape (for example nested `properties=...` models, renamed methods, `begin_*` LRO methods), update the snippet to the Learn shape.
-4. Re-check imports so model/client modules match Learn exactly.
-5. Do not keep compatibility shortcuts that contradict Learn examples in primary snippets.
+2. Verify each symbol and signature against the authoritative source for that language/package (see above).
+3. If the authoritative source shows a different shape (for example nested `properties=...` models, renamed methods, `begin_*` LRO methods), update the snippet to match.
+4. Re-check imports so model/client modules match the authoritative source exactly.
+5. Do not keep compatibility shortcuts that contradict authoritative examples in primary snippets.
 
 ### Scenario Coverage Gate (required for every regenerated skill, all languages)
 
@@ -1081,7 +1084,7 @@ Before finalizing any regenerated skill:
 6. If the SDK has broad operation-group coverage (common in management SDKs), include an operation-group table and explicitly call out which groups are covered in snippets vs. referenced only.
 7. Never claim "full API surface" unless the skill genuinely demonstrates all major operation groups; otherwise state that the skill is optimized for hero workflows plus selected secondary scenarios.
 
-8. **Validate regenerated skill behavior**
+3. **Validate regenerated skill behavior**
 
 ```bash
 cd tests

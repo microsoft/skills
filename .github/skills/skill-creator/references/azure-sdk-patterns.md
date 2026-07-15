@@ -47,7 +47,7 @@ For Azure SDK skills, keep `SKILL.md` focused on hero flows and use `references/
 
 Use present-tense guidance in reference files; avoid historical migration notes in user-facing capability indexes.
 
-For Python SDK skills that provide both sync and async clients, present both forms as first-class options. Do not encode a blanket preference for either mode in capability prioritization.
+For Python SDK skills that provide both sync and async clients, present both forms as first-class options with equal priority. Do not encode a blanket preference for either mode in capability prioritization. When the SDK is sync-only or async-only, document the available mode only.
 
 ---
 
@@ -140,7 +140,7 @@ async def run_also_bad():
         await client.agents.get_agent("agent-id")  # credential.get_token() will block
 ```
 
-When writing a skill, present both sync and async forms as first-class options with equal priority. Do not encode a preference for either mode.
+When writing a skill, present both sync and async forms as first-class options with equal priority when the SDK provides both. Do not encode a preference for either mode. When the SDK is sync-only or async-only, document the available mode only.
 
 ### Pagination: ItemPaged / AsyncItemPaged
 
