@@ -1,0 +1,20 @@
+# Purpose: Measure skill effectiveness by comparing the same stimulus with and without the corresponding skill.
+name: azure-ai-transcription-py-skill-experiment
+evals:
+  - skill_effectiveness_eval.yaml
+vary:
+  - /defaults/model
+  - /environment/skills
+baseline: sonnet_baseline
+variants:
+  sonnet_skill:
+    overrides:
+      model: claude-sonnet-4.6
+    environment:
+      skills:
+        - ../../../../.github/plugins/azure-sdk-python/skills/azure-ai-transcription-py
+  sonnet_baseline:
+    overrides:
+      model: claude-sonnet-4.6
+    environment:
+      skills: []

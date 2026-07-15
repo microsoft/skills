@@ -25,8 +25,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@microsoft/vally':
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.7.0
+        version: 0.7.0
       '@types/node':
         specifier: ^20.14.0
         version: 20.19.30
@@ -47,7 +47,7 @@ importers:
         version: 8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ^4.1.9
-        version: 4.1.9(@types/node@20.19.30)(@vitest/coverage-v8@4.1.9)(vite@8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@20.19.30)(@vitest/coverage-v8@4.1.9)(vite@8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))
 
 packages:
 
@@ -291,24 +291,28 @@ packages:
     resolution: {integrity: sha512-Krg/3ZWxXB7Dw4VOLZEZrYmqc39Yvz9M1K9SPOfjpEy2SFnF/KVLaFt/6E1uYdjgvJ7BmocfVcFYp0hUmy5Axw==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
     hasBin: true
 
   '@github/copilot-linux-x64@1.0.64':
     resolution: {integrity: sha512-2k9FGppYnxHLwVH+TVCf13JfjSlvS15wsZM5xYxEFlqL/CIBvTK7yn5p7M+P1dWoTUpCmavKG3601BtHPenrRg==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
     hasBin: true
 
   '@github/copilot-linuxmusl-arm64@1.0.64':
     resolution: {integrity: sha512-C+EYoMvmlUxR0YYxLkD3nwn940y0zId8z+pPl9rFO6f9heMGXYCwCZL2i2c3GW6CvGgZF6Wbzw1Kk0Gvw46F2w==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
     hasBin: true
 
   '@github/copilot-linuxmusl-x64@1.0.64':
     resolution: {integrity: sha512-VSTGl7dGQDhH2ACeyYq1hYhAsMUbumpqeVe+CGo/u7fKOMrTNMTR5SB3s+zsHCskKZkJkZ2gsUWROCiDBsThEg==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
     hasBin: true
 
   '@github/copilot-sdk@1.0.3':
@@ -357,14 +361,18 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@microsoft/vally@0.6.0':
-    resolution: {integrity: sha512-b283YRDFZXUkKNKY3+1EfMBVbHrBLIs5jfUi7lIQ8N0Y10lVsNnNGkRbtTbd7tLYZajr6AhtnpIroc4RFzo1cQ==}
+  '@microsoft/vally@0.7.0':
+    resolution: {integrity: sha512-GYxSgub10SC6X1d/vVUCOorGzAMWIUN7uk2zq65pPle0CfKdWy+HiEpnJkgrXGat7kZxzx+jM9lrffW3nfKpmw==}
 
   '@napi-rs/wasm-runtime@1.1.5':
     resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
+
+  '@opentelemetry/api@1.9.1':
+    resolution: {integrity: sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==}
+    engines: {node: '>=8.0.0'}
 
   '@oxc-project/types@0.137.0':
     resolution: {integrity: sha512-WT+Gb24i8hmvo85AIv2oEYouEXkRlKAlT9WaCa3TfLgNCN+GhrJOGZuIlMouAh38Qe4QOx26eUOVsq70qXrywA==}
@@ -404,36 +412,42 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@rolldown/binding-linux-arm64-musl@1.1.2':
     resolution: {integrity: sha512-LjQP/iZLBu8o8PjIfk4x3At0/mT6h282pvz8Z5LAyhGbu/kDezyO7ea62rF5uoqmgnIYqbN/MqJ3Si3Aymi7xQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@rolldown/binding-linux-ppc64-gnu@1.1.2':
     resolution: {integrity: sha512-X/7bVLWelEsbyWDUSXt7zVsTniLLPIY2n1rH58qr78l9i7MNbbxBWD8gI2vRfBWf4NUXJCUuQnfZDsp32LqsfQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@rolldown/binding-linux-s390x-gnu@1.1.2':
     resolution: {integrity: sha512-gb6dYKW/1KDorGXyy48glEBJs/sxVSC5pcVrox/pFGV4mvwSFeg2sK5L2tRkVsVlh7kueqOgg4GEcuipJcGuKg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@rolldown/binding-linux-x64-gnu@1.1.2':
     resolution: {integrity: sha512-JY4w85pU3iAiJVMh5nuk4/Mh9GjMsupe8MrIN53rwxAZW64GKrWeJBuN6SxQg9QTU5uB1cxyhDzW8jqRn1EABw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rolldown/binding-linux-x64-musl@1.1.2':
     resolution: {integrity: sha512-xvpA7o5KCYLB0Rwscmuylb1/zHHSUx4g4xilm4prC5jP76pEUlzBmMbgpbh7bVDbId4NcfT96gN5i6mE6UDaiw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@rolldown/binding-openharmony-arm64@1.1.2':
     resolution: {integrity: sha512-p/ts6KBLjuk49Bp21XH77poQGt02iNz7ChgHep7tudPOaLinR/De/RHdxF8w8Yj4r/bF/bqXwH6PZrB2sA+Nvw==}
@@ -822,24 +836,28 @@ packages:
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   lightningcss-linux-arm64-musl@1.32.0:
     resolution: {integrity: sha512-UpQkoenr4UJEzgVIYpI80lDFvRmPVg6oqboNHfoH4CQIfNA+HOrZ7Mo7KZP02dC6LjghPQJeBsvXhJod/wnIBg==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   lightningcss-linux-x64-gnu@1.32.0:
     resolution: {integrity: sha512-V7Qr52IhZmdKPVr+Vtw8o+WLsQJYCTd8loIfpDaMRWGUZfBOYEJeyJIkqGIDMZPwPx24pUMfwSxxI8phr/MbOA==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   lightningcss-linux-x64-musl@1.32.0:
     resolution: {integrity: sha512-bYcLp+Vb0awsiXg/80uCRezCYHNg1/l3mt0gzHnWV9XP1W5sKa5/TCdGWaR/zBM2PeF/HbsQv/j2URNOiVuxWg==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   lightningcss-win32-arm64-msvc@1.32.0:
     resolution: {integrity: sha512-8SbC8BR40pS6baCM8sbtYDSwEVQd4JlFTOlaD3gWGHfThTcABnNDBda6eTZeqbofalIJhFx0qKzgHJmcPTnGdw==}
@@ -1364,9 +1382,10 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@microsoft/vally@0.6.0':
+  '@microsoft/vally@0.7.0':
     dependencies:
       '@github/copilot-sdk': 1.0.3
+      '@opentelemetry/api': 1.9.1
       js-tiktoken: 1.0.21
       picomatch: 4.0.4
       yaml: 2.9.0
@@ -1378,6 +1397,8 @@ snapshots:
       '@emnapi/runtime': 1.11.1
       '@tybys/wasm-util': 0.10.3
     optional: true
+
+  '@opentelemetry/api@1.9.1': {}
 
   '@oxc-project/types@0.137.0': {}
 
@@ -1466,7 +1487,7 @@ snapshots:
       obug: 2.1.3
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.9(@types/node@20.19.30)(@vitest/coverage-v8@4.1.9)(vite@8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))
+      vitest: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@20.19.30)(@vitest/coverage-v8@4.1.9)(vite@8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))
 
   '@vitest/expect@4.1.9':
     dependencies:
@@ -2001,7 +2022,7 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.8.2
 
-  vitest@4.1.9(@types/node@20.19.30)(@vitest/coverage-v8@4.1.9)(vite@8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)):
+  vitest@4.1.9(@opentelemetry/api@1.9.1)(@types/node@20.19.30)(@vitest/coverage-v8@4.1.9)(vite@8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
       '@vitest/expect': 4.1.9
       '@vitest/mocker': 4.1.9(vite@8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))
@@ -2024,6 +2045,7 @@ snapshots:
       vite: 8.1.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
+      '@opentelemetry/api': 1.9.1
       '@types/node': 20.19.30
       '@vitest/coverage-v8': 4.1.9(vitest@4.1.9)
     transitivePeerDependencies:

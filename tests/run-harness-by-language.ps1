@@ -18,7 +18,7 @@ If specified, only run mock harness evaluations (skips real Copilot).
 If specified, only run real Copilot evaluations (skips mock).
 
 .PARAMETER ShowDetails
-Show detailed output for each scenario.
+Show per-scenario details, including generated code and findings.
 
 .PARAMETER OutputFile
 Optional path to save results as JSON. Defaults to stdout only.
@@ -113,8 +113,184 @@ $results = @{
     }
 }
 
+function Get-DiagnosticErrorKind {
+    param(
+        [string[]]$Diagnostics
+    )
+
+    $joined = ($Diagnostics -join "`n").ToLowerInvariant()
+
+    if ($joined -match "authentication failed|bad credentials|github cli user login|401") {
+        return "auth"
+    }
+    if ($joined -match "timeout|session\.idle|timed out") {
+        return "timeout"
+    }
+    if ($joined -match "rate limit|429|econnreset|etimedout|socket hang up|temporarily unavailable|service unavailable") {
+        return "transient"
+    }
+    if ($joined -match "empty or invalid|failed to parse|did not produce json output file") {
+        return "parse"
+    }
+
+    return "fatal"
+}
+
+function Test-HarnessAuthPreflight {
+    if ($env:GH_TOKEN -or $env:GITHUB_TOKEN) {
+        return $true
+    }
+
+    try {
+        $null = & gh auth status 2>&1
+        return $LASTEXITCODE -eq 0
+    }
+    catch {
+        return $false
+    }
+}
+
+function Get-HarnessModeResult {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Skill,
+
+        [Parameter(Mandatory = $true)]
+        [bool]$UseMock,
+
+        [switch]$IncludeDetails
+    )
+
+    $tempJson = [System.IO.Path]::GetTempFileName()
+    $args = @("harness", $Skill, "--output", "json", "--output-file", $tempJson)
+
+    if ($UseMock) {
+        $args += "--mock"
+    }
+
+    # Capture stdout/stderr as plain strings in case parsing fails and we need diagnostics.
+    $rawOutput = & pnpm @args 2>&1 | ForEach-Object { "$_" }
+    $exitCode = $LASTEXITCODE
+
+    try {
+        if (-not (Test-Path $tempJson)) {
+            $kind = Get-DiagnosticErrorKind -Diagnostics @($rawOutput)
+            return @{
+                status      = "ERROR"
+                error_kind  = $kind
+                exit_code   = $exitCode
+                error       = "Harness did not produce JSON output file."
+                diagnostics = @($rawOutput)
+            }
+        }
+
+        $jsonText = Get-Content $tempJson -Raw
+        if ([string]::IsNullOrWhiteSpace($jsonText)) {
+            $kind = Get-DiagnosticErrorKind -Diagnostics @($rawOutput)
+            return @{
+                status      = "ERROR"
+                error_kind  = $kind
+                exit_code   = $exitCode
+                error       = "Harness JSON output file was empty."
+                diagnostics = @($rawOutput)
+            }
+        }
+
+        $parsed = $jsonText | ConvertFrom-Json -Depth 100
+
+        if ($null -eq $parsed) {
+            $kind = Get-DiagnosticErrorKind -Diagnostics @($rawOutput)
+            return @{
+                status      = "ERROR"
+                error_kind  = $kind
+                exit_code   = $exitCode
+                error       = "Harness JSON output was empty or invalid."
+                diagnostics = @($rawOutput)
+            }
+        }
+
+        if ($parsed.status -eq "ERROR") {
+            $combinedDiagnostics = @($rawOutput)
+            if ($parsed.diagnostics) {
+                $combinedDiagnostics += @($parsed.diagnostics)
+            }
+
+            return @{
+                status      = "ERROR"
+                error_kind  = if ($parsed.error_kind) { $parsed.error_kind } else { Get-DiagnosticErrorKind -Diagnostics $combinedDiagnostics }
+                exit_code   = $exitCode
+                error       = if ($parsed.error) { $parsed.error } else { "Harness reported an execution error." }
+                diagnostics = $combinedDiagnostics
+            }
+        }
+
+        $result = @{
+            status           = if ($exitCode -eq 0) { "PASS" } else { "FAIL" }
+            exit_code        = $exitCode
+            summary          = @{
+                total_scenarios = $parsed.total_scenarios
+                passed          = $parsed.passed
+                failed          = $parsed.failed
+                pass_rate       = $parsed.pass_rate
+                avg_score       = $parsed.avg_score
+                duration_ms     = $parsed.duration_ms
+            }
+            failed_scenarios = @()
+        }
+
+        foreach ($scenarioResult in @($parsed.results)) {
+            if (-not $scenarioResult.passed) {
+                $result.failed_scenarios += @{
+                    scenario = $scenarioResult.scenario
+                    score    = $scenarioResult.score
+                    findings = @($scenarioResult.findings)
+                }
+            }
+        }
+
+        if ($IncludeDetails) {
+            $result.scenarios = @()
+            foreach ($scenarioResult in @($parsed.results)) {
+                $result.scenarios += @{
+                    scenario       = $scenarioResult.scenario
+                    passed         = $scenarioResult.passed
+                    score          = $scenarioResult.score
+                    generated_code = $scenarioResult.generated_code
+                    raw_response   = $scenarioResult.raw_response
+                    findings       = @($scenarioResult.findings)
+                }
+            }
+        }
+
+        return $result
+    }
+    catch {
+        $kind = Get-DiagnosticErrorKind -Diagnostics @($rawOutput)
+        return @{
+            status      = "ERROR"
+            error_kind  = $kind
+            exit_code   = $exitCode
+            error       = "Failed to parse harness JSON output: $($_.Exception.Message)"
+            diagnostics = @($rawOutput)
+        }
+    }
+    finally {
+        Remove-Item -Path $tempJson -Force -ErrorAction SilentlyContinue
+    }
+}
+
 # Run harness for each skill
 Set-Location $testsDir
+
+$canRunRealHarness = $true
+if ($runReal) {
+    $canRunRealHarness = Test-HarnessAuthPreflight
+    if (-not $canRunRealHarness) {
+        Write-Host "Real harness auth preflight failed. Skipping all real-mode runs." -ForegroundColor Red
+        Write-Host "Run 'gh auth login' or set GH_TOKEN/GITHUB_TOKEN, then rerun." -ForegroundColor Yellow
+        Write-Host ""
+    }
+}
 
 foreach ($skill in $skills) {
     $skillResult = @{
@@ -130,29 +306,25 @@ foreach ($skill in $skills) {
     if ($runMock) {
         Write-Host "  [MOCK] Running..." -ForegroundColor Gray -NoNewline
         try {
-            $mockOutput = & pnpm harness $skill --mock 2>&1
-            $mockSuccess = $LASTEXITCODE -eq 0
+            $mockResult = Get-HarnessModeResult -Skill $skill -UseMock $true -IncludeDetails:$ShowDetails
+            $mockSuccess = $mockResult.status -eq "PASS"
             
             if ($mockSuccess) {
                 Write-Host " ✓ PASS" -ForegroundColor Green
                 $results.summary.mock.passed++
-                $skillResult.mock = @{
-                    status = "PASS"
-                    output = $mockOutput
-                }
+                $skillResult.mock = $mockResult
             }
             else {
-                Write-Host " ✗ FAIL" -ForegroundColor Red
+                $statusColor = if ($mockResult.status -eq "ERROR") { "Red" } else { "Red" }
+                Write-Host " ✗ $($mockResult.status)" -ForegroundColor $statusColor
                 $results.summary.mock.failed++
                 $results.summary.mock.errors += $skill
-                $skillResult.mock = @{
-                    status = "FAIL"
-                    output = $mockOutput
-                }
+                $skillResult.mock = $mockResult
             }
             
-            if ($ShowDetails) {
-                Write-Host $mockOutput -ForegroundColor DarkGray
+            if ($ShowDetails -and $skillResult.mock.summary) {
+                $mockSummary = $skillResult.mock.summary
+                Write-Host "    scenarios: $($mockSummary.passed)/$($mockSummary.total_scenarios), avg score: $([math]::Round([double]$mockSummary.avg_score, 1))" -ForegroundColor DarkGray
             }
         }
         catch {
@@ -168,31 +340,41 @@ foreach ($skill in $skills) {
     
     # Real harness
     if ($runReal) {
+        if (-not $canRunRealHarness) {
+            Write-Host "  [REAL]  Skipped (auth preflight failed)" -ForegroundColor Red
+            $results.summary.real.failed++
+            $results.summary.real.errors += "$skill (AUTH_ERROR)"
+            $skillResult.real = @{
+                status     = "ERROR"
+                error_kind = "auth"
+                error      = "Skipped due to failed auth preflight. Run 'gh auth login' or set GH_TOKEN/GITHUB_TOKEN."
+            }
+            Write-Host ""
+            $results.skills += $skillResult
+            continue
+        }
+
         Write-Host "  [REAL]  Running..." -ForegroundColor Gray -NoNewline
         try {
-            $realOutput = & pnpm harness $skill 2>&1
-            $realSuccess = $LASTEXITCODE -eq 0
+            $realResult = Get-HarnessModeResult -Skill $skill -UseMock $false -IncludeDetails:$ShowDetails
+            $realSuccess = $realResult.status -eq "PASS"
             
             if ($realSuccess) {
                 Write-Host " ✓ PASS" -ForegroundColor Green
                 $results.summary.real.passed++
-                $skillResult.real = @{
-                    status = "PASS"
-                    output = $realOutput
-                }
+                $skillResult.real = $realResult
             }
             else {
-                Write-Host " ✗ FAIL" -ForegroundColor Red
+                $statusColor = if ($realResult.status -eq "ERROR") { "Red" } else { "Red" }
+                Write-Host " ✗ $($realResult.status)" -ForegroundColor $statusColor
                 $results.summary.real.failed++
                 $results.summary.real.errors += $skill
-                $skillResult.real = @{
-                    status = "FAIL"
-                    output = $realOutput
-                }
+                $skillResult.real = $realResult
             }
             
-            if ($ShowDetails) {
-                Write-Host $realOutput -ForegroundColor DarkGray
+            if ($ShowDetails -and $skillResult.real.summary) {
+                $realSummary = $skillResult.real.summary
+                Write-Host "    scenarios: $($realSummary.passed)/$($realSummary.total_scenarios), avg score: $([math]::Round([double]$realSummary.avg_score, 1))" -ForegroundColor DarkGray
             }
         }
         catch {

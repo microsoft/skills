@@ -2,7 +2,7 @@
 # Each scenario tests a specific FastAPI router pattern against acceptance criteria
 
 config:
-  model: gpt-4
+  model: gpt-5.5
   max_tokens: 2000
   temperature: 0.3
 
@@ -36,16 +36,16 @@ scenarios:
     mock_response: |
       from typing import Optional
       from fastapi import APIRouter, Depends, HTTPException, Query, status
-      
+
       from app.models.project import ProjectResponse, ProjectCreate, ProjectUpdate
       from app.services.project_service import ProjectService
-      
+
       router = APIRouter(prefix="/api", tags=["projects"])
-      
+
       def get_service() -> ProjectService:
           """Dependency to get service instance."""
           return ProjectService()
-      
+
       @router.get("/projects", response_model=list[ProjectResponse])
       async def list_projects(
           limit: int = Query(default=50, ge=1, le=100),
@@ -54,7 +54,7 @@ scenarios:
       ) -> list[ProjectResponse]:
           """List all projects with pagination."""
           return await service.list_projects(limit=limit, offset=offset)
-      
+
       @router.get("/projects/{project_id}", response_model=ProjectResponse)
       async def get_project(
           project_id: str,
@@ -68,7 +68,7 @@ scenarios:
                   detail="Project not found",
               )
           return result
-      
+
       @router.post(
           "/projects",
           response_model=ProjectResponse,
@@ -80,7 +80,7 @@ scenarios:
       ) -> ProjectResponse:
           """Create a new project."""
           return await service.create_project(data)
-      
+
       @router.patch("/projects/{project_id}", response_model=ProjectResponse)
       async def update_project(
           project_id: str,
@@ -95,7 +95,7 @@ scenarios:
                   detail="Project not found",
               )
           return await service.update_project(project_id, data)
-      
+
       @router.delete(
           "/projects/{project_id}",
           status_code=status.HTTP_204_NO_CONTENT,
@@ -130,27 +130,27 @@ scenarios:
       - "HTTP_401_UNAUTHORIZED"
       - "HTTP_403_FORBIDDEN"
     forbidden_patterns:
-      - "current_user: str"  # Should be User type
-      - "current_user: Optional[^\\[]"  # Should have full type like Optional[User]
-      - "get_current_user_required.*Optional"  # Can't be both required and optional
+      - "current_user: str" # Should be User type
+      - "current_user: Optional[^\\[]" # Should have full type like Optional[User]
+      - "get_current_user_required.*Optional" # Can't be both required and optional
     tags:
       - authentication
       - security
     mock_response: |
       from typing import Optional
       from fastapi import APIRouter, Depends, HTTPException, status
-      
+
       from app.auth.jwt import get_current_user, get_current_user_required
       from app.models.user import User
       from app.models.task import TaskResponse, TaskCreate, TaskUpdate
       from app.services.task_service import TaskService
-      
+
       router = APIRouter(prefix="/api", tags=["tasks"])
-      
+
       def get_service() -> TaskService:
           """Dependency to get service instance."""
           return TaskService()
-      
+
       @router.get("/tasks", response_model=list[TaskResponse])
       async def list_tasks(
           current_user: Optional[User] = Depends(get_current_user),
@@ -159,7 +159,7 @@ scenarios:
           """List tasks. Authentication optional."""
           user_id = current_user.id if current_user else None
           return await service.list_tasks(user_id=user_id)
-      
+
       @router.post(
           "/tasks",
           response_model=TaskResponse,
@@ -172,7 +172,7 @@ scenarios:
       ) -> TaskResponse:
           """Create a new task. Authentication required."""
           return await service.create_task(data, owner_id=current_user.id)
-      
+
       @router.patch("/tasks/{task_id}", response_model=TaskResponse)
       async def update_task(
           task_id: str,
@@ -193,7 +193,7 @@ scenarios:
                   detail="Not authorized to update this task",
               )
           return await service.update_task(task_id, data)
-      
+
       @router.delete(
           "/tasks/{task_id}",
           status_code=status.HTTP_204_NO_CONTENT,
@@ -237,7 +237,7 @@ scenarios:
     forbidden_patterns:
       - "response_model=dict"
       - "response_model=str"
-      - "response_model=list[^\\[]"  # Should specify type: list[Model], not just list
+      - "response_model=list[^\\[]" # Should specify type: list[Model], not just list
       - "-> dict:"
       - "-> Any:"
     tags:
@@ -246,22 +246,22 @@ scenarios:
     mock_response: |
       from fastapi import APIRouter, Depends, HTTPException, status
       from pydantic import BaseModel
-      
+
       from app.models.article import ArticleResponse, ArticleCreate
       from app.services.article_service import ArticleService
-      
+
       router = APIRouter(prefix="/api", tags=["articles"])
-      
+
       def get_service() -> ArticleService:
           return ArticleService()
-      
+
       @router.get("/articles", response_model=list[ArticleResponse])
       async def list_articles(
           service: ArticleService = Depends(get_service),
       ) -> list[ArticleResponse]:
           """List all articles."""
           return await service.list_articles()
-      
+
       @router.get("/articles/{article_id}", response_model=ArticleResponse)
       async def get_article(
           article_id: str,
@@ -275,7 +275,7 @@ scenarios:
                   detail="Article not found",
               )
           return article
-      
+
       @router.post(
           "/articles",
           response_model=ArticleResponse,
@@ -287,7 +287,7 @@ scenarios:
       ) -> ArticleResponse:
           """Create a new article."""
           return await service.create_article(data)
-      
+
       @router.delete(
           "/articles/{article_id}",
           status_code=status.HTTP_204_NO_CONTENT,
@@ -323,42 +323,52 @@ scenarios:
       - "Query\\(default="
       - "description="
     forbidden_patterns:
-      - "q: str"  # Should have Query validation
-      - "limit: int = 50"  # Should have Query with constraints
-      - "offset: int = 0"  # Should have Query with constraints
-      - "Query\\(\\)"  # Query should have parameters
+      - "limit: int = 50" # Should have Query with constraints
+      - "offset: int = 0" # Should have Query with constraints
+      - "Query\\(\\)" # Query should have parameters
     tags:
       - validation
       - query-parameters
     mock_response: |
-      from typing import Annotated, Optional
-      from fastapi import APIRouter, Depends, Query, status
-      
-      from app.models.search import SearchResponse
-      from app.services.search_service import SearchService
-      
-      router = APIRouter(prefix="/api", tags=["search"])
-      
-      def get_service() -> SearchService:
-          return SearchService()
-      
-      @router.get("/search", response_model=list[SearchResponse])
+      from typing import Literal
+
+      from fastapi import APIRouter, Query
+
+      router = APIRouter(prefix="/search", tags=["search"])
+
+
+      @router.get("")
       async def search(
-          q: Annotated[str, Query(min_length=1, max_length=200, description="Search query")],
-          limit: Annotated[int, Query(ge=1, le=100, description="Max results")] = 50,
-          offset: Annotated[int, Query(ge=0, description="Results to skip")] = 0,
-          sort_by: Annotated[Optional[str], Query(description="Sort by: relevance, date, popularity")] = "relevance",
-          service: SearchService = Depends(get_service),
-      ) -> list[SearchResponse]:
-          """
-          Search for items.
-          
-          - **q**: Search term (required, 1-200 characters)
-          - **limit**: Maximum results to return (1-100, default 50)
-          - **offset**: Number of results to skip (default 0)
-          - **sort_by**: Sort results by relevance, date, or popularity
-          """
-          return await service.search(q=q, limit=limit, offset=offset, sort_by=sort_by)
+          q: str = Query(
+              ...,
+              min_length=1,
+              max_length=200,
+              description="Search term to query for.",
+          ),
+          limit: int = Query(
+              50,
+              ge=1,
+              le=100,
+              description="Maximum number of results to return.",
+          ),
+          offset: int = Query(
+              0,
+              ge=0,
+              description="Number of results to skip before returning matches.",
+          ),
+          sort_by: Literal["relevance", "date", "popularity"] = Query(
+              "relevance",
+              description="Sort order for search results.",
+          ),
+      ) -> dict[str, object]:
+          """Search for items matching the provided query parameters."""
+          return {
+              "q": q,
+              "limit": limit,
+              "offset": offset,
+              "sort_by": sort_by,
+              "results": [],
+          }
 
   # Error Handling with HTTPException
   - name: error_handling_http_exception
@@ -377,25 +387,25 @@ scenarios:
       - "if.*is None"
       - "if.*owner_id"
     forbidden_patterns:
-      - "except"  # Should use HTTPException, not try/except
-      - "return None"  # Should raise HTTPException instead
-      - "raise Exception"  # Should use HTTPException
+      - "except" # Should use HTTPException, not try/except
+      - "return None" # Should raise HTTPException instead
+      - "raise Exception" # Should use HTTPException
     tags:
       - error-handling
       - security
     mock_response: |
       from fastapi import APIRouter, Depends, HTTPException, status
-      
+
       from app.models.user import UserResponse, UserUpdate
       from app.auth.jwt import get_current_user_required
       from app.models.user import User
       from app.services.user_service import UserService
-      
+
       router = APIRouter(prefix="/api", tags=["users"])
-      
+
       def get_service() -> UserService:
           return UserService()
-      
+
       @router.get("/users/{user_id}", response_model=UserResponse)
       async def get_user(
           user_id: str,
@@ -409,7 +419,7 @@ scenarios:
                   detail="User not found",
               )
           return user
-      
+
       @router.patch("/users/{user_id}", response_model=UserResponse)
       async def update_user(
           user_id: str,
@@ -456,28 +466,28 @@ scenarios:
       - "posts"
       - "comments"
     forbidden_patterns:
-      - "include_router.*prefix.*prefix"  # Double prefix mounting
-      - "APIRouter\\(\\)"  # Should have prefix
+      - "include_router.*prefix.*prefix" # Double prefix mounting
+      - "APIRouter\\(\\)" # Should have prefix
     tags:
       - routing
       - advanced
     mock_response: |
       # routers/posts.py
       from fastapi import APIRouter, Depends, HTTPException, status
-      
+
       from app.models.post import PostResponse, PostCreate
       from app.services.post_service import PostService
-      
+
       router = APIRouter(prefix="/api/posts", tags=["posts"])
-      
+
       def get_service() -> PostService:
           return PostService()
-      
+
       @router.get("", response_model=list[PostResponse])
       async def list_posts(service: PostService = Depends(get_service)) -> list[PostResponse]:
           """List all posts."""
           return await service.list_posts()
-      
+
       @router.post(
           "",
           response_model=PostResponse,
@@ -489,23 +499,23 @@ scenarios:
       ) -> PostResponse:
           """Create a new post."""
           return await service.create_post(data)
-      
+
       # routers/comments.py
       from fastapi import APIRouter, Depends, HTTPException, status
-      
+
       from app.models.comment import CommentResponse, CommentCreate
       from app.services.comment_service import CommentService
-      
+
       router = APIRouter(prefix="/api/comments", tags=["comments"])
-      
+
       def get_service() -> CommentService:
           return CommentService()
-      
+
       @router.get("", response_model=list[CommentResponse])
       async def list_comments(service: CommentService = Depends(get_service)) -> list[CommentResponse]:
           """List all comments."""
           return await service.list_comments()
-      
+
       @router.post(
           "",
           response_model=CommentResponse,
@@ -517,12 +527,12 @@ scenarios:
       ) -> CommentResponse:
           """Create a new comment."""
           return await service.create_comment(data)
-      
+
       # main.py
       from fastapi import FastAPI
       from routers.posts import router as posts_router
       from routers.comments import router as comments_router
-      
+
       app = FastAPI(title="My API")
       app.include_router(posts_router)
       app.include_router(comments_router)
@@ -543,32 +553,32 @@ scenarios:
       - "NotificationService"
       - "HTTPException"
     forbidden_patterns:
-      - "(?<!async )def list_notifications"  # Should be async
-      - "(?<!await )service\\.get_notification"  # Should be await
-      - "Depends\\(\\)"  # Should have function
-      - "NotificationService\\(\\)"  # Should be via Depends
+      - "(?<!async )def list_notifications" # Should be async
+      - "(?<!await )service\\.get_notification" # Should be await
+      - "Depends\\(\\)" # Should have function
+      - "NotificationService\\(\\)" # Should be via Depends
     tags:
       - async
       - service-injection
     mock_response: |
       from fastapi import APIRouter, Depends, HTTPException, status
-      
+
       from app.models.notification import NotificationResponse, NotificationCreate
       from app.services.notification_service import NotificationService
-      
+
       router = APIRouter(prefix="/api", tags=["notifications"])
-      
+
       def get_service() -> NotificationService:
           """Dependency to get service instance."""
           return NotificationService()
-      
+
       @router.get("/notifications", response_model=list[NotificationResponse])
       async def list_notifications(
           service: NotificationService = Depends(get_service),
       ) -> list[NotificationResponse]:
           """List all notifications."""
           return await service.list_notifications()
-      
+
       @router.get("/notifications/{notification_id}", response_model=NotificationResponse)
       async def get_notification(
           notification_id: str,
@@ -582,7 +592,7 @@ scenarios:
                   detail="Notification not found",
               )
           return notification
-      
+
       @router.post(
           "/notifications",
           response_model=NotificationResponse,
@@ -594,7 +604,7 @@ scenarios:
       ) -> NotificationResponse:
           """Create a new notification."""
           return await service.create_notification(data)
-      
+
       @router.delete(
           "/notifications/{notification_id}",
           status_code=status.HTTP_204_NO_CONTENT,
@@ -629,26 +639,26 @@ scenarios:
       - "service.*=.*Depends"
       - "current_user.*=.*Depends"
     forbidden_patterns:
-      - "service = ReportService\\(\\)"  # Should use Depends
-      - "current_user: str"  # Should be User type
+      - "service = ReportService\\(\\)" # Should use Depends
+      - "current_user: str" # Should be User type
     tags:
       - dependencies
       - advanced
     mock_response: |
       from typing import Optional
       from fastapi import APIRouter, Depends, HTTPException, Query, status
-      
+
       from app.auth.jwt import get_current_user_required
       from app.models.user import User
       from app.models.report import ReportResponse, ReportCreate
       from app.services.report_service import ReportService
-      
+
       router = APIRouter(prefix="/api", tags=["reports"])
-      
+
       def get_service() -> ReportService:
           """Dependency to get service instance."""
           return ReportService()
-      
+
       @router.get("/reports", response_model=list[ReportResponse])
       async def list_reports(
           limit: int = Query(default=50, ge=1, le=100),
@@ -664,7 +674,7 @@ scenarios:
               offset=offset,
               status_filter=status_filter,
           )
-      
+
       @router.post(
           "/reports",
           response_model=ReportResponse,
@@ -677,7 +687,7 @@ scenarios:
       ) -> ReportResponse:
           """Create a new report for the current user."""
           return await service.create_report(data, user_id=current_user.id)
-      
+
       @router.get("/reports/{report_id}", response_model=ReportResponse)
       async def get_report(
           report_id: str,

@@ -2,7 +2,7 @@
 # Each scenario tests a specific Pydantic model pattern against acceptance criteria
 
 config:
-  model: gpt-4
+  model: gpt-5.5
   max_tokens: 2000
   temperature: 0.3
 

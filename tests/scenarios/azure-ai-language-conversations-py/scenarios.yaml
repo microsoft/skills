@@ -1,0 +1,102 @@
+config:
+  model: gpt-5.5
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: clu_basic_defaultazurecredential
+    prompt: |
+      Create a Python example that uses ConversationAnalysisClient with DefaultAzureCredential.
+      Build a valid task payload for Conversation analysis and print the top intent.
+      Use a context manager for the client.
+    expected_patterns:
+      - "DefaultAzureCredential"
+      - "ConversationAnalysisClient"
+      - "with ConversationAnalysisClient"
+      - "analyze_conversation"
+      - '"kind": "Conversation"'
+      - "projectName"
+      - "deploymentName"
+      - "topIntent"
+    forbidden_patterns:
+      - "client = ConversationAnalysisClient("
+      - "analyze("
+    tags:
+      - basic
+      - authentication
+      - payload
+    mock_response: |
+      import os
+      from azure.identity import DefaultAzureCredential
+      from azure.ai.language.conversations import ConversationAnalysisClient
+
+      endpoint = os.environ["AZURE_CONVERSATIONS_ENDPOINT"]
+      project_name = os.environ["AZURE_CONVERSATIONS_PROJECT"]
+      deployment_name = os.environ["AZURE_CONVERSATIONS_DEPLOYMENT"]
+
+      task = {
+          "kind": "Conversation",
+          "analysisInput": {
+              "conversationItem": {
+                  "participantId": "1",
+                  "id": "1",
+                  "modality": "text",
+                  "language": "en",
+                  "text": "Book a flight to Seattle",
+              }
+          },
+          "parameters": {
+              "projectName": project_name,
+              "deploymentName": deployment_name,
+              "verbose": True,
+          },
+      }
+
+      with ConversationAnalysisClient(endpoint, DefaultAzureCredential()) as client:
+          result = client.analyze_conversation(task=task)
+          print(result["result"]["prediction"]["topIntent"])
+
+  - name: clu_legacy_api_key_existing_deployments
+    prompt: |
+      Show the legacy API-key authentication path for an existing keyed deployment.
+      Use AzureKeyCredential with ConversationAnalysisClient in a context manager.
+      Mention this path is for existing deployments.
+    expected_patterns:
+      - "AzureKeyCredential"
+      - "ConversationAnalysisClient"
+      - "with ConversationAnalysisClient"
+      - "analyze_conversation"
+    forbidden_patterns:
+      - 'api_key="'
+      - "client = ConversationAnalysisClient("
+    tags:
+      - legacy
+      - authentication
+    mock_response: |
+      import os
+      from azure.core.credentials import AzureKeyCredential
+      from azure.ai.language.conversations import ConversationAnalysisClient
+
+      endpoint = os.environ["AZURE_CONVERSATIONS_ENDPOINT"]
+      key = os.environ["AZURE_CONVERSATIONS_KEY"]
+
+      # Legacy path for existing keyed deployments; prefer DefaultAzureCredential for new code.
+      with ConversationAnalysisClient(endpoint, AzureKeyCredential(key)) as client:
+          result = client.analyze_conversation(
+              task={
+                  "kind": "Conversation",
+                  "analysisInput": {
+                      "conversationItem": {
+                          "participantId": "1",
+                          "id": "1",
+                          "modality": "text",
+                          "text": "What is my order status?",
+                      }
+                  },
+                  "parameters": {
+                      "projectName": os.environ["AZURE_CONVERSATIONS_PROJECT"],
+                      "deploymentName": os.environ["AZURE_CONVERSATIONS_DEPLOYMENT"],
+                  },
+              }
+          )
+          print(result["result"]["prediction"]["topIntent"])

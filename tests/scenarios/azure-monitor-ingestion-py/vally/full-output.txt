@@ -1,0 +1,94 @@
+Running experiment 'azure-monitor-ingestion-py-skill-experiment'
+Output: Q:\src\skills\tests\scenarios\azure-monitor-ingestion-py\vally\vally-experiment-results\2026-06-30T23-35-17-490Z
+
+Loaded 4 stimuli from 2 eval(s)
+[90mRunning with 5 workers[0m
+
+[1m[33mΓöüΓöüΓöü azure-monitor-ingestion-py-eval ┬╖ sync_basic_upload [90m[variant: sonnet_baseline][0m [90m[claude-sonnet-4.6][0m[1m[33m ΓöüΓöüΓöü[0m
+[1m[36m  Metrics[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  Tokens        [37m29,139[0m
+  Turns         [37m2[0m
+  Tool calls    [37m2[0m
+  Wall time     [37m27.4s[0m
+  Errors        [37m0[0m
+  Skills used   [37m0[0m
+  Model         [90mclaude-sonnet-4.6[0m
+
+[1m[36m  Graders[0m [90m(3/3)[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  [32mΓ£ö[0m [90mPython syntax check[0m  [2mCommand 'node .vally/tools/check-python-syntax.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mPython idiomatic static checks[0m  [2mCommand 'node .vally/tools/check-python-idiomatic.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mIdiomatic Python quality[0m  [2mThe generated code is excellent across all rubric criteria. It uses the correct Azure SDK APIs with proper imports, reads all configuration from environment variables, provides complete executable code with a main() function and __main__ guard, handles all required exception types explicitly with no bare excepts, and follows modern Python conventions throughout. The conditional import pattern for ServiceError and ValidationError is a practical touch that handles SDK version differences. The code would be immediately runnable with the proper Azure environment configured.[0m
+
+  [32mAll graders passed.[0m
+
+[1m[33mΓöüΓöüΓöü azure-monitor-ingestion-py-eval ┬╖ async_upload_with_context_manager [90m[variant: sonnet_baseline][0m [90m[claude-sonnet-4.6][0m[1m[33m ΓöüΓöüΓöü[0m
+[1m[36m  Metrics[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  Tokens        [37m29,267[0m
+  Turns         [37m2[0m
+  Tool calls    [37m2[0m
+  Wall time     [37m29.5s[0m
+  Errors        [37m0[0m
+  Skills used   [37m0[0m
+  Model         [90mclaude-sonnet-4.6[0m
+
+[1m[36m  Graders[0m [90m(3/3)[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  [32mΓ£ö[0m [90mPython syntax check[0m  [2mCommand 'node .vally/tools/check-python-syntax.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mPython idiomatic static checks[0m  [2mCommand 'node .vally/tools/check-python-idiomatic.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mIdiomatic Python quality[0m  [2mThe generated code is excellent. It correctly uses the async Azure Monitor Logs Ingestion client with the exact patterns requested (async with, await upload), handles all four required exception types explicitly with no bare excepts, avoids hardcoded secrets by using DefaultAzureCredential, follows modern Python conventions throughout, and produces a complete, runnable file. The only minor point is that ENDPOINT and RULE_ID could be read from os.environ rather than being placeholder strings, but this is a common and acceptable pattern in Azure SDK examples.[0m
+
+  [32mAll graders passed.[0m
+
+[1m[33mΓöüΓöüΓöü azure-monitor-ingestion-py-eval ┬╖ sync_basic_upload [90m[variant: sonnet_skill][0m [90m[claude-sonnet-4.6][0m[1m[33m ΓöüΓöüΓöü[0m
+[1m[36m  Metrics[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  Tokens        [37m47,855[0m
+  Turns         [37m3[0m
+  Tool calls    [37m3[0m
+  Wall time     [37m28.9s[0m
+  Errors        [37m0[0m
+  Skills used   [37m1[0m
+  Model         [90mclaude-sonnet-4.6[0m
+
+[1m[36m  Graders[0m [90m(3/3)[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  [32mΓ£ö[0m [90mPython syntax check[0m  [2mCommand 'node .vally/tools/check-python-syntax.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mPython idiomatic static checks[0m  [2mCommand 'node .vally/tools/check-python-idiomatic.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mIdiomatic Python quality[0m  [2mThe solution is solid and largely idiomatic: it creates a runnable main.py, uses the correct SDK APIs and workflow, keeps all config in environment variables, uses a context manager for client lifecycle, and avoids bare excepts and wildcard imports. The main deductions are (1) the import of LogsUploadError from a private module (_exceptions), which is fragile across SDK versions, and (2) some explicitly requested exception types (ServiceError, ValidationError, AzureError) are not handled by nameΓÇöonly covered by the catch-all. These are minor but real gaps against the stated requirements.[0m
+
+  [32mAll graders passed.[0m
+
+[1m[33mΓöüΓöüΓöü azure-monitor-ingestion-py-eval ┬╖ async_upload_with_context_manager [90m[variant: sonnet_skill][0m [90m[claude-sonnet-4.6][0m[1m[33m ΓöüΓöüΓöü[0m
+[1m[36m  Metrics[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  Tokens        [37m48,624[0m
+  Turns         [37m3[0m
+  Tool calls    [37m3[0m
+  Wall time     [37m33.2s[0m
+  Errors        [37m0[0m
+  Skills used   [37m1[0m
+  Model         [90mclaude-sonnet-4.6[0m
+
+[1m[36m  Graders[0m [90m(3/3)[0m
+[90m  ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+  [32mΓ£ö[0m [90mPython syntax check[0m  [2mCommand 'node .vally/tools/check-python-syntax.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mPython idiomatic static checks[0m  [2mCommand 'node .vally/tools/check-python-idiomatic.mjs' passed all checks[0m
+  [32mΓ£ö[0m [90mIdiomatic Python quality[0m  [2mThe code is a solid, nearly complete async ingestion example that correctly demonstrates the Azure Monitor Ingestion async client with context managers, credential handling via environment variables, and a retry pattern for failed logs. It loses points mainly because `ValidationError` is entirely absent and `ServiceError` is not handled as required by the task's critical exception-handling specification. The private `_models` import is a minor style issue. Everything else ΓÇö structure, naming, control flow, and use of the correct async APIs ΓÇö is well-executed.[0m
+
+  [32mAll graders passed.[0m
+
+  [32mΓ£ö[0m [1m[37mazure-monitor-ingestion-py-eval[0m [90m[claude-sonnet-4.6][0m  score: [32m91.7%[0m [90m(threshold: 75.0%)[0m
+
+  [32mΓ£ö[0m [1m[37mazure-monitor-ingestion-py-eval[0m [90m[claude-sonnet-4.6][0m  score: [32m100.0%[0m [90m(threshold: 75.0%)[0m
+
+[1mSaved artifacts[0m
+[90mMarkdown ΓåÆ Q:\src\skills\tests\scenarios\azure-monitor-ingestion-py\vally\vally-experiment-results\2026-06-30T23-35-17-490Z\report.md[0m
+
+Γ£ö sonnet_skill: 1/1 evals passed
+Γ£ö sonnet_baseline: 1/1 evals passed
+
+Run ID: 66a90c8e-0ddd-4cf9-a4b1-9b82fc1af30f
+Output: Q:\src\skills\tests\scenarios\azure-monitor-ingestion-py\vally\vally-experiment-results\2026-06-30T23-35-17-490Z

@@ -1,0 +1,43 @@
+name: azure-sdk-python-skill-evaluations
+
+evals:
+  - ../../agent-framework-azure-ai-py/vally/eval.yaml
+  - ../../azure-ai-contentsafety-py/vally/eval.yaml
+  - ../../azure-ai-contentunderstanding-py/vally/eval.yaml
+  - ../../azure-ai-language-conversations-py/vally/eval.yaml
+  - ../../azure-ai-ml-py/vally/eval.yaml
+  - ../../azure-ai-projects-py/vally/eval.yaml
+  - ../../azure-ai-textanalytics-py/vally/eval.yaml
+  - ../../azure-ai-transcription-py/vally/eval.yaml
+  - ../../azure-ai-translation-document-py/vally/eval.yaml
+  - ../../azure-ai-translation-text-py/vally/eval.yaml
+  - ../../azure-ai-vision-imageanalysis-py/vally/eval.yaml
+  - ../../azure-ai-voicelive-py/vally/eval.yaml
+  - ../../azure-appconfiguration-py/vally/eval.yaml
+  - ../../azure-containerregistry-py/vally/eval.yaml
+  - ../../azure-cosmos-db-py/vally/eval.yaml
+  - ../../azure-cosmos-py/vally/eval.yaml
+  - ../../azure-data-tables-py/vally/eval.yaml
+  - ../../azure-eventgrid-py/vally/eval.yaml
+  - ../../azure-eventhub-py/vally/eval.yaml
+  - ../../azure-identity-py/vally/eval.yaml
+  - ../../azure-keyvault-py/vally/eval.yaml
+  - ../../azure-messaging-webpubsubservice-py/vally/eval.yaml
+  - ../../azure-mgmt-apicenter-py/vally/eval.yaml
+  - ../../azure-mgmt-apimanagement-py/vally/eval.yaml
+  - ../../azure-mgmt-botservice-py/vally/eval.yaml
+  - ../../azure-mgmt-fabric-py/vally/eval.yaml
+  - ../../azure-monitor-ingestion-py/vally/eval.yaml
+  - ../../azure-monitor-opentelemetry-exporter-py/vally/eval.yaml
+  - ../../azure-monitor-opentelemetry-py/vally/eval.yaml
+  - ../../azure-monitor-query-py/vally/eval.yaml
+  - ../../azure-search-documents-py/vally/eval.yaml
+  - ../../azure-servicebus-py/vally/eval.yaml
+  - ../../azure-speech-to-text-rest-py/vally/eval.yaml
+  - ../../azure-storage-blob-py/vally/eval.yaml
+  - ../../azure-storage-file-datalake-py/vally/eval.yaml
+  - ../../azure-storage-file-share-py/vally/eval.yaml
+  - ../../azure-storage-queue-py/vally/eval.yaml
+  - ../../fastapi-router-py/vally/eval.yaml
+  - ../../m365-agents-py/vally/eval.yaml
+  - ../../pydantic-models-py/vally/eval.yaml

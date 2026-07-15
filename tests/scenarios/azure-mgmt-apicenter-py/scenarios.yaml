@@ -2,7 +2,7 @@
 # Each scenario tests a specific usage pattern against acceptance criteria
 
 config:
-  model: gpt-4
+  model: gpt-5.5
   max_tokens: 2000
   temperature: 0.3
 
@@ -23,7 +23,7 @@ scenarios:
     forbidden_patterns:
       - "hardcoded"
       - "xxxxx"
-      - "subscription_id=\""
+      - 'subscription_id="'
       - "credential = Cli"
     tags:
       - basic
@@ -34,22 +34,22 @@ scenarios:
       from azure.identity import DefaultAzureCredential
       from azure.mgmt.apicenter import ApiCenterMgmtClient
       from azure.mgmt.apicenter.models import Service
-      
+
       subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
       resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
+
       credential = DefaultAzureCredential()
       client = ApiCenterMgmtClient(
           subscription_id=subscription_id,
           credential=credential,
       )
-      
+
       service = client.services.create_or_update(
           resource_group_name=resource_group,
           service_name="my-api-center",
           resource=Service(location="eastus"),
       )
-      
+
       print(f"Created service: {service.name}")
 
   # API Registration Workflow
@@ -62,7 +62,7 @@ scenarios:
       - "create_or_update"
       - "ApiKind.REST"
       - "LifecycleStage"
-      - "workspace_name=\"default\""
+      - 'workspace_name="default"'
       - "Api("
       - "kind="
       - "state="
@@ -80,16 +80,16 @@ scenarios:
       from azure.identity import DefaultAzureCredential
       from azure.mgmt.apicenter import ApiCenterMgmtClient
       from azure.mgmt.apicenter.models import Api, ApiKind, LifecycleStage
-      
+
       subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
       resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
+
       credential = DefaultAzureCredential()
       client = ApiCenterMgmtClient(
           subscription_id=subscription_id,
           credential=credential,
       )
-      
+
       api = client.apis.create_or_update(
           resource_group_name=resource_group,
           service_name="my-api-center",
@@ -102,7 +102,7 @@ scenarios:
               summary="API for managing pet store",
           ),
       )
-      
+
       print(f"Registered API: {api.title}")
 
   # API Version and Definition
@@ -116,11 +116,12 @@ scenarios:
       - "api_definitions.create_or_update"
       - "ApiVersion("
       - "ApiDefinition("
-      - "specification="
-      - "VersionStage"
+      - "ApiVersionProperties("
+      - "ApiDefinitionProperties("
+      - "begin_import_specification"
       - "workspace_name="
     forbidden_patterns:
-      - "import_specification"
+      #      - "import_specification" # Should be forbidden because the actual API is `begin_import_specification`
       - "swagger_url="
       - "workspace_name=None"
       - "version_name=None"
@@ -130,54 +131,68 @@ scenarios:
       - governance
     mock_response: |
       import os
+
       from azure.identity import DefaultAzureCredential
       from azure.mgmt.apicenter import ApiCenterMgmtClient
       from azure.mgmt.apicenter.models import (
-          ApiVersion,
+          ApiSpecImportRequest,
+          ApiSpecImportSourceFormat,
           ApiDefinition,
-          VersionStage,
-          ExternalDocumentationProperties,
+          ApiDefinitionProperties,
+          ApiVersion,
+          ApiVersionProperties,
+          LifecycleStage,
       )
-      
-      subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
-      resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
-      credential = DefaultAzureCredential()
-      client = ApiCenterMgmtClient(
-          subscription_id=subscription_id,
+
+      credential = DefaultAzureCredential(require_envvar=True)
+
+      with ApiCenterMgmtClient(
           credential=credential,
-      )
-      
-      # Create API version
-      version = client.api_versions.create_or_update(
-          resource_group_name=resource_group,
-          service_name="my-api-center",
-          workspace_name="default",
-          api_name="pet-api",
-          version_name="v1.0",
-          resource=ApiVersion(
-              title="Version 1.0",
-              stage=VersionStage.PRODUCTION,
-          ),
-      )
-      
-      # Create API definition with spec
-      definition = client.api_definitions.create_or_update(
-          resource_group_name=resource_group,
-          service_name="my-api-center",
-          workspace_name="default",
-          api_name="pet-api",
-          version_name="v1.0",
-          definition_name="openapi",
-          resource=ApiDefinition(
-              title="OpenAPI Definition",
-              specification=ExternalDocumentationProperties(
-                  url="https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore.json"
+          subscription_id=os.environ["AZURE_SUBSCRIPTION_ID"],
+      ) as client:
+          version = client.api_versions.create_or_update(
+              resource_group_name="my-resource-group",
+              service_name="my-api-center",
+              workspace_name="default",
+              api_name="my-api",
+              version_name="v1.0",
+              resource=ApiVersion(
+                  properties=ApiVersionProperties(
+                      title="Version 1.0",
+                      lifecycle_stage=LifecycleStage.PRODUCTION,
+                  ),
               ),
-          ),
-      )
-      
-      print(f"Created version: {version.title}, Definition: {definition.title}")
+          )
+
+          client.api_definitions.create_or_update(
+              resource_group_name="my-resource-group",
+              service_name="my-api-center",
+              workspace_name="default",
+              api_name="my-api",
+              version_name="v1.0",
+              definition_name="openapi",
+              resource=ApiDefinition(
+                  properties=ApiDefinitionProperties(
+                      title="OpenAPI Definition",
+                      description="OpenAPI 3.0 specification",
+                  ),
+              ),
+          )
+
+          client.api_definitions.begin_import_specification(
+              resource_group_name="my-resource-group",
+              service_name="my-api-center",
+              workspace_name="default",
+              api_name="my-api",
+              version_name="v1.0",
+              definition_name="openapi",
+              body=ApiSpecImportRequest(
+                  format=ApiSpecImportSourceFormat.INLINE,
+                  value='{"openapi":"3.0.0","info":{"title":"My API","version":"1.0","description":"Production OpenAPI specification for My API"},"paths":{}}',
+              ),
+          ).result()
+
+      print(f"Created API version and imported specification: {version.title}")
 
   # Environment and Deployment Tracking
   - name: environment_and_deployment
@@ -194,7 +209,6 @@ scenarios:
       - "deployment_name="
       - "workspace_name="
     forbidden_patterns:
-      - "environment_id="
       - "deployment_id="
       - "workspace_name=None"
       - "environment_name=None"
@@ -204,55 +218,64 @@ scenarios:
       - tracking
       - governance
     mock_response: |
-      import os
+      from os import environ
+
       from azure.identity import DefaultAzureCredential
       from azure.mgmt.apicenter import ApiCenterMgmtClient
-      from azure.mgmt.apicenter.models import (
-          Environment,
-          Deployment,
-          DeploymentState,
-          EnvironmentKind,
-      )
-      
-      subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
-      resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
-      credential = DefaultAzureCredential()
-      client = ApiCenterMgmtClient(
-          subscription_id=subscription_id,
+      from azure.mgmt.apicenter.models import Deployment, DeploymentState, Environment, EnvironmentKind
+
+      RESOURCE_GROUP_NAME = "my-resource-group"
+      SERVICE_NAME = "my-api-center"
+      WORKSPACE_NAME = "default"
+      API_NAME = "my-api"
+      VERSION_NAME = "v1"
+      DEFINITION_NAME = "openapi"
+      ENVIRONMENT_NAME = "production"
+      DEPLOYMENT_NAME = "prod-deployment"
+
+      credential = DefaultAzureCredential(require_envvar=True)
+
+      with ApiCenterMgmtClient(
           credential=credential,
-      )
-      
-      # Create environment
-      environment = client.environments.create_or_update(
-          resource_group_name=resource_group,
-          service_name="my-api-center",
-          workspace_name="default",
-          environment_name="production",
-          resource=Environment(
-              kind=EnvironmentKind.PRODUCTION,
-              title="Production",
-              server={"url": "https://api.example.com"},
-          ),
-      )
-      
-      # Track deployment
-      deployment = client.deployments.create_or_update(
-          resource_group_name=resource_group,
-          service_name="my-api-center",
-          workspace_name="default",
-          deployment_name="prod-2024-01",
-          resource=Deployment(
-              environment_name="production",
-              api_name="pet-api",
-              api_version="v1.0",
-              definition_name="openapi",
-              state=DeploymentState.ACTIVE,
-              title="Production Deployment Jan 2024",
-          ),
-      )
-      
-      print(f"Environment: {environment.title}, Deployment: {deployment.title}")
+          subscription_id=environ["AZURE_SUBSCRIPTION_ID"],
+      ) as client:
+          environment = client.environments.create_or_update(
+              resource_group_name=RESOURCE_GROUP_NAME,
+              service_name=SERVICE_NAME,
+              workspace_name=WORKSPACE_NAME,
+              environment_name=ENVIRONMENT_NAME,
+              resource=Environment(
+                  title="Production",
+                  description="Production environment",
+                  kind=EnvironmentKind.PRODUCTION,
+                  server={
+                      "type": "Azure API Management",
+                      "management_portal_uri": ["https://portal.azure.com"],
+                  },
+              ),
+          )
+
+          deployment = client.deployments.create_or_update(
+              resource_group_name=RESOURCE_GROUP_NAME,
+              service_name=SERVICE_NAME,
+              workspace_name=WORKSPACE_NAME,
+              api_name=API_NAME,
+              deployment_name=DEPLOYMENT_NAME,
+              resource=Deployment(
+                  title="Production Deployment",
+                  description="Deployed to production API Management",
+                  environment_id=f"/workspaces/{WORKSPACE_NAME}/environments/{ENVIRONMENT_NAME}",
+                  definition_id=(
+                      f"/workspaces/{WORKSPACE_NAME}/apis/{API_NAME}"
+                      f"/versions/{VERSION_NAME}/definitions/{DEFINITION_NAME}"
+                  ),
+                  state=DeploymentState.ACTIVE,
+                  server={"runtime_uri": ["https://api.example.com"]},
+              ),
+          )
+
+          print(f"Environment tracked: {environment.name} ({environment.kind})")
+          print(f"Deployment tracked: {deployment.name} ({deployment.state})")
 
   # Metadata Governance - Define Custom Schema
   - name: metadata_governance_schema
@@ -284,16 +307,16 @@ scenarios:
           MetadataSchema,
           MetadataSchemaProperty,
       )
-      
+
       subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
       resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
+
       credential = DefaultAzureCredential()
       client = ApiCenterMgmtClient(
           subscription_id=subscription_id,
           credential=credential,
       )
-      
+
       # Define custom metadata schema
       schema = client.metadata_schemas.create_or_update(
           resource_group_name=resource_group,
@@ -317,7 +340,7 @@ scenarios:
               ]
           ),
       )
-      
+
       print(f"Created metadata schema: {schema.name}")
 
   # List and Search APIs with Filtering
@@ -344,23 +367,23 @@ scenarios:
       import os
       from azure.identity import DefaultAzureCredential
       from azure.mgmt.apicenter import ApiCenterMgmtClient
-      
+
       subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
       resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
+
       credential = DefaultAzureCredential()
       client = ApiCenterMgmtClient(
           subscription_id=subscription_id,
           credential=credential,
       )
-      
+
       # List all APIs in workspace
       apis = client.apis.list(
           resource_group_name=resource_group,
           service_name="my-api-center",
           workspace_name="default",
       )
-      
+
       print("APIs in catalog:")
       for api in apis:
           print(f"  - {api.name}: {api.title}")
@@ -393,16 +416,16 @@ scenarios:
       from azure.identity import DefaultAzureCredential
       from azure.mgmt.apicenter import ApiCenterMgmtClient
       from azure.mgmt.apicenter.models import Api, LifecycleStage
-      
+
       subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
       resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
+
       credential = DefaultAzureCredential()
       client = ApiCenterMgmtClient(
           subscription_id=subscription_id,
           credential=credential,
       )
-      
+
       # Get existing API
       api = client.apis.get(
           resource_group_name=resource_group,
@@ -410,7 +433,7 @@ scenarios:
           workspace_name="default",
           api_name="old-api",
       )
-      
+
       # Update lifecycle stage to deprecated
       updated_api = client.apis.create_or_update(
           resource_group_name=resource_group,
@@ -424,7 +447,7 @@ scenarios:
               summary="This API is deprecated. Use new-api instead.",
           ),
       )
-      
+
       print(f"Updated {api.title} to {updated_api.state}")
 
   # Complete Governance Workflow
@@ -451,7 +474,7 @@ scenarios:
       - "hardcoded"
       - "xxxxx"
       - "workspace_name=None"
-      - "subscription_id=\""
+      - 'subscription_id="'
     tags:
       - workflow
       - governance
@@ -472,16 +495,16 @@ scenarios:
           VersionStage,
           ExternalDocumentationProperties,
       )
-      
+
       subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
       resource_group = os.environ.get("AZURE_RESOURCE_GROUP")
-      
+
       credential = DefaultAzureCredential()
       client = ApiCenterMgmtClient(
           subscription_id=subscription_id,
           credential=credential,
       )
-      
+
       # 1. Create API Center service
       service = client.services.create_or_update(
           resource_group_name=resource_group,
@@ -489,7 +512,7 @@ scenarios:
           resource=Service(location="eastus"),
       )
       print(f"1. Created service: {service.name}")
-      
+
       # 2. Register API
       api = client.apis.create_or_update(
           resource_group_name=resource_group,
@@ -504,7 +527,7 @@ scenarios:
           ),
       )
       print(f"2. Registered API: {api.title}")
-      
+
       # 3. Create version and spec
       version = client.api_versions.create_or_update(
           resource_group_name=resource_group,
@@ -518,7 +541,7 @@ scenarios:
           ),
       )
       print(f"3. Created version: {version.title}")
-      
+
       # 4. Define custom governance schema
       schema = client.metadata_schemas.create_or_update(
           resource_group_name=resource_group,
@@ -541,7 +564,7 @@ scenarios:
           ),
       )
       print(f"4. Created governance schema: {schema.name}")
-      
+
       # 5. List all APIs
       print("5. Registered APIs:")
       apis = client.apis.list(

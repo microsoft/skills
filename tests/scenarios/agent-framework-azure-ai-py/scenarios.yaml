@@ -2,7 +2,7 @@
 # Each scenario tests a specific usage pattern against acceptance criteria
 
 config:
-  model: gpt-4
+  model: gpt-5.5
   max_tokens: 2000
   temperature: 0.3
 
@@ -18,7 +18,7 @@ scenarios:
       - "create_agent"
       - "run"
     forbidden_patterns:
-      - "AgentsClient"  # Should use provider for basic example
+      - "AgentsClient" # Should use provider for basic example
     tags:
       - basic
       - provider
@@ -26,7 +26,7 @@ scenarios:
       import asyncio
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           async with (
               AzureCliCredential() as credential,
@@ -38,7 +38,7 @@ scenarios:
               )
               result = await agent.run("Hello!")
               print(result.text)
-      
+
       asyncio.run(main())
 
   # Persistent agent and thread usage
@@ -59,7 +59,7 @@ scenarios:
       from agent_framework import AgentThread
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           async with (
               AzureCliCredential() as credential,
@@ -71,7 +71,7 @@ scenarios:
               print(result.text)
               print(thread.conversation_id)
               print(thread.service_thread_id)
-      
+
       asyncio.run(main())
 
   # Hosted code interpreter tool
@@ -84,7 +84,7 @@ scenarios:
       - "HostedFileContent"
       - "tools=code_tool"
     forbidden_patterns:
-      - "code_interpreter"  # Avoid string tool names
+      - "code_interpreter" # Avoid string tool names
     tags:
       - tools
       - code-interpreter
@@ -93,7 +93,7 @@ scenarios:
       from agent_framework import HostedCodeInterpreterTool, HostedFileContent
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           async with (
               AzureCliCredential() as credential,
@@ -109,7 +109,7 @@ scenarios:
               )
               result = await agent.run("Summarize the file")
               print(result.text)
-      
+
       asyncio.run(main())
 
   # Hosted file search with vector store
@@ -133,7 +133,7 @@ scenarios:
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.ai.agents.aio import AgentsClient
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           endpoint = os.environ["AZURE_AI_PROJECT_ENDPOINT"]
           async with (
@@ -160,7 +160,7 @@ scenarios:
               )
               result = await agent.run("What does the document say?")
               print(result.text)
-      
+
       asyncio.run(main())
 
   # Hosted web search tool
@@ -180,7 +180,7 @@ scenarios:
       from agent_framework import HostedWebSearchTool
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           os.environ["BING_CONNECTION_ID"] = "your-bing-connection-id"
           async with (
@@ -197,7 +197,7 @@ scenarios:
               )
               result = await agent.run("What are the latest AI updates?")
               print(result.text)
-      
+
       asyncio.run(main())
 
   # MCP Streamable HTTP tool
@@ -210,7 +210,7 @@ scenarios:
       - "async with"
       - "tools=mcp_tool"
     forbidden_patterns:
-      - "HostedMCPTool"  # Use streamable tool in this scenario
+      - "HostedMCPTool" # Use streamable tool in this scenario
     tags:
       - mcp
       - tools
@@ -219,7 +219,7 @@ scenarios:
       from agent_framework import MCPStreamableHTTPTool
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           async with (
               AzureCliCredential() as credential,
@@ -236,7 +236,7 @@ scenarios:
               )
               result = await agent.run("What is Azure AI Foundry?")
               print(result.text)
-      
+
       asyncio.run(main())
 
   # Hosted MCP tool
@@ -249,7 +249,7 @@ scenarios:
       - "approval_mode"
       - "allowed_tools"
     forbidden_patterns:
-      - "MCPStreamableHTTPTool"  # Keep hosted MCP isolated
+      - "MCPStreamableHTTPTool" # Keep hosted MCP isolated
     tags:
       - mcp
       - tools
@@ -258,7 +258,7 @@ scenarios:
       from agent_framework import HostedMCPTool
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           async with (
               AzureCliCredential() as credential,
@@ -276,7 +276,7 @@ scenarios:
               )
               result = await agent.run("How do I use Azure Functions?")
               print(result.text)
-      
+
       asyncio.run(main())
 
   # Streaming responses
@@ -289,14 +289,14 @@ scenarios:
       - "async for"
       - "chunk.text"
     forbidden_patterns:
-      - "stream=True"  # Use run_stream instead
+      - "stream=True" # Use run_stream instead
     tags:
       - streaming
     mock_response: |
       import asyncio
       from agent_framework.azure import AzureAIAgentsProvider
       from azure.identity.aio import AzureCliCredential
-      
+
       async def main():
           async with (
               AzureCliCredential() as credential,
@@ -311,5 +311,5 @@ scenarios:
                   if chunk.text:
                       print(chunk.text, end="", flush=True)
               print()
-      
+
       asyncio.run(main())

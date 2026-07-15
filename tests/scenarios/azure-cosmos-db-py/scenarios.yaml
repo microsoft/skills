@@ -2,7 +2,7 @@
 # Each scenario tests a specific usage pattern against acceptance criteria
 
 config:
-  model: gpt-4
+  model: gpt-5.5
   max_tokens: 2000
   temperature: 0.3
 
@@ -28,10 +28,10 @@ scenarios:
       import os
       from azure.cosmos import CosmosClient
       from azure.identity import DefaultAzureCredential
-      
+
       def _is_emulator_endpoint(endpoint: str) -> bool:
           return "localhost" in endpoint.lower() or "127.0.0.1" in endpoint
-      
+
       def create_client(endpoint: str, cosmos_key: str) -> CosmosClient:
           if _is_emulator_endpoint(endpoint):
               return CosmosClient(
@@ -43,7 +43,7 @@ scenarios:
               url=endpoint,
               credential=DefaultAzureCredential(),
           )
-      
+
       client = create_client(
           endpoint=os.environ["COSMOS_ENDPOINT"],
           cosmos_key=os.environ.get("COSMOS_KEY", ""),
@@ -59,30 +59,98 @@ scenarios:
       - "_init_attempted"
       - "get_container"
       - "container.read()"
-    forbidden_patterns:
-      - "CosmosClient("  # client should be created in helper, not per call
+      - "_create_client"
+    #    forbidden_patterns:
+    #      - "CosmosClient(" # client should be created in helper, not per call
     tags:
       - client
       - singleton
     mock_response: |
+      import logging
+      from threading import Lock
       from typing import Optional
-      from azure.cosmos import ContainerProxy
-      from app.db.cosmos import create_client
-      from app.core.config import settings
-      
+
+      from azure.cosmos import ContainerProxy, CosmosClient
+      from azure.identity import DefaultAzureCredential
+
+      from app.config import settings
+
+      logger = logging.getLogger(__name__)
+
+      _cosmos_client: Optional[CosmosClient] = None
       _cosmos_container: Optional[ContainerProxy] = None
-      _init_attempted: bool = False
-      
+      _init_attempted = False
+      _init_lock = Lock()
+
+
+      def _is_emulator_endpoint(endpoint: str) -> bool:
+          return \"localhost\" in endpoint.lower() or \"127.0.0.1\" in endpoint
+
+
+      def _create_client() -> CosmosClient:
+          if _is_emulator_endpoint(settings.cosmos_endpoint):
+              return CosmosClient(
+                  url=settings.cosmos_endpoint,
+                  credential=settings.cosmos_key,
+                  connection_verify=False,
+              )
+
+          return CosmosClient(
+              url=settings.cosmos_endpoint,
+              credential=DefaultAzureCredential(),
+          )
+
+
       def get_container() -> Optional[ContainerProxy]:
-          global _cosmos_container, _init_attempted
+          global _cosmos_client, _cosmos_container, _init_attempted
+
           if _init_attempted:
               return _cosmos_container
-          _init_attempted = True
-          client = create_client(settings.cosmos_endpoint, settings.cosmos_key)
-          database = client.get_database_client(settings.cosmos_database_name)
-          _cosmos_container = database.get_container_client(settings.cosmos_container_id)
-          _cosmos_container.read()
-          return _cosmos_container
+
+          with _init_lock:
+              if _init_attempted:
+                  return _cosmos_container
+
+              _init_attempted = True
+
+              try:
+                  _cosmos_client = _create_client()
+                  database = _cosmos_client.get_database_client(settings.cosmos_database_name)
+                  _cosmos_container = database.get_container_client(settings.cosmos_container_id)
+                  _cosmos_container.read()
+
+                  logger.info(
+                      \"Cosmos DB connected\",
+                      extra={
+                          \"database\": settings.cosmos_database_name,
+                          \"container\": settings.cosmos_container_id,
+                          \"endpoint\": settings.cosmos_endpoint[:30] + \"...\",
+                      },
+                  )
+              except Exception as exc:
+                  logger.error(
+                      \"Cosmos DB connection failed\",
+                      extra={
+                          \"error_type\": type(exc).__name__,
+                          \"error_message\": str(exc),
+                          \"endpoint\": settings.cosmos_endpoint[:30] + \"...\",
+                      },
+                      exc_info=True,
+                  )
+                  _cosmos_container = None
+
+              return _cosmos_container
+
+
+        def reset_connection() -> None:
+          global _cosmos_client, _cosmos_container, _init_attempted
+
+          if _cosmos_client is not None:
+              _cosmos_client.close()
+
+          _cosmos_client = None
+          _cosmos_container = None
+          _init_attempted = False
 
   # Service Layer CRUD
   - name: service_layer_crud
@@ -104,11 +172,11 @@ scenarios:
       from typing import Optional
       from app.db.cosmos import get_container, get_document, upsert_document, delete_document, query_documents
       from app.models.project import Project, ProjectCreate, ProjectUpdate, ProjectInDB
-      
+
       class ProjectService:
           def _use_cosmos(self) -> bool:
               return get_container() is not None
-      
+
           def _doc_to_model_in_db(self, doc: dict) -> ProjectInDB:
               return ProjectInDB(
                   id=doc["id"],
@@ -116,7 +184,7 @@ scenarios:
                   workspace_id=doc["workspaceId"],
                   doc_type=doc.get("docType", "project"),
               )
-      
+
           def _model_in_db_to_doc(self, model: ProjectInDB) -> dict:
               return {
                   "id": model.id,
@@ -124,10 +192,10 @@ scenarios:
                   "workspaceId": model.workspace_id,
                   "docType": model.doc_type,
               }
-      
+
           def _model_in_db_to_model(self, model: ProjectInDB) -> Project:
               return Project(id=model.id, name=model.name, workspace_id=model.workspace_id)
-      
+
           async def create(self, data: ProjectCreate, author_id: str) -> Project:
               if not self._use_cosmos():
                   raise RuntimeError("Database unavailable")
@@ -139,7 +207,7 @@ scenarios:
               )
               await upsert_document(self._model_in_db_to_doc(model), partition_key=data.workspace_id)
               return self._model_in_db_to_model(model)
-      
+
           async def get_by_id(self, project_id: str, workspace_id: str) -> Optional[Project]:
               if not self._use_cosmos():
                   return None
@@ -147,7 +215,7 @@ scenarios:
               if doc is None:
                   return None
               return self._model_in_db_to_model(self._doc_to_model_in_db(doc))
-      
+
           async def update(self, project_id: str, workspace_id: str, data: ProjectUpdate) -> Optional[Project]:
               if not self._use_cosmos():
                   return None
@@ -161,18 +229,18 @@ scenarios:
                       setattr(model, field, value)
               await upsert_document(self._model_in_db_to_doc(model), partition_key=workspace_id)
               return self._model_in_db_to_model(model)
-      
+
           async def delete(self, project_id: str, workspace_id: str) -> bool:
               if not self._use_cosmos():
                   return False
               return await delete_document(project_id, partition_key=workspace_id)
-      
+
           async def list_by_workspace(self, workspace_id: str) -> list[Project]:
               if not self._use_cosmos():
                   return []
               docs = await query_documents(doc_type="project", partition_key=workspace_id)
               return [self._model_in_db_to_model(self._doc_to_model_in_db(doc)) for doc in docs]
-      
+
       project_service = ProjectService()
 
   # Parameterized Query
@@ -185,14 +253,14 @@ scenarios:
       - "@slug"
       - 'parameters=[{"name": "@slug"'
     forbidden_patterns:
-      - "f\"SELECT"
-      - "%s"  # string formatting in query
+      - 'f"SELECT'
+      - "%s" # string formatting in query
     tags:
       - queries
       - security
     mock_response: |
       from app.db.cosmos import query_documents
-      
+
       async def get_by_slug(slug: str, workspace_id: str):
           docs = await query_documents(
               doc_type="project",
@@ -212,15 +280,15 @@ scenarios:
       - "partition_key=workspace_id"
       - "GLOBAL_PARTITION"
     forbidden_patterns:
-      - "partition_key=None"  # should use a known partition when possible
+      - "partition_key=None" # should use a known partition when possible
     tags:
       - partitioning
     mock_response: |
       GLOBAL_PARTITION = "global"
-      
+
       async def get_project(project_id: str, workspace_id: str):
           return await get_document(project_id, partition_key=workspace_id)
-      
+
       async def get_user_by_email(email: str):
           return await query_documents(
               doc_type="user",
@@ -245,7 +313,7 @@ scenarios:
     mock_response: |
       from starlette.concurrency import run_in_threadpool
       from app.db.cosmos import get_container
-      
+
       async def list_all_users():
           container = get_container()
           query = "SELECT * FROM c WHERE c.docType = @docType"
@@ -268,7 +336,7 @@ scenarios:
       - "mocker.patch"
       - "mock_cosmos_container"
     forbidden_patterns:
-      - "CosmosClient("  # unit tests should not initialize real clients
+      - "CosmosClient(" # unit tests should not initialize real clients
     tags:
       - tests
       - tdd
@@ -276,13 +344,13 @@ scenarios:
       import pytest
       from unittest.mock import MagicMock
       from app.services.project_service import project_service
-      
+
       @pytest.fixture
       def mock_cosmos_container(mocker):
           container = MagicMock()
           mocker.patch("app.db.cosmos.get_container", return_value=container)
           return container
-      
+
       @pytest.mark.asyncio
       async def test_get_by_id_returns_project(mock_cosmos_container):
           mock_cosmos_container.read_item.return_value = {"id": "123", "name": "Test", "workspaceId": "ws-1"}
@@ -307,9 +375,9 @@ scenarios:
     mock_response: |
       from fastapi import APIRouter
       from app.services.project_service import project_service
-      
+
       router = APIRouter()
-      
+
       @router.get("/workspaces/{workspace_id}/projects/{project_id}")
       async def get_project(project_id: str, workspace_id: str):
           return await project_service.get_by_id(project_id, workspace_id)

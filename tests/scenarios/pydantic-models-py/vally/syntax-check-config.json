@@ -1,0 +1,6 @@
+{
+    "excludePatterns": [
+        "*/assets/template.py",
+        "**/_**/template.py"
+    ]
+}

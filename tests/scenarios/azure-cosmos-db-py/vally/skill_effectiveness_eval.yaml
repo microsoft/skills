@@ -1,0 +1,141 @@
+name: azure-cosmos-db-py-eval
+description: Vally evaluation suite for azure-cosmos-db-py
+version: "1.0"
+type: capability
+scoring:
+  weights: {}
+  threshold: 0.75
+defaults:
+  runs: 1
+  timeout: 30m
+  model: claude-sonnet-4.6
+  grader_model: gpt-5.5
+stimuli:
+  - name: dual_auth_client_setup
+    prompt: |-
+      Create a Cosmos DB client setup with dual authentication.
+      Use DefaultAzureCredential in Azure and key-based auth for emulator.
+      Include emulator detection and SSL verification disabled for emulator.
+
+      Output requirements for grading:
+      - Generate Python code, not prose.
+      - Create at least one runnable Python file in the workspace (for example, `main.py`).
+      - Return the final answer as Python code only.
+      - CRITICAL: Include explicit exception handling:
+        * Wrap credential/client initialization and all CRUD operations in try/except blocks
+        * Handle: ClientAuthenticationError, CosmosHttpResponseError, AzureError
+        * Example: try: item = container.upsert_item(body) except CosmosHttpResponseError as e: print(f'Error: {e}')
+    rubric:
+      - Uses the APIs, imports, and workflow expected by the skill.
+      - Keeps credentials in environment variables and avoids hardcoded secrets.
+      - Includes explicit try/except exception handling.
+      - Provides complete executable Python code with clear control flow.
+      - Uses modern Python conventions and readable structure.
+    graders:
+      - type: run-command
+        name: Python syntax check
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/check-python-syntax.mjs
+          timeout: 90s
+      - type: run-command
+        name: Python idiomatic static checks
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/check-python-idiomatic.mjs
+          timeout: 90s
+      - type: prompt
+        name: Idiomatic Python quality
+        weight: 1
+        config:
+          model: claude-sonnet-4.6
+          prompt: |-
+            Evaluate whether the generated Python code is idiomatic.
+            Pass only when:
+            1. The code includes try/except blocks (explicit exception handling required)
+            2. Uses Pythonic naming and clear control flow
+            3. Avoids wildcard imports
+            4. Uses context managers or lifecycle-safe patterns where relevant
+            5. Uses proper error handling (no bare except clauses)
+            Fail immediately if no Python code is generated or if there are no try/except blocks.
+          scoring: scale_1_5
+  - name: singleton_container_initialization
+    prompt: |-
+      Show a singleton Cosmos container initialization with a cached container
+      and a safe one-time initialization flag.
+
+      Output requirements for grading:
+      - Generate Python code, not prose.
+      - Create at least one runnable Python file in the workspace (for example, `main.py`).
+      - Return the final answer as Python code only.
+      - CRITICAL: Include explicit exception handling:
+        * Wrap credential/client initialization and all CRUD operations in try/except blocks
+        * Handle: ClientAuthenticationError, CosmosHttpResponseError, AzureError
+        * Example: try: item = container.upsert_item(body) except CosmosHttpResponseError as e: print(f'Error: {e}')
+    rubric:
+      - Uses the APIs, imports, and workflow expected by the skill.
+      - Keeps credentials in environment variables and avoids hardcoded secrets.
+      - Includes explicit try/except exception handling.
+      - Provides complete executable Python code with clear control flow.
+      - Uses modern Python conventions and readable structure.
+    graders:
+      - type: run-command
+        name: Python syntax check
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/check-python-syntax.mjs
+          timeout: 90s
+      - type: run-command
+        name: Python idiomatic static checks
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/check-python-idiomatic.mjs
+          timeout: 90s
+      - type: prompt
+        name: Idiomatic Python quality
+        weight: 1
+        config:
+          model: claude-sonnet-4.6
+          prompt: |-
+            Evaluate whether the generated Python code is idiomatic.
+            Pass only when:
+            1. The code includes try/except blocks (explicit exception handling required)
+            2. Uses Pythonic naming and clear control flow
+            3. Avoids wildcard imports
+            4. Uses context managers or lifecycle-safe patterns where relevant
+            5. Uses proper error handling (no bare except clauses)
+            Fail immediately if no Python code is generated or if there are no try/except blocks.
+          scoring: scale_1_5
+constraints:
+  expect_skills:
+    - azure-cosmos-db-py
+environment:
+  skills:
+    - ../../../../.github/plugins/azure-sdk-python/skills/azure-cosmos-db-py
+  files:
+    - src: ../../_shared/vally/tools/check-python-syntax.mjs
+      dest: .vally/tools/check-python-syntax.mjs
+    - src: ../../_shared/vally/tools/check-python-idiomatic.mjs
+      dest: .vally/tools/check-python-idiomatic.mjs
+artifacts:
+  include:
+    - "**/*.py"
+    - "**/requirements*.txt"
+    - "**/pyproject.toml"
+    - "**/setup.py"
+    - "**/README.md"
+  exclude:
+    - "**/.venv/**"
+    - "**/venv/**"
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/.mypy_cache/**"
+    - "**/.pytest_cache/**"
