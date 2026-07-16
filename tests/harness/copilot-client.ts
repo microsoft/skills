@@ -128,6 +128,24 @@ export class SkillCopilotClient implements CopilotClient {
         if (existsSync(candidate)) {
           return candidate;
         }
+
+        const pluginSkillsDir = join(this.pluginsDir, entry.name, "skills");
+        const skillEntries = existsSync(pluginSkillsDir)
+          ? readdirSync(pluginSkillsDir, { withFileTypes: true })
+          : [];
+        for (const skillEntry of skillEntries) {
+          if (!skillEntry.isDirectory()) {
+            continue;
+          }
+          const nestedCandidate = join(
+            pluginSkillsDir,
+            skillEntry.name,
+            skillName,
+          );
+          if (existsSync(join(nestedCandidate, "SKILL.md"))) {
+            return nestedCandidate;
+          }
+        }
       }
     }
 
