@@ -39,7 +39,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
 
@@ -100,7 +100,7 @@ jobs:
             else
               find tests/scenarios -type f \( -name 'eval.yaml' -o -name 'eval.yml' \) -path '*/vally/*' | sort -u > "$specs_file"
             fi
-          elif [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ github.event_name }}" = "pull_request_target" ]; then
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
             collect_from_changed_dirs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" | sort -u > "$specs_file"
           else
             base_sha="${{ github.event.before }}"
