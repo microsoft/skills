@@ -170,13 +170,14 @@ If one pattern handles ~80% of use cases:
 
 If no single pattern dominates:
 
-1. Pick the most common workflow for SKILL.md
-2. Acknowledge other approaches in a `/references/workflows-comparison.md` that explains trade-offs (e.g., "Local dev uses DeveloperToolsCredential; production uses ManagedIdentityCredential")
-3. Do NOT treat valid alternatives as "advanced" — they're equally valid, just different contexts
+1. Include every hero scenario in SKILL.md, even when that means multiple equally valid workflows
+2. Show one complete, runnable example for each hero scenario in SKILL.md
+3. Use `/references/workflows-comparison.md` for trade-offs, secondary variations, and deeper context that would otherwise bloat the main file
+4. Do NOT treat valid alternatives as "advanced" when they are core to real usage — they're equally valid, just different contexts
 
-**Example**: Azure Identity SDK has 8 credential types. Pick `DefaultAzureCredential` for SKILL.md for local development; for production, direct users to specific credentials (`ManagedIdentityCredential`, `WorkloadIdentityCredential`) or configure `DefaultAzureCredential` with `AZURE_TOKEN_CREDENTIALS=prod`. Document `AzureCliCredential`, etc. in `/references/credential-types.md` without ranking them.
+**Example**: Azure Identity SDK has several hero scenarios. Keep the primary local-development and production-safe credential flows in SKILL.md, then use `/references/credential-types.md` for deeper comparisons across `AzureCliCredential`, workload identity, service principal variants, and other secondary credential choices.
 
-**Decision rule**: If you're unsure, ask: "Would a user choosing the other approach call what I wrote wrong?" If no, both are core workflows—acknowledge both with trade-offs.
+**Decision rule**: If you're unsure, ask: "Would a user choosing the other approach call what I wrote wrong?" If yes, it's another hero scenario and belongs in SKILL.md. If no, it can be summarized and linked from `/references/`.
 
 ---
 
@@ -400,7 +401,7 @@ Use a token counter or model playground to measure each section. Compare to the 
 
 **3. Example count audit:**
 
-- [ ] 1 complete example per core workflow (up to 2 only when Case 2 documents multiple equally valid workflows). For Python SDKs that support both sync and async, the paired sync + async examples for the same core workflow count as one workflow, not two.
+- [ ] 1 complete example per hero scenario / core workflow documented in SKILL.md. For Python SDKs that support both sync and async, the paired sync + async examples for the same workflow count as one workflow, not two.
 - [ ] Feature table includes 3-5 core methods (not comprehensive API)
 - [ ] Max 1 example per best practice bullet
 
@@ -413,9 +414,10 @@ Use a token counter or model playground to measure each section. Compare to the 
 
 **4b. Authentication guidance validation** (critical for all credentials):
 
-- [ ] If skill uses Azure Identity credentials, verify guidance against [official credential-chains docs](https://learn.microsoft.com/en-us/azure/developer/python/sdk/authentication/credential-chains#usage-guidance-for-defaultazurecredential)
-- [ ] Development guidance: OK to recommend `DefaultAzureCredential` (supports multiple dev credential types)
-- [ ] Production guidance: `DefaultAzureCredential` alone (unconstrained) is not sufficient; require either `AZURE_TOKEN_CREDENTIALS=prod` (or a specific target credential) to constrain the chain, or a specific credential (e.g., `ManagedIdentityCredential`) used directly
+- [ ] If skill uses Azure Identity credentials, verify guidance against the current official credential docs for that language/package (Microsoft Learn where available; otherwise the upstream SDK repo or package docs)
+- [ ] For Python skills, development guidance may recommend `DefaultAzureCredential` (supports multiple dev credential types)
+- [ ] For Python skills, production guidance: `DefaultAzureCredential` alone (unconstrained) is not sufficient; require either `AZURE_TOKEN_CREDENTIALS=prod` (or a specific target credential) to constrain the chain, or a specific credential (e.g., `ManagedIdentityCredential`) used directly
+- [ ] For Rust skills, development/production guidance reflects the actual supported credentials (`DeveloperToolsCredential` for local dev; a specific production credential such as `ManagedIdentityCredential` for production)
 - [ ] Link to `/references/auth-strategies.md` or official docs for production credential selection
 
 **4c. Run Vally lint/eval (if the skill has a spec under `tests/scenarios/<skill-name>/vally/`):**
@@ -1080,7 +1082,7 @@ Regeneration is not complete when snippets compile — it is complete when the s
 
 Before finalizing any regenerated skill:
 
-1. Identify **hero scenarios** from current Learn quickstarts/tutorials/samples for that SDK.
+1. Identify **hero scenarios** from the current authoritative docs/samples for that SDK (Microsoft Learn where available; otherwise the upstream SDK repo and package documentation).
 2. Ensure each hero scenario is represented in the skill with copy-pastable snippets (or an explicit link to a bundled reference file when too large).
 3. Add/refresh test scenarios so hero flows are validated by harness patterns.
 4. Add at least **one important non-hero scenario** (for example: update/patch, delete/cleanup, export/import, advanced auth mode, paging/filtering, retries/error handling, or LRO monitoring) when supported by the SDK. For Python SDKs that support both sync and async clients, present both forms with equal priority; do not treat either as universally preferred.
@@ -1281,7 +1283,7 @@ Before completing a skill:
 - [ ] Authentication follows language rules (`DefaultAzureCredential` for Python/.NET/Java/TS/Go local dev; `DeveloperToolsCredential` local dev + `ManagedIdentityCredential` production for Rust)
 - [ ] Includes cleanup/delete in examples
 - [ ] References organized by feature (`capabilities.md` index + dedicated deep-dive files)
-- [ ] Hero scenarios from current Learn docs are explicitly covered in snippets and tests
+- [ ] Hero scenarios from the current authoritative docs/samples for that SDK are explicitly covered in snippets and tests
 - [ ] At least one high-value non-hero scenario is included when the SDK supports a distinct non-hero scenario (otherwise note that no distinct non-hero scenario applies)
 - [ ] For Azure SDK skills, `references/capabilities.md` indexes hero/non-hero coverage and links to dedicated non-hero docs
 - [ ] For Azure SDK skills, `references/non-hero-scenarios.md` contains concrete non-hero examples distinct from hero snippets
