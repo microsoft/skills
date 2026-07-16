@@ -21,9 +21,9 @@ stimuli:
       - Create at least one runnable Python file in the workspace (for example, `main.py`).
       - Return the final answer as Python code only.
       - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send/receive operations in try/except blocks
-        * Handle: ServiceBusError, EventHubError, OperationTimeoutError, AzureError
-        * Example: try: sender.send_batch(batch) except ServiceBusError as e: print(f'Error: {e}')
+        * Wrap client initialization and publish operations in try/except blocks
+        * Handle: HttpResponseError, AzureError, Exception
+        * Example: try: client.send(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -70,9 +70,9 @@ stimuli:
       - Create at least one runnable Python file in the workspace (for example, `main.py`).
       - Return the final answer as Python code only.
       - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send/receive operations in try/except blocks
-        * Handle: ServiceBusError, EventHubError, OperationTimeoutError, AzureError
-        * Example: try: sender.send_batch(batch) except ServiceBusError as e: print(f'Error: {e}')
+        * Wrap client initialization and publish operations in try/except blocks
+        * Handle: HttpResponseError, AzureError, Exception
+        * Example: try: client.send(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
