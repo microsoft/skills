@@ -110,33 +110,41 @@ stimuli:
             - Async/await throughout
           scoring: scale_1_5
       - name: Official Azure SDK Crate Selection
-        type: rust-cargo-build-failure-check
+        type: program
         weight: 1.0
         config:
-          commands:
-            - command: cargo +nightly -Zscript .vally/tools/check-azure-crates.rs
-          emit_in_metadata: true
+          program: cargo
+          args:
+            - "+nightly"
+            - "-Zscript"
+            - ".vally/tools/check-azure-crates.rs"
       - name: TokenCredential Authentication
-        type: rust-cargo-build-failure-check
+        type: program
         weight: 1.0
         config:
-          commands:
-            - command: cargo +nightly -Zscript .vally/tools/check-token-credential.rs
-          emit_in_metadata: true
+          program: cargo
+          args:
+            - "+nightly"
+            - "-Zscript"
+            - ".vally/tools/check-token-credential.rs"
       - name: Async-First with Tokio Runtime
-        type: rust-cargo-build-failure-check
+        type: program
         weight: 1.0
         config:
-          commands:
-            - command: cargo +nightly -Zscript .vally/tools/check-async-runtime.rs
-          emit_in_metadata: true
+          program: cargo
+          args:
+            - "+nightly"
+            - "-Zscript"
+            - ".vally/tools/check-async-runtime.rs"
       - name: No Hardcoded Secrets
-        type: rust-cargo-build-failure-check
+        type: program
         weight: 1.0
         config:
-          commands:
-            - command: cargo +nightly -Zscript .vally/tools/check-no-secrets.rs
-          emit_in_metadata: true
+          program: cargo
+          args:
+            - "+nightly"
+            - "-Zscript"
+            - ".vally/tools/check-no-secrets.rs"
       - name: Rust Cargo Trajectory Build Failure
         type: rust-cargo-build-failure-check
         weight: 1.0
