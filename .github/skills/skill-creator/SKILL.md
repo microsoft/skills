@@ -186,7 +186,7 @@ Follow this structure (based on existing Azure SDK skills):
 
 1. **Title** — `# SDK Name`
 2. **Installation** — `pip install`, `npm install`, etc.
-3. **Environment Variables** — Required configuration, with an inline comment explaining when it's required . If using `DefaultAzureCredential`in production,include `AZURE_TOKEN_CREDENTIALS` (set to `prod` or `<specific_credential>`)
+3. **Environment Variables** — Required configuration, with an inline comment explaining when it's required. If using `DefaultAzureCredential` in production, include `AZURE_TOKEN_CREDENTIALS` (set to `prod` or `<specific_credential>`)
 4. **Authentication & Lifecycle** — For Python skills, prefer `DefaultAzureCredential`: use it as-is for local development, and constrain it for production by setting `AZURE_TOKEN_CREDENTIALS` to `prod` (or a specific target credential name). A specific Microsoft Entra Token credential such as `ManagedIdentityCredential` or `WorkloadIdentityCredential` may be used directly instead. **For Python skills, this section MUST start with the standard callout block** (see [Required Authentication & Lifecycle Callout (Python)](#required-authentication--lifecycle-callout-python) below).
 5. **Core Workflow** — Minimal viable example (per core workflow discipline above)
 6. **Feature Tables** — Clients, methods, tools
@@ -238,8 +238,10 @@ If configuring a Rust skill, use `DeveloperToolsCredential` for local developmen
 ```python
 # Python — note: client is wrapped in `with` for deterministic cleanup
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
-# Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
-credential = DefaultAzureCredential(require_envvar=True)
+# Local dev: DefaultAzureCredential works as-is.
+credential = DefaultAzureCredential()
+# Production alternative: constrain DefaultAzureCredential with AZURE_TOKEN_CREDENTIALS.
+# credential = DefaultAzureCredential(require_envvar=True)
 # Or use a specific credential directly in production:
 # See https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#credential-classes
 # credential = ManagedIdentityCredential()
@@ -419,8 +421,15 @@ Use a token counter or model playground to measure each section. Compare to the 
 **4c. Run Vally lint/eval (if the skill has a spec under `tests/scenarios/<skill-name>/vally/`):**
 
 ```bash
-vally lint --eval-spec tests/scenarios/<skill-name>/vally/eval.yaml
-vally eval --eval-spec tests/scenarios/<skill-name>/vally/eval.yaml
+# If the eval spec uses the shared Rust custom grader plugin, build it first.
+(cd tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure && npm install && npm run build)
+
+vally lint --eval-spec tests/scenarios/<skill-name>/vally/eval.yaml \
+  --grader-plugin tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure \
+  --strict
+
+vally eval --eval-spec tests/scenarios/<skill-name>/vally/eval.yaml \
+  --grader-plugin tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure
 ```
 
 - [ ] `vally lint` passes with no errors
@@ -480,7 +489,7 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 ```markdown
 1. **Do not mix sync and async clients in the same call path.** Use either `azure.xxx` sync clients or `azure.xxx.aio` async clients within a single call path — do not combine both.
 2. **Always use context managers for clients and async credentials.** Wrap every client in `with Client(...) as client:` (sync) or `async with Client(...) as client:` (async). For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
-3. **Use `DefaultAzureCredential`** for code that runs locally. Use a specific token credential (e.g. `ManagedIdentityCredential`, `WorkloadIdentityCredential`) for code that runs in Azure.
+3. **Use `DefaultAzureCredential`** for code that runs locally. For code that runs in Azure, either constrain `DefaultAzureCredential` with `AZURE_TOKEN_CREDENTIALS=prod` (or a specific target credential) or use a specific token credential directly (e.g. `ManagedIdentityCredential`, `WorkloadIdentityCredential`).
 ```
 
 **Variants to apply when the SDK shape differs:**
@@ -531,7 +540,7 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 6. Move advanced patterns to `/references/`
 7. Include `references/capabilities.md` and `references/non-hero-scenarios.md`
 
-**Before writing your skill**: Ask "Which of these is my use case most similar to?" then mirror that structure.
+**Before writing your skill**: Apply the checklist above directly, then mirror only the structure patterns that fit your use case.
 
 ---
 
@@ -632,9 +641,11 @@ AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used i
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 from azure.ai.example import ExampleClient
 
-# Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
+# Local dev: DefaultAzureCredential works as-is.
+credential = DefaultAzureCredential()
 
-credential = DefaultAzureCredential(require_envvar=True)
+# Production alternative: constrain DefaultAzureCredential with AZURE_TOKEN_CREDENTIALS.
+# credential = DefaultAzureCredential(require_envvar=True)
 
 # Or use a specific credential directly in production:
 
