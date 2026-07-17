@@ -1621,10 +1621,14 @@ if ($Compare) {
     Write-Information ""
     Write-Information "Generating comparison reports..."
     
-    # Run compare-experiment.mjs for the experiment directory
     $compareScript = Join-Path $PSScriptRoot "compare-experiment.mjs"
     if (Test-Path $compareScript) {
-        & node $compareScript $experimentResultsDir
+        foreach ($result in $results) {
+            if ($result.ExperimentDir -and (Test-Path $result.ExperimentDir)) {
+                Write-Information "Comparing: $($result.Skill)"
+                & node $compareScript $result.ExperimentDir
+            }
+        }
     }
     else {
         Write-Warning "compare-experiment.mjs not found at: $compareScript"

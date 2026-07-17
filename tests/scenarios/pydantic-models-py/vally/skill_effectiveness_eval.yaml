@@ -138,8 +138,6 @@ environment:
       dest: .vally/tools/check-python-idiomatic.mjs
     - src: ./syntax-check-config.json
       dest: .vally/syntax-check-config.json
-    - src: ./syntax-check-config.json
-      dest: .vally/syntax-check-config.json
 artifacts:
   include:
     - "**/*.py"

@@ -239,20 +239,22 @@ foreach ($evalFile in $evalFiles) {
     if ($requiresRustCustomGrader) { $npxArgs += @("--grader-plugin", $customGraderPluginDir) }
     if ($JUnit) { $npxArgs += "--junit" }
 
-    & npx @npxArgs
+    & pnpm --dir $PSScriptRoot exec @npxArgs
     $exitCode = $LASTEXITCODE
     $durationSec = [math]::Round(((Get-Date) - $start).TotalSeconds, 1)
 
-    $runDir = Get-ChildItem -Path $scenarioOutDir -Directory -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTimeUtc -Descending |
-    Select-Object -First 1
+    $runDir = $null
+    if ($exitCode -eq 0) {
+        $runDir = Get-ChildItem -Path $scenarioOutDir -Directory -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTimeUtc -Descending |
+        Select-Object -First 1
+    }
 
     $summary = $null
     if ($runDir) {
-        $jsonlPath = Join-Path $runDir.FullName "results.jsonl"
+        $jsonlPath = Join-Path $runDir.FullName "run-summary.jsonl"
         if (Test-Path -LiteralPath $jsonlPath) {
             $line = Get-Content -Path $jsonlPath |
-            Where-Object { $_ -match '"type"\s*:\s*"run-summary"' } |
             Select-Object -Last 1
             if ($line) {
                 try { $summary = $line | ConvertFrom-Json -Depth 20 } catch {}

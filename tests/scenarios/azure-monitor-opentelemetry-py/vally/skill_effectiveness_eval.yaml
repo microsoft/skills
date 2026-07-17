@@ -21,9 +21,9 @@ stimuli:
       - Create at least one runnable Python file in the workspace (for example, `main.py`).
       - Return the final answer as Python code only.
       - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and query/ingestion operations in try/except blocks
-        * Handle: ServiceError, HttpResponseError, ValidationError, AzureError
-        * Example: try: results = client.query_workspace(query) except HttpResponseError as e: print(f'Query failed: {e}')
+        * Wrap configure_azure_monitor and app startup in try/except blocks
+        * Handle: AzureError, HttpResponseError, Exception
+        * Example: try: configure_azure_monitor() except Exception as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -63,17 +63,18 @@ stimuli:
           scoring: scale_1_5
   - name: explicit_connection_string
     prompt: |-
-      Show configure_azure_monitor with an explicit connection string literal.
-      Include InstrumentationKey and IngestionEndpoint.
+      Show configure_azure_monitor with an explicit connection string passed from
+      an environment variable. Include InstrumentationKey and IngestionEndpoint
+      as part of the connection string value read from the environment.
 
       Output requirements for grading:
       - Generate Python code, not prose.
       - Create at least one runnable Python file in the workspace (for example, `main.py`).
       - Return the final answer as Python code only.
       - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and query/ingestion operations in try/except blocks
-        * Handle: ServiceError, HttpResponseError, ValidationError, AzureError
-        * Example: try: results = client.query_workspace(query) except HttpResponseError as e: print(f'Query failed: {e}')
+        * Wrap configure_azure_monitor and app startup in try/except blocks
+        * Handle: AzureError, HttpResponseError, Exception
+        * Example: try: configure_azure_monitor() except Exception as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

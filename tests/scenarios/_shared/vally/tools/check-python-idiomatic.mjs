@@ -75,7 +75,7 @@ if (files.length === 0) {
 const failures = [];
 for (const file of files) {
   const text = readFileSync(file, "utf-8");
-  if (text.includes("\t")) {
+  if (/^\t|^ *\t/m.test(text)) {
     failures.push(`${file}: contains tab indentation`);
   }
   if (/^\s*from\s+\S+\s+import\s+\*/m.test(text)) {
