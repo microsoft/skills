@@ -36,7 +36,7 @@ jobs:
           node-version: "20"
 
       - name: Install Vally CLI
-        run: npm install -g @microsoft/vally-cli@0.6.0
+        run: npm install -g @microsoft/vally-cli@0.9.0
 
       - name: Verify Vally CLI
         run: vally --version
