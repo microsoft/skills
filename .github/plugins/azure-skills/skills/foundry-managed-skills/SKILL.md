@@ -1,6 +1,12 @@
 ---
 name: foundry-managed-skills
-description: "Author, version, attach, and consume Foundry-managed skills (SKILL.md as a project resource). USE FOR: azd ai skill, Foundry skills REST/SDK, attach skill to toolbox, SkillsProvider, download skills into hosted agent containers, update agent behavior without code changes, skill versioning/rollback. DO NOT USE FOR: general Microsoft Learn docs search, non-Foundry agent frameworks, or Azure Functions/App Service deploy."
+description: >-
+  Author, version, attach, and consume Foundry-managed skills (SKILL.md as a
+  project resource). Use for azd ai skill, Foundry skills REST/SDK, toolbox
+  attach, SkillsProvider, downloading skills into hosted agent containers,
+  updating agent behavior without code changes, and skill versioning or
+  rollback. Do not use for general Microsoft Learn search, non-Foundry agent
+  frameworks, or Azure Functions/App Service deploy.
 license: MIT
 metadata:
   author: Microsoft
@@ -32,7 +38,7 @@ This skill teaches the mental model and gotchas, then directs you to live CLI/SD
 ## Mental Model
 
 - A **skill** is a directory with `SKILL.md` (YAML front matter + Markdown body), uploaded to a Foundry project.
-- Every mutation creates an **immutable version**; `create`/`update` promote a new default unless you pin a version.
+- Content create/update creates an **immutable version** and promotes it to default unless you pin a version. Rollback via `update --set-default-version` only moves the default pointer (no new version).
 - Agents discover skills primarily via the `description` field (progressive disclosure) — write **when-to-use** descriptions, not vague summaries.
 - Toolbox references without a pinned version follow `default_version`; pinned refs (`skill@2`) stay fixed.
 - `SkillsProvider` downloads the default version at **agent startup** — redeploy (or restart) to pick up updates.
