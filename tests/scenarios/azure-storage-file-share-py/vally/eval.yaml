@@ -9,7 +9,7 @@ defaults:
   runs: 1
   timeout: 30m
   model: claude-sonnet-4.6
-  grader_model: gpt-5.5
+  judge_model: gpt-5.5
 stimuli:
   - name: service_client_connection_string
     prompt: |-

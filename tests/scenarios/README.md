@@ -111,7 +111,7 @@ A typical eval spec includes:
    - type
 2. defaults:
    - model
-   - grader_model
+   - judge_model
    - runs
    - timeout
 3. stimuli:
@@ -130,7 +130,7 @@ Use existing scenarios as references, for example:
 
 - tests/scenarios/fastapi-router-py/vally/eval.yaml
 
-Note that grader_model and model should come from different LLM families - LLMs are rather poor at evaluating their own output.
+Note that judge_model and model should come from different LLM families - LLMs are rather poor at evaluating their own output.
 
 ## Writing skill_effectiveness_experiment.yaml
 
