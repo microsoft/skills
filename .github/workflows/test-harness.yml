@@ -24,9 +24,24 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: tests/pnpm-lock.yaml
 
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Verify Rust skill links are in sync
         run: |
           python .github/scripts/sync_skill_links.py --plugin azure-sdk-rust --check
+
+      - name: Verify Python skill links are in sync
+        run: |
+          python .github/scripts/sync_skill_links.py --plugin azure-sdk-python --check
+
+      - name: Validate Python skill syntax
+        run: |
+          python .github/scripts/check_skill_python_syntax.py
+
+      - name: Validate Rust skill syntax
+        run: |
+          python .github/scripts/check_skill_rust_syntax.py
 
       - name: Install dependencies
         working-directory: tests

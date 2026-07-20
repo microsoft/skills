@@ -4,7 +4,7 @@
 Generate vally skill effectiveness experiments for specified skills.
 
 .DESCRIPTION
-Creates skill_effectiveness_experiment.yaml and skill_effectiveness_eval.yaml files
+Creates skill_effectiveness_experiment.yaml files
 for all matching skills in the scenarios directory. Each experiment compares
 performance with and without the skill context (baseline vs. skill variants).
 
@@ -80,7 +80,7 @@ function New-ExperimentFile {
 # Purpose: Measure skill effectiveness by comparing the same stimulus with and without the corresponding skill.
 name: $experimentName
 evals:
-  - skill_effectiveness_eval.yaml
+    - eval.yaml
 vary:
   - /defaults/model
   - /environment/skills
@@ -107,31 +107,6 @@ variants:
         Set-Content -Path $OutputPath -Value $content -Encoding UTF8
         Write-Information "✓ Created: $OutputPath"
     }
-}
-
-function Copy-EvalFile {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$SourcePath,
-        
-        [Parameter(Mandatory = $true)]
-        [string]$DestPath,
-        
-        [Parameter(Mandatory = $false)]
-        [switch]$DryRun
-    )
-    
-    if (Test-Path $SourcePath) {
-        if ($DryRun) {
-            Write-Verbose "Would copy: $SourcePath -> $DestPath"
-        }
-        else {
-            Copy-Item -Path $SourcePath -Destination $DestPath -Force
-            Write-Information "✓ Copied: $DestPath"
-        }
-        return $true
-    }
-    return $false
 }
 
 # Find all matching skill scenario directories
@@ -176,8 +151,7 @@ foreach ($skillDir in $skillDirs) {
     
     # Paths for experiment files
     $experimentFile = Join-Path $vallyDir "skill_effectiveness_experiment.yaml"
-    $evalFile = Join-Path $vallyDir "skill_effectiveness_eval.yaml"
-    $sourceEvalFile = Join-Path $vallyDir "eval.yaml"
+    $evalFile = Join-Path $vallyDir "eval.yaml"
     
     # Create experiment file
     if ((Test-Path $experimentFile) -and -not $Force) {
@@ -185,33 +159,18 @@ foreach ($skillDir in $skillDirs) {
         $skipped++
     }
     else {
+        if (-not (Test-Path $evalFile)) {
+            Write-Warning "Source eval.yaml not found for $skillName"
+            $skipped++
+            continue
+        }
+
         try {
             New-ExperimentFile -SkillName $skillName -SkillPath $skillPath -OutputPath $experimentFile -DryRun:$DryRun
             $created++
         }
         catch {
             Write-Error "Failed to create experiment file for $skillName : $_"
-            $failed++
-        }
-    }
-    
-    # Create eval file (copy from eval.yaml)
-    if ((Test-Path $evalFile) -and -not $Force) {
-        Write-Verbose "Skipping (exists): $evalFile"
-    }
-    else {
-        try {
-            if (Copy-EvalFile -SourcePath $sourceEvalFile -DestPath $evalFile -DryRun:$DryRun) {
-                if (-not $DryRun) {
-                    $created++
-                }
-            }
-            else {
-                Write-Warning "Source eval.yaml not found for $skillName"
-            }
-        }
-        catch {
-            Write-Error "Failed to copy eval file for $skillName : $_"
             $failed++
         }
     }

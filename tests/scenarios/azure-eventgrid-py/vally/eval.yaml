@@ -13,17 +13,9 @@ defaults:
 stimuli:
   - name: basic_cloudevent_publish
     prompt: |-
-      Publish a single CloudEvent to an Event Grid custom topic.
+      Write a Python application which shows how to publish a single CloudEvent to an Event Grid custom topic.
       Use DefaultAzureCredential, environment variables, and proper imports.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and publish operations in try/except blocks
-        * Handle: HttpResponseError, AzureError, Exception
-        * Example: try: client.send(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -62,17 +54,9 @@ stimuli:
           scoring: scale_1_5
   - name: batch_cloudevent_publish
     prompt: |-
-      Send a batch of CloudEvents to Event Grid using a list.
+      Write a Python application which shows how to send a batch of CloudEvents to Event Grid using a list.
       Use DefaultAzureCredential and a topic endpoint from env.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and publish operations in try/except blocks
-        * Handle: HttpResponseError, AzureError, Exception
-        * Example: try: client.send(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -134,4 +118,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-

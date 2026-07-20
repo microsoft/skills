@@ -1015,15 +1015,6 @@ if ($AnalysisOnly) {
     exit $analysisExitCode
 }
 
-# Validate vally is available
-$vallyCmd = Get-Command vally -ErrorAction SilentlyContinue
-if (-not $vallyCmd) {
-    Write-Error "vally command not found. Please install Vally to run experiments."
-    exit 1
-}
-
-Write-Information "Vally: $($vallyCmd.Source)"
-
 # Find all matching skill scenarios with experiments
 $skillDirs = Get-ChildItem -Path $ScenariosRoot -Directory -Filter $SkillPattern | 
 Where-Object { Test-Path (Join-Path $_.FullName "vally" "skill_effectiveness_experiment.yaml") } |
@@ -1044,6 +1035,18 @@ if ($DryRun) {
     }
     exit 0
 }
+
+# Validate vally is available via pnpm after dry-run check
+$vallyExe = & pnpm --dir $PSScriptRoot exec which vally 2>$null
+if (-not $vallyExe) {
+    Write-Error "vally command not found. Please install @microsoft/vally via pnpm."
+    exit 1
+}
+
+# Use package-local binary via pnpm
+$vallyCmd = "pnpm", "--dir", $PSScriptRoot, "exec", "vally"
+
+Write-Information "Vally: $vallyExe"
 
 # Create results directory with timestamp
 $timestamp = Get-Date -Format "yyyy-MM-ddTHH-mm-ss-fffZ"

@@ -13,17 +13,9 @@ defaults:
 stimuli:
   - name: client_creation
     prompt: |-
-      Create an AIProjectClient with proper authentication using DefaultAzureCredential.
+      Write a Python application that creates an AIProjectClient with proper authentication using DefaultAzureCredential.
       Use environment variables for the endpoint and include a context manager pattern.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential/client initialization and all API operations in try/except blocks
-        * Handle: AzureError, HttpResponseError, ServiceError, and generic Exception types
-        * Example: try: result = client.analyze(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -40,7 +32,7 @@ stimuli:
             - .vally/tools/check-python-syntax.mjs
           timeout: 90s
       - type: run-command
-        name: Python idiomatic static checks
+        name: Idiomatic Python quality
         weight: 1
         config:
           command: node
@@ -48,31 +40,20 @@ stimuli:
             - .vally/tools/check-python-idiomatic.mjs
           timeout: 90s
       - type: prompt
-        name: Idiomatic Python quality
+        name: Rubric LLM judge
         weight: 1
         config:
           prompt: |-
-            Evaluate whether the generated Python code is idiomatic.
-            Pass only when the code uses Pythonic naming, clear control flow,
-            explicit exception handling (no bare except), avoids wildcard imports,
-            and uses context managers or lifecycle-safe patterns where relevant.
-            Fail immediately if no Python code is generated.
-            Treat missing code as an automatic failure when there is no `.py` file in the workspace
-            and no substantive Python code in the assistant output.
+            Evaluate the generated answer against the stimulus rubric.
+            Use the rubric criteria as the primary judgment basis.
+            Score 1 if the answer is missing required code output or is largely non-compliant.
+            Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
   - name: versioned_agent_creation
     prompt: |-
-      Create a versioned agent using create_version() with PromptAgentDefinition.
+      Write a Python application that creates a versioned agent using create_version() with PromptAgentDefinition.
       Include a version label and description. The agent should be named "customer-support-agent".
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential/client initialization and all API operations in try/except blocks
-        * Handle: AzureError, HttpResponseError, ServiceError, and generic Exception types
-        * Example: try: result = client.analyze(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -89,7 +70,7 @@ stimuli:
             - .vally/tools/check-python-syntax.mjs
           timeout: 90s
       - type: run-command
-        name: Python idiomatic static checks
+        name: Idiomatic Python quality
         weight: 1
         config:
           command: node
@@ -97,17 +78,14 @@ stimuli:
             - .vally/tools/check-python-idiomatic.mjs
           timeout: 90s
       - type: prompt
-        name: Idiomatic Python quality
+        name: Rubric LLM judge
         weight: 1
         config:
           prompt: |-
-            Evaluate whether the generated Python code is idiomatic.
-            Pass only when the code uses Pythonic naming, clear control flow,
-            explicit exception handling (no bare except), avoids wildcard imports,
-            and uses context managers or lifecycle-safe patterns where relevant.
-            Fail immediately if no Python code is generated.
-            Treat missing code as an automatic failure when there is no `.py` file in the workspace
-            and no substantive Python code in the assistant output.
+            Evaluate the generated answer against the stimulus rubric.
+            Use the rubric criteria as the primary judgment basis.
+            Score 1 if the answer is missing required code output or is largely non-compliant.
+            Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
 constraints:
   expect_skills:

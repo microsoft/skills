@@ -13,17 +13,8 @@ defaults:
 stimuli:
   - name: default_credential_basic
     prompt: |-
-      Show a minimal example using DefaultAzureCredential to request a token
+      Write a python program which demonstrates a minimal example using DefaultAzureCredential to request a token
       for https://management.azure.com/.default.
-
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential initialization and token acquisition in try/except blocks
-        * Handle: ClientAuthenticationError, CredentialUnavailableError, AzureError
-        * Example: try: credential = DefaultAzureCredential() except ClientAuthenticationError as e: print(f'Auth error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -64,15 +55,6 @@ stimuli:
     prompt: |-
       Create a ManagedIdentityCredential using a user-assigned client ID from
       AZURE_CLIENT_ID environment variable.
-
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential initialization and token acquisition in try/except blocks
-        * Handle: ClientAuthenticationError, CredentialUnavailableError, AzureError
-        * Example: try: credential = DefaultAzureCredential() except ClientAuthenticationError as e: print(f'Auth error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

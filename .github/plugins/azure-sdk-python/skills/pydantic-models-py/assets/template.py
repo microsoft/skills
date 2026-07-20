@@ -1,7 +1,11 @@
 """
-{{ResourceName}} Models
+ResourceName Models
 
-Pydantic models for {{resource_name}} resource following the multi-model pattern.
+Pydantic models for resource_name resource following the multi-model pattern.
+
+Template placeholders to replace:
+- ResourceName (PascalCase)
+- resource_name (snake_case)
 """
 
 from datetime import datetime
@@ -14,7 +18,7 @@ from pydantic import BaseModel, Field
 # ============================================================================
 
 
-class {{ResourceName}}Base(BaseModel):
+class ResourceNameBase(BaseModel):
     """
     Base model with common fields.
 
@@ -25,7 +29,7 @@ class {{ResourceName}}Base(BaseModel):
         ...,
         min_length=1,
         max_length=200,
-        description="Display name for the {{resource_name}}",
+        description="Display name for the resource_name",
     )
     description: Optional[str] = Field(
         None,
@@ -43,9 +47,9 @@ class {{ResourceName}}Base(BaseModel):
 # ============================================================================
 
 
-class {{ResourceName}}Create({{ResourceName}}Base):
+class ResourceNameCreate(ResourceNameBase):
     """
-    Request model for creating a new {{resource_name}}.
+    Request model for creating a new resource_name.
 
     Includes all required fields for creation.
     """
@@ -63,7 +67,7 @@ class {{ResourceName}}Create({{ResourceName}}Base):
 # ============================================================================
 
 
-class {{ResourceName}}Update(BaseModel):
+class ResourceNameUpdate(BaseModel):
     """
     Request model for partial updates.
 
@@ -90,7 +94,7 @@ class {{ResourceName}}Update(BaseModel):
 # ============================================================================
 
 
-class {{ResourceName}}({{ResourceName}}Base):
+class ResourceName(ResourceNameBase):
     """
     Response model with all fields.
 
@@ -114,7 +118,7 @@ class {{ResourceName}}({{ResourceName}}Base):
 # ============================================================================
 
 
-class {{ResourceName}}InDB({{ResourceName}}):
+class ResourceNameInDB(ResourceName):
     """
     Database document model.
 

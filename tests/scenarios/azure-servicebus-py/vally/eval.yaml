@@ -15,20 +15,13 @@ stimuli:
     prompt: |-
       Create a sync example that sends a message to a queue and receives it.
       Use DefaultAzureCredential and context managers.
+      Use sender.send_messages(...) to send messages and handle ServiceBusError exceptions.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send/receive operations in try/except blocks
-        * Handle: ServiceBusError, EventHubError, OperationTimeoutError, AzureError
-        * Example: try: sender.send_batch(batch) except ServiceBusError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
       - Provides complete executable Python code with clear control flow and error handling.
-      - Includes explicit try/except exception handling.
+      - Includes explicit try/except exception handling for ServiceBusError.
       - Uses modern Python conventions and readable structure.
     graders:
       - type: run-command
@@ -62,17 +55,9 @@ stimuli:
           scoring: scale_1_5
   - name: async_queue_send_receive
     prompt: |-
-      Create an async example that sends and receives messages from a queue.
+      Create an asynchronous Python example that sends and receives messages from a servicebus queue.
       Use async clients and await all operations.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send/receive operations in try/except blocks
-        * Handle: ServiceBusError, EventHubError, OperationTimeoutError, AzureError
-        * Example: try: sender.send_batch(batch) except ServiceBusError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -134,4 +119,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-

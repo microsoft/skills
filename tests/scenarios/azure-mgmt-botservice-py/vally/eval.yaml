@@ -13,17 +13,9 @@ defaults:
 stimuli:
   - name: basic_bot_creation
     prompt: |-
-      Create a basic Azure Bot Service using the management SDK.
+      Write a Python application which shows how to create a basic Azure Bot Service using the management SDK.
       Include proper authentication, bot creation with F0 SKU, and cleanup.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential/client initialization and all API operations in try/except blocks
-        * Handle: AzureError, HttpResponseError, ServiceError, and generic Exception types
-        * Example: try: result = client.analyze(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -62,18 +54,10 @@ stimuli:
           scoring: scale_1_5
   - name: bot_retrieval_operations
     prompt: |-
-      Write code to retrieve bot information from Azure Bot Service.
+      Write a Python application which shows how to retrieve bot information from Azure Bot Service.
       Include getting a specific bot, listing bots in a resource group,
       and accessing bot properties.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential/client initialization and all API operations in try/except blocks
-        * Handle: AzureError, HttpResponseError, ServiceError, and generic Exception types
-        * Example: try: result = client.analyze(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -135,4 +119,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-

@@ -13,23 +13,9 @@ defaults:
 stimuli:
   - name: basic_aad_client
     prompt: |-
-      Create a basic Cosmos DB NoSQL example using DefaultAzureCredential.
+      Create a python application which demonstrates creating a basic Cosmos DB NoSQL.
       Get a database and container, upsert an item, and read it back.
-
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Ensure ALL Python syntax is valid and correct:
-        * Use proper bracket matching: {}, [], ()
-        * Do not use placeholder variables or template syntax
-      - All .py files must pass Python syntax validation: `python -m py_compile <file>`
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential acquisition in try/except
-        * Wrap client initialization in try/except
-        * Wrap all CRUD operations (upsert, read) in try/except blocks
-        * Handle specific exceptions: ClientAuthenticationError, CosmosHttpResponseError, exceptions.AzureError
-        * Example: try: credential = DefaultAzureCredential() except ClientAuthenticationError as e: handle_auth_error(e)
+      Use token credentials, not connection strings or SAS tokens.
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -68,22 +54,8 @@ stimuli:
           scoring: scale_1_5
   - name: connection_string_client
     prompt: |-
-      Create a CosmosClient using a connection string and retrieve
+      Create a python application using a CosmosClient with a connection string which retrieve
       an existing database.
-
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Ensure ALL Python syntax is valid and correct:
-        * Use proper bracket matching: {}, [], ()
-        * Do not use placeholder variables or template syntax
-      - All .py files must pass Python syntax validation: `python -m py_compile <file>`
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization in try/except
-        * Wrap database retrieval in try/except blocks
-        * Handle specific exceptions: ClientAuthenticationError, CosmosHttpResponseError, exceptions.AzureError
-        * Example: try: client = CosmosClient.from_connection_string(conn) except ClientAuthenticationError as e: handle_auth_error(e)
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

@@ -44,7 +44,12 @@ async def list_items() -> list[Item]:
 
 ```python
 @router.post("/items", status_code=status.HTTP_201_CREATED)
+async def create_item(item: ItemCreate) -> Item:
+  ...
+
 @router.delete("/items/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_item(id: str) -> None:
+  ...
 ```
 
 ## Integration Steps

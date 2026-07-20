@@ -13,18 +13,10 @@ defaults:
 stimuli:
   - name: producer_batch_send
     prompt: |-
-      Create a synchronous Event Hub producer that authenticates with
+      Create a synchronous Event Hub producer in Python that authenticates with
       DefaultAzureCredential, creates a batch, handles batch size limits,
       and sends the batch.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send/receive operations in try/except blocks
-        * Handle: ServiceBusError, EventHubError, OperationTimeoutError, AzureError
-        * Example: try: sender.send_batch(batch) except ServiceBusError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -63,18 +55,10 @@ stimuli:
           scoring: scale_1_5
   - name: consumer_receive_with_checkpoint
     prompt: |-
-      Create an Event Hub consumer that uses DefaultAzureCredential and
+      Create an Event Hub consumer in Python that uses DefaultAzureCredential and
       receives events from the beginning of the stream while checkpointing
       each event.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send/receive operations in try/except blocks
-        * Handle: ServiceBusError, EventHubError, OperationTimeoutError, AzureError
-        * Example: try: sender.send_batch(batch) except ServiceBusError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -136,4 +120,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-

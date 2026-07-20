@@ -88,10 +88,14 @@ print(result["DisplayText"])
 
 ```python
 # WAV PCM 16kHz
-"Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000"
+wav_headers = {
+    "Content-Type": "audio/wav; codecs=audio/pcm; samplerate=16000"
+}
 
 # OGG OPUS
-"Content-Type": "audio/ogg; codecs=opus"
+ogg_headers = {
+    "Content-Type": "audio/ogg; codecs=opus"
+}
 ```
 
 ## Response Formats

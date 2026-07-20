@@ -177,6 +177,8 @@ pnpm test
 
 Use this convention so Vally evals can live beside harness scenarios without changing existing harness behavior.
 
+For full setup, execution commands, scenario structure, and troubleshooting, see `tests/scenarios/README.md`.
+
 ### Folder Layout
 
 ```text

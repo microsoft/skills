@@ -17,14 +17,6 @@ stimuli:
       authentication. Include connecting to an existing search index and
       executing a simple search query.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and query operations in try/except blocks
-        * Handle: HttpResponseError, AzureError, Exception
-        * Example: try: results = client.search(search_text="...") except HttpResponseError as e: print(f'Query failed: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -67,14 +59,6 @@ stimuli:
       Generate embeddings for a query and search using VectorizedQuery.
       Include proper vector configuration and search parameters.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and query operations in try/except blocks
-        * Handle: HttpResponseError, AzureError, Exception
-        * Example: try: results = client.search(search_text="...") except HttpResponseError as e: print(f'Query failed: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -136,4 +120,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-

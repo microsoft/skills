@@ -13,18 +13,10 @@ defaults:
 stimuli:
   - name: secret_crud_basic
     prompt: |-
-      Create a basic Azure Key Vault secrets example that authenticates with
+      Write a Python application which shows how to create a basic Azure Key Vault secrets example that authenticates with
       DefaultAzureCredential, sets a secret, gets it, then deletes and purges it.
       Use AZURE_KEYVAULT_URL for the vault URL.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and secret/key/certificate operations in try/except blocks
-        * Handle: ResourceNotFoundError, HttpResponseError, ClientAuthenticationError, AzureError
-        * Example: try: secret = client.get_secret(name) except ResourceNotFoundError: print('Secret not found')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -63,17 +55,9 @@ stimuli:
           scoring: scale_1_5
   - name: list_secret_versions
     prompt: |-
-      List all secret names and all versions for a specific secret using
+      Write a Python application which shows how to list all secret names and all versions for a specific secret using
       SecretClient.list_properties_of_secrets and list_properties_of_secret_versions.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and secret/key/certificate operations in try/except blocks
-        * Handle: ResourceNotFoundError, HttpResponseError, ClientAuthenticationError, AzureError
-        * Example: try: secret = client.get_secret(name) except ResourceNotFoundError: print('Secret not found')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

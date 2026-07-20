@@ -18,20 +18,6 @@ stimuli:
       Use proper status codes, response models, and async/await patterns.
       Include pagination with limit and offset query parameters.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Use ONLY concrete resource names. Substitute all placeholders:
-        * Use "project" (snake_case), "Project" (PascalCase), "projects" (plural)
-        * NEVER use {{variable}}, {{resource_name}}, {{ResourceName}}, or {{resource_plural}}
-      - All .py files must pass Python syntax validation: `python -m py_compile <file>`
-      - Do NOT reference, import, or copy from template.py files
-      - CRITICAL: Include explicit exception handling:
-        * Wrap async endpoint logic in try/except blocks
-        * Handle HTTPException, ValueError, and generic Exception types
-        * Provide meaningful error messages in responses
-        * Example: try: ... except ValueError as e: raise HTTPException(status_code=400, detail=str(e))
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -49,7 +35,7 @@ stimuli:
             - .vally/syntax-check-config.json
           timeout: 90s
       - type: run-command
-        name: Python idiomatic static checks
+        name: Idiomatic Python quality
         weight: 1
         config:
           command: node
@@ -57,17 +43,14 @@ stimuli:
             - .vally/tools/check-python-idiomatic.mjs
           timeout: 90s
       - type: prompt
-        name: Idiomatic Python quality
+        name: Rubric LLM judge
         weight: 1
         config:
           prompt: |-
-            Evaluate whether the generated Python code is idiomatic.
-            Pass only when the code uses Pythonic naming, clear control flow,
-            explicit exception handling (no bare except), avoids wildcard imports,
-            and uses context managers or lifecycle-safe patterns where relevant.
-            Fail immediately if no Python code is generated.
-            Treat missing code as an automatic failure when there is no `.py` file in the workspace
-            and no substantive Python code in the assistant output.
+            Evaluate the generated answer against the stimulus rubric.
+            Use the rubric criteria as the primary judgment basis.
+            Score 1 if the answer is missing required code output or is largely non-compliant.
+            Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
   - name: router_with_authentication
     prompt: |-
@@ -77,20 +60,6 @@ stimuli:
       - Use get_current_user for optional and get_current_user_required for required auth
       Include proper type hints and HTTPException for unauthorized access.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Use ONLY concrete resource names. Substitute all placeholders:
-        * Use "task" (snake_case), "Task" (PascalCase), "tasks" (plural)
-        * NEVER use {{variable}}, {{resource_name}}, {{ResourceName}}, or {{resource_plural}}
-      - All .py files must pass Python syntax validation: `python -m py_compile <file>`
-      - Do NOT reference, import, or copy from template.py files
-      - CRITICAL: Include explicit exception handling:
-        * Wrap async endpoint logic in try/except blocks
-        * Handle HTTPException, ValueError, and generic Exception types
-        * Provide meaningful error messages in responses
-        * Example: try: ... except ValueError as e: raise HTTPException(status_code=400, detail=str(e))
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -108,7 +77,7 @@ stimuli:
             - .vally/syntax-check-config.json
           timeout: 90s
       - type: run-command
-        name: Python idiomatic static checks
+        name: Idiomatic Python quality
         weight: 1
         config:
           command: node
@@ -116,17 +85,14 @@ stimuli:
             - .vally/tools/check-python-idiomatic.mjs
           timeout: 90s
       - type: prompt
-        name: Idiomatic Python quality
+        name: Rubric LLM judge
         weight: 1
         config:
           prompt: |-
-            Evaluate whether the generated Python code is idiomatic.
-            Pass only when the code uses Pythonic naming, clear control flow,
-            explicit exception handling (no bare except), avoids wildcard imports,
-            and uses context managers or lifecycle-safe patterns where relevant.
-            Fail immediately if no Python code is generated.
-            Treat missing code as an automatic failure when there is no `.py` file in the workspace
-            and no substantive Python code in the assistant output.
+            Evaluate the generated answer against the stimulus rubric.
+            Use the rubric criteria as the primary judgment basis.
+            Score 1 if the answer is missing required code output or is largely non-compliant.
+            Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
 constraints:
   expect_skills:

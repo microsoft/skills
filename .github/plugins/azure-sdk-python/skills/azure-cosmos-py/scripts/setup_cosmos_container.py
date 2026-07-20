@@ -65,7 +65,7 @@ def create_indexing_policy(
         policy["excludedPaths"] = [{"path": p} for p in exclude_paths]
     
     # Always exclude _etag
-    policy["excludedPaths"].append({"path": "/_etag/?")})
+    policy["excludedPaths"].append({"path": "/_etag/?"})
     
     # Composite indexes for ORDER BY on multiple fields
     if composite_indexes:

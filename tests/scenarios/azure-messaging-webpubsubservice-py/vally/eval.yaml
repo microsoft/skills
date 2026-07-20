@@ -13,17 +13,9 @@ defaults:
 stimuli:
   - name: connection_string_broadcast
     prompt: |-
-      Create a WebPubSubServiceClient using a connection string from environment
+      Write a Python application which shows how to create a WebPubSubServiceClient using a connection string from environment
       variables, then send a text and JSON message to all connections.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send operations in try/except blocks
-        * Handle: HttpResponseError, AzureError, Exception
-        * Example: try: client.send_to_all(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -62,17 +54,9 @@ stimuli:
           scoring: scale_1_5
   - name: default_credential_targeted_sends
     prompt: |-
-      Use DefaultAzureCredential with endpoint and hub from environment variables,
+      Write a Python application which shows how to use DefaultAzureCredential with endpoint and hub from environment variables,
       then send a message to a user and to a group.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and send operations in try/except blocks
-        * Handle: HttpResponseError, AzureError, Exception
-        * Example: try: client.send_to_all(...) except HttpResponseError as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

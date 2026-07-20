@@ -1,7 +1,7 @@
 # Purpose: Measure skill effectiveness by comparing the same stimulus with and without the corresponding skill.
 name: azure-cosmos-py-skill-experiment
 evals:
-  - skill_effectiveness_eval.yaml
+  - eval.yaml
 vary:
   - /defaults/model
   - /environment/skills

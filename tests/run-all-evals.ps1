@@ -100,6 +100,65 @@ if (-not (Test-Path -LiteralPath $ScenariosRoot)) {
 $resolvedScenariosRoot = (Resolve-Path -LiteralPath $ScenariosRoot).ProviderPath
 $resolvedResultsRoot = [System.IO.Path]::GetFullPath($ResultsRoot)
 
+$testsPackageJsonPath = Join-Path $PSScriptRoot "package.json"
+$pnpmWorkspaceYamlPath = Join-Path $PSScriptRoot "pnpm-workspace.yaml"
+$pnpmCmd = Get-Command pnpm -ErrorAction SilentlyContinue
+if (-not $pnpmCmd) {
+    Write-Error "pnpm was not found on PATH. Install/enable pnpm via Corepack, then retry.`nExample:`n  corepack enable`n  corepack prepare pnpm@11.10.0 --activate"
+    exit 1
+}
+
+if (Test-Path -LiteralPath $pnpmWorkspaceYamlPath) {
+    $workspacePolicyBlocksEsbuild = $false
+    try {
+        $pnpmWorkspaceYaml = Get-Content -LiteralPath $pnpmWorkspaceYamlPath -Raw
+        if ($pnpmWorkspaceYaml -match '(?ms)^\s*allowBuilds\s*:\s*.*?^\s*esbuild\s*:\s*false\s*$') {
+            $workspacePolicyBlocksEsbuild = $true
+        }
+    }
+    catch {
+        Write-Warning "Could not inspect pnpm workspace policy at ${pnpmWorkspaceYamlPath}: $($_.Exception.Message)"
+    }
+
+    if ($workspacePolicyBlocksEsbuild) {
+        Write-Error "pnpm workspace policy currently blocks esbuild in $pnpmWorkspaceYamlPath (allowBuilds.esbuild=false).`nRun:`n  pnpm --dir $PSScriptRoot approve-builds`nThen select/allow esbuild and rerun this script."
+        exit 1
+    }
+}
+
+if (Test-Path -LiteralPath $testsPackageJsonPath) {
+    try {
+        $testsPackageJson = Get-Content -LiteralPath $testsPackageJsonPath -Raw | ConvertFrom-Json -Depth 20
+        $packageManagerValue = [string]$testsPackageJson.packageManager
+        if ($packageManagerValue -match '^pnpm@([^+]+)') {
+            $requiredPnpmVersion = $Matches[1]
+            $activePnpmVersion = (& pnpm --version 2>&1 | Select-Object -First 1).ToString().Trim()
+            if ([string]::IsNullOrWhiteSpace($activePnpmVersion) -or $activePnpmVersion -ne $requiredPnpmVersion) {
+                Write-Error "pnpm version mismatch. Required: $requiredPnpmVersion (from tests/package.json), active: $activePnpmVersion.`nRun:`n  corepack prepare pnpm@$requiredPnpmVersion --activate"
+                exit 1
+            }
+        }
+    }
+    catch {
+        Write-Warning "Could not validate pnpm packageManager pin from ${testsPackageJsonPath}: $($_.Exception.Message)"
+    }
+}
+
+# Validate install policy once up front so we do not fail repeatedly per eval.
+$pnpmInstallCheckOutput = & pnpm --dir $PSScriptRoot install --frozen-lockfile --reporter=append-only 2>&1
+$pnpmInstallCheckExitCode = $LASTEXITCODE
+if ($pnpmInstallCheckExitCode -ne 0) {
+    $pnpmInstallCheckText = ($pnpmInstallCheckOutput | Out-String)
+    if ($pnpmInstallCheckText -match 'ERR_PNPM_IGNORED_BUILDS') {
+        Write-Error "pnpm install is blocked by unapproved build scripts.`nRun:`n  pnpm --dir $PSScriptRoot approve-builds`nThen rerun this script."
+        exit 1
+    }
+
+    Write-Error "Preflight pnpm install check failed in $PSScriptRoot."
+    $pnpmInstallCheckOutput | ForEach-Object { Write-Error $_ }
+    exit 1
+}
+
 $languageFilter = @($Language | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim().ToLowerInvariant() })
 $serviceFilter = @($AzureService | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim().ToLowerInvariant() })
 
@@ -157,6 +216,11 @@ $customGraderSource = Join-Path $customGraderPluginDir "index.ts"
 $customGraderPackage = Join-Path $customGraderPluginDir "package.json"
 $customGraderTsConfig = Join-Path $customGraderPluginDir "tsconfig.json"
 $customGraderDistEntry = Join-Path $customGraderPluginDir "dist\index.js"
+$vallyCmd = Join-Path $PSScriptRoot "node_modules\.bin\vally.cmd"
+if (-not (Test-Path -LiteralPath $vallyCmd)) {
+    Write-Warning "Local Vally executable not found at $vallyCmd; using 'pnpm exec vally' for this run."
+    $vallyCmd = "pnpm-exec"
+}
 
 $requiresRustCustomGrader = $false
 foreach ($eval in $evalFiles) {
@@ -222,9 +286,19 @@ if ($requiresRustCustomGrader) {
     }
 }
 
-$results = @()
+$results = [System.Collections.Concurrent.ConcurrentBag[object]]::new()
 
-foreach ($evalFile in $evalFiles) {
+$evalFiles | ForEach-Object -ThrottleLimit $Workers -Parallel {
+    $evalFile = $_
+    $resolvedScenariosRoot = $using:resolvedScenariosRoot
+    $resolvedResultsRoot = $using:resolvedResultsRoot
+    $requiresRustCustomGrader = $using:requiresRustCustomGrader
+    $customGraderPluginDir = $using:customGraderPluginDir
+    $JUnit = $using:JUnit
+    $PSScriptRoot = $using:PSScriptRoot
+    $vallyCmd = $using:vallyCmd
+    $results = $using:results
+
     $relativeDir = [System.IO.Path]::GetRelativePath($resolvedScenariosRoot, $evalFile.DirectoryName).TrimStart('\', '/')
     if ([string]::IsNullOrWhiteSpace($relativeDir)) { $relativeDir = "root" }
 
@@ -235,12 +309,29 @@ foreach ($evalFile in $evalFiles) {
     Write-Host "`n=== Running eval: $($evalFile.FullName) ==="
 
     $start = Get-Date
-    $npxArgs = @("vally", "eval", "--eval-spec", $evalFile.FullName, "--output-dir", $scenarioOutDir, "--workers", "$Workers")
+    $npxArgs = @("vally", "eval", "--eval-spec", $evalFile.FullName, "--output-dir", $scenarioOutDir, "--workers", "1")
     if ($requiresRustCustomGrader) { $npxArgs += @("--grader-plugin", $customGraderPluginDir) }
     if ($JUnit) { $npxArgs += "--junit" }
 
-    & pnpm --dir $PSScriptRoot exec @npxArgs
-    $exitCode = $LASTEXITCODE
+    $evalOutput = @()
+    $exitCode = 1
+    $PSNativeCommandUseErrorActionPreference = $false
+    if ($vallyCmd -and $vallyCmd -ne "pnpm-exec") {
+        $evalOutput = & $vallyCmd @npxArgs 2>&1
+        $exitCode = $LASTEXITCODE
+    }
+    else {
+        $evalOutput = & pnpm --dir $PSScriptRoot exec @npxArgs 2>&1
+        $exitCode = $LASTEXITCODE
+    }
+
+    if ($exitCode -ne 0) {
+        Write-Host "Eval failed with exit code ${exitCode}: $($evalFile.FullName)"
+        if ($evalOutput) {
+            $evalOutput | ForEach-Object { Write-Host $_ }
+        }
+    }
+
     $durationSec = [math]::Round(((Get-Date) - $start).TotalSeconds, 1)
 
     $runDir = $null
@@ -265,6 +356,38 @@ foreach ($evalFile in $evalFiles) {
     $passed = if ($summary) { [bool]$summary.passed } else { $exitCode -eq 0 }
 
     $details = ""
+
+    $normalizeDetailText = {
+        param([string]$text)
+
+        if ([string]::IsNullOrEmpty($text)) {
+            return ""
+        }
+
+        # Strip ANSI escape sequences and normalize common status glyphs to ASCII.
+        $normalized = $text -replace "`e\[[0-9;?]*[A-Za-z]", ""
+        $normalized = $normalized -replace "✅", "PASS"
+        $normalized = $normalized -replace "❌", "FAIL"
+        $normalized = $normalized -replace "✔", "PASS"
+        $normalized = $normalized -replace "✗", "FAIL"
+
+        # Remove non-ASCII characters that can render as mojibake in Windows terminals.
+        $normalized = $normalized -replace "[^\u0009\u000A\u000D\u0020-\u007E]", ""
+        $normalized = $normalized -replace "\s+", " "
+
+        return $normalized.Trim()
+    }
+
+    if ($exitCode -ne 0 -and $evalOutput) {
+        $detailLines = $evalOutput |
+        Select-Object -Last 8 |
+        ForEach-Object {
+            & $normalizeDetailText ([string]$_)
+        } |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+
+        $details = ($detailLines -join " | ")
+    }
     if ($summary -and $summary.evals) {
         $detailItems = foreach ($e in $summary.evals) {
             $status = if ($e.passed) { "PASS" } else { "FAIL" }
@@ -281,7 +404,7 @@ foreach ($evalFile in $evalFiles) {
         $details = ($detailItems -join "; ")
     }
 
-    $results += [pscustomobject]@{
+    $results.Add([pscustomobject]@{
         Scenario    = $relativeDir
         EvalSpec    = $evalFile.FullName
         Status      = if ($passed) { "PASS" } else { "FAIL" }
@@ -289,8 +412,10 @@ foreach ($evalFile in $evalFiles) {
         DurationSec = $durationSec
         RunDir      = if ($runDir) { $runDir.FullName } else { "" }
         Details     = $details
-    }
+    })
 }
+
+$results = $results | Sort-Object Scenario
 
 Write-Host "`n=== Vally evaluation summary ==="
 $results | Sort-Object Scenario | Format-Table -AutoSize Scenario, Status, ExitCode, DurationSec, RunDir

@@ -13,18 +13,10 @@ defaults:
 stimuli:
   - name: basic_blob_service_client
     prompt: |-
-      Create a basic Azure Blob Storage example that authenticates with
+      Create a basic Python application which authenticates with
       DefaultAzureCredential and initializes a BlobServiceClient. Then
       create a container client and create the container.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential/client initialization and all storage operations in try/except blocks
-        * Handle: ResourceNotFoundError, ResourceExistsError, AzureError
-        * Example: try: blob_client.upload_blob(data) except ResourceExistsError: pass
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -63,17 +55,9 @@ stimuli:
           scoring: scale_1_5
   - name: upload_blob_with_blob_client
     prompt: |-
-      Upload a local file to Azure Blob Storage using BlobClient.
+      Create a Python application which uploads a local file to Azure Blob Storage using BlobClient.
       Use overwrite=True when uploading.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap credential/client initialization and all storage operations in try/except blocks
-        * Handle: ResourceNotFoundError, ResourceExistsError, AzureError
-        * Example: try: blob_client.upload_blob(data) except ResourceExistsError: pass
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

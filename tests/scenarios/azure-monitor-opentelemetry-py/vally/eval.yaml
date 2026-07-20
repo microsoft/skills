@@ -13,17 +13,9 @@ defaults:
 stimuli:
   - name: one_line_setup
     prompt: |-
-      Provide the minimal one-line setup for Azure Monitor OpenTelemetry in Python.
+      Write a Python application which shows the minimal one-line setup for Azure Monitor OpenTelemetry.
       Use configure_azure_monitor and assume the connection string is in environment variables.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap configure_azure_monitor and app startup in try/except blocks
-        * Handle: AzureError, HttpResponseError, Exception
-        * Example: try: configure_azure_monitor() except Exception as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -62,18 +54,10 @@ stimuli:
           scoring: scale_1_5
   - name: explicit_connection_string
     prompt: |-
-      Show configure_azure_monitor with an explicit connection string passed from
+      Write a Python application which shows configure_azure_monitor with an explicit connection string passed from
       an environment variable. Include InstrumentationKey and IngestionEndpoint
       as part of the connection string value read from the environment.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap configure_azure_monitor and app startup in try/except blocks
-        * Handle: AzureError, HttpResponseError, Exception
-        * Example: try: configure_azure_monitor() except Exception as e: print(f'Error: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -135,4 +119,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-

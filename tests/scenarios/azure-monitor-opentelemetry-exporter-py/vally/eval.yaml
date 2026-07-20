@@ -13,17 +13,9 @@ defaults:
 stimuli:
   - name: trace_exporter_basic
     prompt: |-
-      Create a minimal trace exporter example using AzureMonitorTraceExporter.
+      Write a Python application which shows a minimal trace exporter example using AzureMonitorTraceExporter.
       Use BatchSpanProcessor, TracerProvider, and emit a span.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and query/ingestion operations in try/except blocks
-        * Handle: ServiceError, HttpResponseError, ValidationError, AzureError
-        * Example: try: results = client.query_workspace(query) except HttpResponseError as e: print(f'Query failed: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -62,17 +54,9 @@ stimuli:
           scoring: scale_1_5
   - name: metric_exporter_basic
     prompt: |-
-      Show how to configure AzureMonitorMetricExporter with a
+      Write a Python application which shows how to configure AzureMonitorMetricExporter with a
       PeriodicExportingMetricReader and record a counter metric.
 
-      Output requirements for grading:
-      - Generate Python code, not prose.
-      - Create at least one runnable Python file in the workspace (for example, `main.py`).
-      - Return the final answer as Python code only.
-      - CRITICAL: Include explicit exception handling:
-        * Wrap client initialization and query/ingestion operations in try/except blocks
-        * Handle: ServiceError, HttpResponseError, ValidationError, AzureError
-        * Example: try: results = client.query_workspace(query) except HttpResponseError as e: print(f'Query failed: {e}')
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -134,4 +118,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-
