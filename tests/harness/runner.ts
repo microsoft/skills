@@ -20,8 +20,17 @@ import type {
   GenerationConfig,
   Finding,
 } from "./types.js";
-import { DEFAULT_GENERATION_CONFIG, Severity, createFinding } from "./types.js";
-import { SkillCopilotClient, checkCopilotAvailable } from "./copilot-client.js";
+import {
+  DEFAULT_GENERATION_CONFIG,
+  Severity,
+  createEvaluationResult,
+  createFinding,
+} from "./types.js";
+import {
+  CopilotGenerationError,
+  SkillCopilotClient,
+  checkCopilotAvailable,
+} from "./copilot-client.js";
 import { AcceptanceCriteriaLoader } from "./criteria-loader.js";
 import { CodeEvaluator } from "./evaluator.js";
 import {
@@ -282,19 +291,41 @@ export class SkillEvaluationRunner {
         );
       }
 
-      // Generate code
-      const genResult = await this.copilotClient.generate(
-        scenario.prompt,
-        skillName,
-        suite.config,
-        scenario.name,
-      );
+      let evalResult: EvaluationResult;
 
-      // Evaluate
-      const evalResult = evaluator.evaluate(genResult.code, scenario.name);
+      try {
+        // Generate code
+        const genResult = await this.copilotClient.generate(
+          scenario.prompt,
+          skillName,
+          suite.config,
+          scenario.name,
+        );
 
-      // Add scenario-specific checks
-      this.checkScenarioPatterns(evalResult, scenario, genResult.code);
+        // Evaluate
+        evalResult = evaluator.evaluate(genResult.code, scenario.name);
+        evalResult.rawResponse = genResult.rawResponse;
+
+        // Add scenario-specific checks
+        this.checkScenarioPatterns(evalResult, scenario, genResult.code);
+      } catch (error) {
+        const kind =
+          error instanceof CopilotGenerationError ? error.kind : "fatal";
+        const message = error instanceof Error ? error.message : String(error);
+
+        evalResult = createEvaluationResult(skillName, scenario.name, "");
+        evalResult.passed = false;
+        evalResult.errorCount = 1;
+        evalResult.score = 0;
+        evalResult.findings.push(
+          createFinding({
+            severity: Severity.ERROR,
+            rule: `runtime:${kind}`,
+            message: `Code generation failed (${kind}): ${message}`,
+            suggestion: this.getGenerationFailureSuggestion(kind),
+          }),
+        );
+      }
 
       results.push(evalResult);
 
@@ -391,6 +422,21 @@ export class SkillEvaluationRunner {
         return chalk.blue;
       default:
         return chalk.white;
+    }
+  }
+
+  private getGenerationFailureSuggestion(
+    kind: "timeout" | "auth" | "transient" | "fatal",
+  ): string {
+    switch (kind) {
+      case "timeout":
+        return "Retry with HARNESS_COPILOT_TIMEOUT_MS set higher (for example 240000), or re-run this scenario.";
+      case "auth":
+        return "Refresh GitHub authentication (gh auth login) or set GH_TOKEN/GITHUB_TOKEN with valid Copilot access.";
+      case "transient":
+        return "This looks transient; retry the run. If it repeats, verify network stability and API availability.";
+      default:
+        return "Inspect diagnostics and rerun with --verbose for additional context.";
     }
   }
 
@@ -621,6 +667,7 @@ function summaryToDict(summary: EvaluationSummary): Record<string, unknown> {
       skill_name: r.skillName,
       scenario: r.scenario,
       generated_code: r.generatedCode,
+      raw_response: r.rawResponse,
       passed: r.passed,
       score: r.score,
       error_count: r.errorCount,
@@ -770,6 +817,7 @@ function convertRalphToSummary(ralph: RalphLoopSummary): EvaluationSummary {
         skillName: ralph.skillName,
         scenario: scenarioName,
         generatedCode: lastIteration.generatedCode,
+        rawResponse: "",
         findings: lastIteration.findings,
         matchedCorrect: [],
         matchedIncorrect: [],
@@ -813,6 +861,8 @@ interface CLIOptions {
   threshold?: number;
 }
 
+type CliErrorKind = "timeout" | "auth" | "transient" | "fatal";
+
 interface AllSkillsSummary {
   totalSkills: number;
   passedSkills: number;
@@ -824,6 +874,52 @@ interface AllSkillsSummary {
   durationMs: number;
   mode: string;
   skills: EvaluationSummary[];
+}
+
+function classifyCliError(error: unknown): CliErrorKind {
+  if (error instanceof CopilotGenerationError) {
+    return error.kind;
+  }
+
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (
+    message.includes("authentication failed") ||
+    message.includes("bad credentials") ||
+    message.includes("401")
+  ) {
+    return "auth";
+  }
+  if (message.includes("timeout") || message.includes("session.idle")) {
+    return "timeout";
+  }
+  if (message.includes("rate limit") || message.includes("429")) {
+    return "transient";
+  }
+  return "fatal";
+}
+
+function writeCliErrorOutput(
+  options: CLIOptions,
+  skillName: string | undefined,
+  error: unknown,
+): void {
+  const message = error instanceof Error ? error.message : String(error);
+  const payload = {
+    status: "ERROR",
+    error_kind: classifyCliError(error),
+    error: message,
+    skill: skillName ?? null,
+    timestamp: new Date().toISOString(),
+  };
+  const output = JSON.stringify(payload, null, 2);
+
+  if (options.outputFile) {
+    writeFileSync(options.outputFile, output);
+    console.log(`Results written to: ${options.outputFile}`);
+    return;
+  }
+
+  console.log(output);
 }
 
 async function main(): Promise<number> {
@@ -1087,6 +1183,10 @@ async function main(): Promise<number> {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    if (options.output === "json") {
+      writeCliErrorOutput(options, skillArg, err);
+      return 1;
+    }
     console.log(chalk.red(`Error: ${message}`));
     return 1;
   }

@@ -347,7 +347,7 @@ if __name__ == "__main__":
 
 ## Best Practices
 
-1. **This SDK is async-first** — use `async def` handlers and `async with` throughout.
+1. **This SDK is async-first — use `async def` handlers and `async with` throughout.**
 2. **Always use context managers for clients and async credentials.** Wrap every client in `with Client(...) as client:` (sync) or `async with Client(...) as client:` (async). For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
 
 ## Reference Files

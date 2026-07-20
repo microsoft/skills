@@ -1,0 +1,190 @@
+name: Vally Workflow Evaluation
+
+on:
+  pull_request:
+    paths:
+      - "tests/scenarios/**/vally/**"
+      - ".github/workflows/run-vally-evaluations.yml"
+  push:
+    branches: [main]
+    paths:
+      - "tests/scenarios/**/vally/**"
+      - ".github/workflows/run-vally-evaluations.yml"
+  workflow_dispatch:
+    inputs:
+      eval_spec:
+        description: "Optional path to a specific eval spec file (for example tests/scenarios/azure-storage-blob-rust/vally/eval.yaml)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  # eval.yaml's `executor: copilot-sdk` makes vally spawn the real GitHub
+  # Copilot CLI (`@github/copilot`, pulled in transitively via the vally npm
+  # dependency tree -- no extra install step needed) to run each stimulus.
+  # That CLI authenticates via the GH_TOKEN/GITHUB_TOKEN env var, which
+  # requires the GITHUB_TOKEN to carry the "Copilot Requests" permission.
+  copilot-requests: write
+
+jobs:
+  vally:
+    runs-on: ubuntu-latest
+    env:
+      # Authenticates Copilot CLI and Vally's Copilot SDK evaluator path.
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_COPILOT_API_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Install Vally CLI
+        run: npm install -g @microsoft/vally-cli@0.7.0
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Verify Vally CLI
+        run: vally --version
+
+      - name: Resolve eval specs
+        id: specs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          collect_from_changed_dirs() {
+            local base_ref="$1"
+            local head_ref="$2"
+
+            local changed
+            changed=$(git diff --name-only "$base_ref" "$head_ref" -- 'tests/scenarios/**/vally/**' || true)
+
+            if [ -z "$changed" ]; then
+              return 0
+            fi
+
+            if echo "$changed" | grep -qE '^tests/scenarios/_shared/vally/'; then
+              find tests/scenarios -type f \( -name 'eval.yaml' -o -name 'eval.yml' \) -path '*/vally/*' \
+                | grep -vE '^tests/scenarios/_shared/' \
+                | sort -u
+              return 0
+            fi
+
+            echo "$changed" \
+              | grep -E '^tests/scenarios/[^/]+/vally/' \
+              | sed -E 's|^(tests/scenarios/[^/]+/vally)/.*|\1|' \
+              | sort -u \
+              | while read -r dir; do
+                  if [ -f "$dir/eval.yaml" ]; then
+                    echo "$dir/eval.yaml"
+                  elif [ -f "$dir/eval.yml" ]; then
+                    echo "$dir/eval.yml"
+                  fi
+                done
+          }
+
+          specs_file=$(mktemp)
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ -n "${{ inputs.eval_spec }}" ]; then
+              echo "${{ inputs.eval_spec }}" > "$specs_file"
+            else
+              find tests/scenarios -type f \( -name 'eval.yaml' -o -name 'eval.yml' \) -path '*/vally/*' | sort -u > "$specs_file"
+            fi
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            collect_from_changed_dirs "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" | sort -u > "$specs_file"
+          else
+            base_sha="${{ github.event.before }}"
+            if [ -z "$base_sha" ] || [ "$base_sha" = '0000000000000000000000000000000000000000' ]; then
+              find tests/scenarios -type f \( -name 'eval.yaml' -o -name 'eval.yml' \) -path '*/vally/*' | sort -u > "$specs_file"
+            else
+              collect_from_changed_dirs "$base_sha" "${{ github.sha }}" | sort -u > "$specs_file"
+            fi
+          fi
+
+          if [ -s "$specs_file" ]; then
+            echo "has_specs=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "specs<<EOF"
+              cat "$specs_file"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "Resolved eval specs:"
+            cat "$specs_file"
+          else
+            echo "has_specs=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "specs<<EOF"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "No eval specs resolved from this event."
+          fi
+
+      - name: Build rust-cargo-build-failure grader plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure
+          npm install
+          npm run build
+
+      - name: Lint Vally eval specs
+        if: ${{ steps.specs.outputs.has_specs == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t SPECS <<< "${{ steps.specs.outputs.specs }}"
+          for spec in "${SPECS[@]}"; do
+            [ -n "$spec" ] || continue
+            echo "Linting $spec"
+            vally lint --eval-spec "$spec" \
+              --grader-plugin "$GITHUB_WORKSPACE/tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure" \
+              --strict
+          done
+
+      - name: Vally PR scope notice (same-repo)
+        if: ${{ steps.specs.outputs.has_specs == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          echo "::notice::Running Vally evaluations for same-repo PR from ${{ github.event.pull_request.head.repo.full_name }}."
+
+      - name: Vally PR scope notice (cross-repo)
+        if: ${{ steps.specs.outputs.has_specs == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          echo "::notice::Skipping Vally evaluations for cross-repo PR from ${{ github.event.pull_request.head.repo.full_name }} to ${{ github.repository }}. Evaluation runs only on same-repo PRs and non-PR events."
+
+      - name: Run Vally evaluations
+        if: ${{ steps.specs.outputs.has_specs == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p vally-results
+          mapfile -t SPECS <<< "${{ steps.specs.outputs.specs }}"
+
+          args=()
+          for spec in "${SPECS[@]}"; do
+            [ -n "$spec" ] || continue
+            args+=( -e "$spec" )
+          done
+
+          echo "Running Vally eval for ${#args[@]} argument entries"
+          vally eval "${args[@]}" \
+            --grader-plugin "$GITHUB_WORKSPACE/tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure" \
+            --junit --output-dir vally-results --workers 2
+
+      - name: Upload Vally artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vally-results
+          path: |
+            vally-results
+          if-no-files-found: ignore

@@ -12,6 +12,10 @@
 #>
 
 $ErrorActionPreference = "Stop"
+
+# Tag azd telemetry
+$env:AZURE_DEV_USER_AGENT = "microsoft_foundry_skill"
+
 $actionRequired = $false
 
 function Note-Ok     { param([string]$m) Write-Output "[OK] $m" }

@@ -127,7 +127,7 @@ Read, update, enable/disable, manually dispatch, inspect past runs, and delete a
 
 - [CLI CRUD and Operations](references/cli-crud.md)
 - [Declarative Routines](references/azure-yaml.md)
-- [azd ai CLI Reference](../create/references/azd-ai-cli.md)
+- [azd ai CLI Reference](../azd-guidance/references/azd-ai-cli.md)
 - [Deploy a Foundry Agent](../deploy/deploy.md) - deploy the agent a routine will invoke
 - [Invoke a Foundry Agent](../invoke/invoke.md) - smoke-test the agent before scheduling it
 - [Microsoft Foundry Skill (index)](../../SKILL.md)

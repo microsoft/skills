@@ -97,3 +97,10 @@ with ConversationAnalysisClient(endpoint, credential) as client:
     )
 
     print(f"Top intent: {result['result']['prediction']['topIntent']}")
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

@@ -273,3 +273,10 @@ for manifest in client.list_manifest_properties("my-image"):
 7. **Use async client** for high-throughput operations
 8. **Order by last_updated** to find recent/old images
 9. **Check manifest.tags** before deleting to avoid removing tagged images
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

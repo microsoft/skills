@@ -223,7 +223,7 @@ async def test_get_project_by_id_returns_project(mock_cosmos_container):
 
 ## Best Practices
 
-1. **This skill uses async throughout (`azure.cosmos.aio`); do not mix with the sync `azure.cosmos` client.** Keep the whole FastAPI request path async — don't pair sync Cosmos calls with async handlers.
+1. **Pick sync OR async and stay consistent.** Do not mix `azure.xxx` sync clients with `azure.xxx.aio` async clients in the same call path. Choose one mode per module.
 2. **Always use context managers for clients and async credentials.** Wrap the client in `async with CosmosClient(...) as client:` (or manage its lifetime via FastAPI lifespan and close it explicitly). For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
 
 ## Reference Files

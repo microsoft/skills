@@ -7,7 +7,8 @@
 # GitHub Copilot app, from two deterministic facts:
 #   * copilot_app      - is AI_AGENT=github_copilot_app_agent?
 #   * canvas_installed - is the Foundry Agent Canvas (foundry-agent-canvas)
-#                        installed in the project, user, or session location?
+#                        installed in the project, user, session, or
+#                        plugin-contributed location?
 #
 # Output: summary lines, each prefixed with [OK], [WARN], or [ACTION].
 # Exit code: 0 when the gate does not apply (not in the app, or the canvas is not
@@ -27,7 +28,7 @@ fi
 
 echo "[OK] GitHub Copilot app detected (AI_AGENT=github_copilot_app_agent)."
 
-# Candidate install locations: project (repo), user, session.
+# Candidate install locations: project (repo), user, session, and plugin-contributed.
 dirs=()
 root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [ -n "$root" ] && dirs+=("$root/.github/extensions/$ext")
@@ -41,6 +42,15 @@ installed_at=""
 for d in "${dirs[@]}"; do
   if [ -f "$d/extension.mjs" ]; then installed_at="$d"; break; fi
 done
+
+# Plugin-contributed extensions live under ~/.copilot/installed-plugins/<repo>/<plugin>/...
+# The layout varies (some nest the extension under an extensions/ subfolder, others place it
+# directly), but the leaf directory holding extension.mjs is always named after the extension.
+plugin_root="$home_dir/.copilot/installed-plugins"
+if [ -z "$installed_at" ] && [ -n "$home_dir" ] && [ -d "$plugin_root" ]; then
+  mjs="$(find "$plugin_root" -maxdepth 6 -type f -name extension.mjs -path "*/$ext/extension.mjs" -print -quit 2>/dev/null)"
+  [ -n "$mjs" ] && installed_at="$(dirname "$mjs")"
+fi
 
 if [ -z "$installed_at" ]; then
   echo "[WARN] Foundry Agent Canvas is not installed -- canvas-first gate does not apply; continue with the normal create workflow."

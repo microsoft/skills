@@ -298,3 +298,10 @@ async def translate_text():
 7. **Handle profanity** appropriately for your application
 8. **Use html text_type** when translating HTML content
 9. **Include alignment** for applications needing word mapping
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

@@ -329,7 +329,7 @@ except ConnectionError as e:
 
 ## Best Practices
 
-1. **This SDK is async-only; use `azure.ai.voicelive.aio` throughout.** Do not try to pair it with sync clients from other Azure SDKs in the same call path — keep the whole request path async.
+1. **This SDK is async-only; use the `.aio` namespace throughout.** Do not try to pair it with sync clients from other Azure SDKs in the same call path — keep the whole request path async.
 2. **Always use context managers for clients and async credentials.** Wrap every connection in `async with connect(...) as conn:`. For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
 
 ## References

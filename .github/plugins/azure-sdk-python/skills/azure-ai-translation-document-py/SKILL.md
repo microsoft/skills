@@ -276,3 +276,10 @@ async def translate_documents():
 7. **Separate target containers** for each language
 8. **Use async client** for multiple concurrent jobs
 9. **Check supported formats** before submitting documents
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

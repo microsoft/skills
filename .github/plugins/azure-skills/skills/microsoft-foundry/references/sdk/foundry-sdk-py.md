@@ -150,7 +150,7 @@ agent = project_client.agents.create_version(
 )
 ```
 
-> 💡 **Tip:** `WebSearchPreviewTool` requires no external resource or connection. For Bing Grounding (which requires a dedicated Bing resource and project connection), see [Bing Grounding reference](../../foundry-agent/create/references/tool-bing-grounding.md).
+> 💡 **Tip:** `WebSearchPreviewTool` requires no external resource or connection. For Bing Grounding (which requires a dedicated Bing resource and project connection), see [Bing Grounding reference](../../foundry-agent/create/references/tools/prompt-agent/tool-bing-grounding.md).
 
 ### Interacting with Agents
 

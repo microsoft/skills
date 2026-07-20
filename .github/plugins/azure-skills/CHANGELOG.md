@@ -1,5 +1,49 @@
 # Changelog
 
+## 1.1.104
+
+- feat: set azd user agent env ([#2882](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2882))
+
+## 1.1.103
+
+- fix: split prompt-agent tool references into tools/prompt-agent/ ([#2857](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2857))
+
+## 1.1.102
+
+- feat: replace azure-validate AZCLI/Bicep validation steps with a shared script ([#2856](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2856))
+
+## 1.1.101
+
+- feat: replace azure-validate Aspire Functions secret-storage scan with a script ([#2854](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2854))
+
+## 1.1.100
+
+- feat: replace azure-validate Aspire ACA env-var setup with a script ([#2855](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2855))
+
+## 1.1.99
+
+- feat: script-ify Terraform validation preflight sequence (azure-validate) ([#2862](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2862))
+
+## 1.1.98
+
+- fix: improve canvas-entry gate logic and add plugin-contributed extension detection ([#2866](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2866))
+
+## 1.1.97
+
+- fix(microsoft-foundry): support user-entra-token auth for incoming a2a ([#2858](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2858))
+
+## 1.1.96
+
+- feature: retire azure-rbac skill ([#2779](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2779))
+
+## 1.1.95
+
+- fix(microsoft-foundry): hosted agents call incoming A2A agent ([#2846](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2846))
+
+## 1.1.94
+
+- feat: align the Microsoft Foundry skill with the latest azd behavior ([#2844](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2844))
+
 ## 1.1.93
 
 - feat: add cicd sub skill ([#2838](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2838))

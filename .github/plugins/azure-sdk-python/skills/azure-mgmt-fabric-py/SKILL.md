@@ -280,3 +280,10 @@ capacity = poller.result()
 8. **Handle LRO properly** — don't assume immediate completion
 9. **Set up capacity admins** — specify users who can manage workspaces
 10. **Monitor capacity usage** via Azure Monitor metrics
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

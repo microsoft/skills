@@ -16,6 +16,73 @@ import type {
 import { DEFAULT_GENERATION_CONFIG } from "./types.js";
 import { CopilotClient as SDKCopilotClient } from "@github/copilot-sdk";
 
+export type CopilotGenerationErrorKind =
+  | "timeout"
+  | "auth"
+  | "transient"
+  | "fatal";
+
+export class CopilotGenerationError extends Error {
+  readonly kind: CopilotGenerationErrorKind;
+  readonly retryable: boolean;
+
+  constructor(
+    kind: CopilotGenerationErrorKind,
+    message: string,
+    retryable: boolean,
+  ) {
+    super(message);
+    this.name = "CopilotGenerationError";
+    this.kind = kind;
+    this.retryable = retryable;
+  }
+}
+
+export function classifyCopilotError(error: unknown): CopilotGenerationError {
+  if (error instanceof CopilotGenerationError) {
+    return error;
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("authentication failed") ||
+    normalized.includes("bad credentials") ||
+    normalized.includes("failed to fetch github cli user login") ||
+    normalized.includes("401")
+  ) {
+    return new CopilotGenerationError("auth", message, false);
+  }
+
+  if (
+    normalized.includes("timeout") ||
+    normalized.includes("session.idle") ||
+    normalized.includes("timed out")
+  ) {
+    return new CopilotGenerationError("timeout", message, true);
+  }
+
+  if (
+    normalized.includes("429") ||
+    normalized.includes("rate limit") ||
+    normalized.includes("econnreset") ||
+    normalized.includes("etimedout") ||
+    normalized.includes("enotfound") ||
+    normalized.includes("socket hang up") ||
+    normalized.includes("temporarily unavailable") ||
+    normalized.includes("service unavailable")
+  ) {
+    return new CopilotGenerationError("transient", message, true);
+  }
+
+  return new CopilotGenerationError("fatal", message, false);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
+}
+
 // =============================================================================
 // Mock Client
 // =============================================================================
@@ -85,6 +152,8 @@ export class MockCopilotClient implements CopilotClient {
 export class SkillCopilotClient implements CopilotClient {
   private static readonly SKILLS_DIR = ".github/skills";
   private static readonly PLUGINS_DIR = ".github/plugins";
+  private static readonly DEFAULT_TIMEOUT_MS = 120000;
+  private static readonly DEFAULT_MAX_RETRIES = 2;
 
   private basePath: string;
   private skillsDir: string;
@@ -227,23 +296,28 @@ Generate only code. Follow the patterns from the skill documentation exactly.
   ): Promise<GenerationResult> {
     const startTime = Date.now();
     const fullPrompt = this.buildPrompt(prompt, skillContext);
+    const timeoutMs = this.getTimeoutMs();
+    const maxRetries = this.getMaxRetries();
 
-    const client = new SDKCopilotClient();
-
-    let rawResponse = "";
-
-    try {
-      const session = await client.createSession({
-        model: config.model,
-      });
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const client = new SDKCopilotClient();
+      let session: unknown;
 
       try {
-        const response = await session.sendAndWait(
-          { prompt: fullPrompt },
-          120000,
-        );
+        session = await client.createSession({
+          model: config.model,
+        });
 
-        rawResponse = response?.data?.content ?? "";
+        const response = await (
+          session as {
+            sendAndWait: (
+              request: { prompt: string },
+              timeout: number,
+            ) => Promise<{ data?: { content?: string } }>;
+          }
+        ).sendAndWait({ prompt: fullPrompt }, timeoutMs);
+
+        const rawResponse = response?.data?.content ?? "";
         const code = this.extractCode(rawResponse);
 
         return {
@@ -255,20 +329,51 @@ Generate only code. Follow the patterns from the skill documentation exactly.
           durationMs: Date.now() - startTime,
           rawResponse,
         };
+      } catch (error) {
+        const classified = classifyCopilotError(error);
+        if (!classified.retryable || attempt === maxRetries) {
+          throw classified;
+        }
+
+        // Exponential backoff with jitter for transient SDK/network failures.
+        const backoffMs = Math.min(1000 * 2 ** attempt, 8000);
+        const jitterMs = Math.floor(Math.random() * 300);
+        await sleep(backoffMs + jitterMs);
       } finally {
-        const s = session as unknown as {
+        const s = session as {
           disconnect?: () => Promise<void>;
           destroy?: () => Promise<void>;
         };
-        if (typeof s.disconnect === "function") {
+        if (s && typeof s.disconnect === "function") {
           await s.disconnect();
-        } else if (typeof s.destroy === "function") {
+        } else if (s && typeof s.destroy === "function") {
           await s.destroy();
         }
+        await client.stop();
       }
-    } finally {
-      await client.stop();
     }
+
+    throw new CopilotGenerationError(
+      "fatal",
+      "Code generation failed after all retry attempts.",
+      false,
+    );
+  }
+
+  private getTimeoutMs(): number {
+    const raw = process.env["HARNESS_COPILOT_TIMEOUT_MS"];
+    const parsed = raw ? Number.parseInt(raw, 10) : NaN;
+    return Number.isFinite(parsed) && parsed > 0
+      ? parsed
+      : SkillCopilotClient.DEFAULT_TIMEOUT_MS;
+  }
+
+  private getMaxRetries(): number {
+    const raw = process.env["HARNESS_COPILOT_MAX_RETRIES"];
+    const parsed = raw ? Number.parseInt(raw, 10) : NaN;
+    return Number.isFinite(parsed) && parsed >= 0
+      ? parsed
+      : SkillCopilotClient.DEFAULT_MAX_RETRIES;
   }
 
   /**
@@ -295,9 +400,12 @@ Generate only code. Follow the patterns from the skill documentation exactly.
     const codeLines: string[] = [];
     let inCode = false;
 
+    const assignmentRegex = /^[A-Za-z_][A-Za-z0-9_]*\s*=\s*.+$/;
+    const callStartRegex = /^[A-Za-z_][A-Za-z0-9_.]*\s*\(.+$/;
+
     for (const line of lines) {
-      // Heuristic: lines starting with import, def, class, or indented
-      if (
+      const trimmed = line.trim();
+      const isCodeLikeLine =
         line.startsWith("import ") ||
         line.startsWith("from ") ||
         line.startsWith("def ") ||
@@ -307,8 +415,12 @@ Generate only code. Follow the patterns from the skill documentation exactly.
         line.startsWith("let ") ||
         line.startsWith("using ") ||
         line.startsWith("    ") ||
-        line.startsWith("\t")
-      ) {
+        line.startsWith("\t") ||
+        assignmentRegex.test(trimmed) ||
+        callStartRegex.test(trimmed);
+
+      // Heuristic: lines starting with import, def, class, or indented
+      if (isCodeLikeLine) {
         inCode = true;
         codeLines.push(line);
       } else if (inCode && line.trim() === "") {

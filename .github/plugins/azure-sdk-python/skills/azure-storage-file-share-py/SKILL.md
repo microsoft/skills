@@ -243,3 +243,10 @@ async def upload_file():
 6. **Create snapshots** before major changes
 7. **Set quotas** to prevent unexpected storage costs
 8. **Use ranges** for partial file updates
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

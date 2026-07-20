@@ -7,7 +7,7 @@ Reference for wiring a **remote tool** (catalog tile or generic MCP server) into
 Three catalog backends cooperate: the **asset-gallery** index discovers connectors, the Logic Apps **managedApis** GET supplies OAuth metadata, and the Logic Apps **apiOperations** GET supplies the operation list and input schemas. Skip these calls only for fully BYO `generic_mcp` servers — every catalog-MCP or connector-namespace flow needs all three.
 
 > 📘 For the toolbox MCP endpoint, protocol, and testing, see [toolbox-reference.md](toolbox-reference.md).
-> 📘 For prompt-agent MCP wiring (without a toolbox), see [tool-mcp.md](tool-mcp.md).
+> 📘 For prompt-agent MCP wiring (without a toolbox), see [tool-mcp.md](tools/prompt-agent/tool-mcp.md).
 
 ## When to use this reference
 
@@ -703,7 +703,7 @@ The response body for `/mcp` is plain JSON (no SSE `data:` framing) despite the 
 - [Toolbox (preview)](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/toolbox)
 - [Private tools catalog](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-catalog#private-tools-catalog)
 - [Cognitive Services projects REST API](https://learn.microsoft.com/rest/api/aiservices/)
-- [tool-mcp.md](tool-mcp.md) — prompt-agent MCP wiring (no toolbox)
+- [tool-mcp.md](tools/prompt-agent/tool-mcp.md) — prompt-agent MCP wiring (no toolbox)
 - [toolbox-reference.md](toolbox-reference.md) — MCP endpoint, auth, testing, troubleshooting
-- [agent-tools.md](agent-tools.md) — the agent-tools index
+- [agent-tools.md](tools/prompt-agent/agent-tools.md) — the agent-tools index
 - [use-toolbox-in-hosted-agent.md](use-toolbox-in-hosted-agent.md) — wiring a toolbox into a hosted agent

@@ -186,15 +186,15 @@ user_connected = client.user_exists(user_id="user123")
 group_has_connections = client.group_exists(group="my-group")
 
 client.close_connection(connection_id="abc123", reason="Session ended")
-client.close_all_connections(user_id="user123")
+client.close_user_connections(user_id="user123", reason="Session ended")
 ```
 
 ### 6.2 Anti-Patterns (ERRORS)
 
-#### ❌ INCORRECT: Wrong parameter name
+#### ❌ INCORRECT: Wrong method for closing a user's connections
 ```python
-# WRONG - close_all_connections requires user_id
-client.close_all_connections(connection_id="abc123")
+# WRONG - close_all_connections does not accept user_id; use close_user_connections instead
+client.close_all_connections(user_id="user123")
 ```
 
 ---
