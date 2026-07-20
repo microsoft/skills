@@ -13,7 +13,14 @@ defaults:
 stimuli:
   - name: core_workflow
     prompt: |-
-      Write a Python application that demonstrates the core workflow for the azure-ai-transcription-py skill using the official SDK patterns, environment variables, and explicit error handling.
+      Write a Python application that submits a batch transcription job using the
+      Azure AI Transcription SDK. The application should:
+      - Authenticate using DefaultAzureCredential and the TRANSCRIPTION_ENDPOINT environment variable
+      - Initialize a TranscriptionClient using a context manager
+      - Submit a batch transcription job for an audio file URL (use a placeholder URL)
+        with locale "en-US" and diarization enabled
+      - Poll for job completion using job.result()
+      - Print the transcription status and handle errors with explicit try/except
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

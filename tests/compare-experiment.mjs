@@ -284,7 +284,7 @@ divider();
 const tokenDelta = pct(sS.totalTokens,   bS.totalTokens).trim();
 const timeDelta  = pct(sS.wallTimeSec,   bS.wallTimeSec).trim();
 const scoreDelta = pct(sS.avgScore,      bS.avgScore).trim();
-const bothPass   = bS.passRate >= 1 && sS.passRate >= 1;
+const bothPass   = !!(bData.summary.passed) && !!(sData.summary.passed);
 
 console.log('\nVERDICT');
 console.log(`Both runs passed threshold : ${bothPass}`);

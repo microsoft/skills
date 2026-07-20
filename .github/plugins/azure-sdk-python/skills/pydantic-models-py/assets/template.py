@@ -1,11 +1,7 @@
 """
-ResourceName Models
+{{ResourceName}} Models
 
-Pydantic models for resource_name resource following the multi-model pattern.
-
-Template placeholders to replace:
-- ResourceName (PascalCase)
-- resource_name (snake_case)
+Pydantic models for {{resource_name}} resource following the multi-model pattern.
 """
 
 from datetime import datetime
@@ -18,7 +14,7 @@ from pydantic import BaseModel, Field
 # ============================================================================
 
 
-class ResourceNameBase(BaseModel):
+class {{ResourceName}}Base(BaseModel):
     """
     Base model with common fields.
 
@@ -29,7 +25,7 @@ class ResourceNameBase(BaseModel):
         ...,
         min_length=1,
         max_length=200,
-        description="Display name for the resource_name",
+        description="Display name for the {{resource_name}}",
     )
     description: Optional[str] = Field(
         None,
@@ -47,9 +43,9 @@ class ResourceNameBase(BaseModel):
 # ============================================================================
 
 
-class ResourceNameCreate(ResourceNameBase):
+class {{ResourceName}}Create({{ResourceName}}Base):
     """
-    Request model for creating a new resource_name.
+    Request model for creating a new {{resource_name}}.
 
     Includes all required fields for creation.
     """
@@ -67,7 +63,7 @@ class ResourceNameCreate(ResourceNameBase):
 # ============================================================================
 
 
-class ResourceNameUpdate(BaseModel):
+class {{ResourceName}}Update(BaseModel):
     """
     Request model for partial updates.
 
@@ -94,7 +90,7 @@ class ResourceNameUpdate(BaseModel):
 # ============================================================================
 
 
-class ResourceName(ResourceNameBase):
+class {{ResourceName}}({{ResourceName}}Base):
     """
     Response model with all fields.
 
@@ -118,7 +114,7 @@ class ResourceName(ResourceNameBase):
 # ============================================================================
 
 
-class ResourceNameInDB(ResourceName):
+class {{ResourceName}}InDB({{ResourceName}}):
     """
     Database document model.
 

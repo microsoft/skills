@@ -19,7 +19,7 @@ stimuli:
       CRITICAL: Include explicit exception handling:
         * Wrap credential/client initialization and all storage operations in try/except blocks
         * Handle: ResourceNotFoundError, ResourceExistsError, AzureError
-        * Example: try: blob_client.upload_blob(data) except ResourceExistsError: pass
+        * Example: try: share_client.create_share() except ResourceExistsError: pass
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

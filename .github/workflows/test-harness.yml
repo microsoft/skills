@@ -16,7 +16,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 11.10.0
 
       - uses: actions/setup-node@v4
         with:
@@ -42,6 +42,9 @@ jobs:
       - name: Validate Rust skill syntax
         run: |
           python .github/scripts/check_skill_rust_syntax.py
+
+      - name: Install Python dependencies
+        run: pip install -r tests/requirements.txt
 
       - name: Install dependencies
         working-directory: tests

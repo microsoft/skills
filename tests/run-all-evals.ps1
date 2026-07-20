@@ -309,19 +309,19 @@ $evalFiles | ForEach-Object -ThrottleLimit $Workers -Parallel {
     Write-Host "`n=== Running eval: $($evalFile.FullName) ==="
 
     $start = Get-Date
-    $npxArgs = @("vally", "eval", "--eval-spec", $evalFile.FullName, "--output-dir", $scenarioOutDir, "--workers", "1")
-    if ($requiresRustCustomGrader) { $npxArgs += @("--grader-plugin", $customGraderPluginDir) }
-    if ($JUnit) { $npxArgs += "--junit" }
+    $vallyArgs = @("eval", "--eval-spec", $evalFile.FullName, "--output-dir", $scenarioOutDir, "--workers", "1")
+    if ($requiresRustCustomGrader) { $vallyArgs += @("--grader-plugin", $customGraderPluginDir) }
+    if ($JUnit) { $vallyArgs += "--junit" }
 
     $evalOutput = @()
     $exitCode = 1
     $PSNativeCommandUseErrorActionPreference = $false
     if ($vallyCmd -and $vallyCmd -ne "pnpm-exec") {
-        $evalOutput = & $vallyCmd @npxArgs 2>&1
+        $evalOutput = & $vallyCmd @vallyArgs 2>&1
         $exitCode = $LASTEXITCODE
     }
     else {
-        $evalOutput = & pnpm --dir $PSScriptRoot exec @npxArgs 2>&1
+        $evalOutput = & pnpm --dir $PSScriptRoot exec vally @vallyArgs 2>&1
         $exitCode = $LASTEXITCODE
     }
 

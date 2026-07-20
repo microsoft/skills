@@ -53,8 +53,9 @@ stimuli:
   - name: language_detection
     prompt: |-
       Write a Python application that detects the language of provided text using the
-      Azure AI Text Translation service. Show both automatic detection via
-      translate and explicit detection via the detect method.
+      Azure AI Text Translation service. Use the translate method with the source
+      language omitted to trigger automatic language detection, and print the detected
+      source language from the translation result.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
