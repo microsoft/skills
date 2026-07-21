@@ -19,8 +19,11 @@ PY_FENCE_RE = re.compile(r"```(?:python|py)\n(.*?)\n```", re.S)
 
 
 def check_python_file(path: Path, repo_root: Path, errors: list[str]) -> int:
+    content = path.read_text(encoding="utf-8")
+    if "{{" in content:
+        return 0  # skip template files with placeholder syntax
     try:
-        ast.parse(path.read_text(encoding="utf-8"))
+        ast.parse(content)
         return 1
     except SyntaxError as exc:
         rel = path.relative_to(repo_root).as_posix()
