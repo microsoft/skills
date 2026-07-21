@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.105
+
+- feat: Migrate VM Troubleshooter workflow to azure-diagnostics ([#2859](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2859))
+
 ## 1.1.104
 
 - feat: set azd user agent env ([#2882](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2882))
