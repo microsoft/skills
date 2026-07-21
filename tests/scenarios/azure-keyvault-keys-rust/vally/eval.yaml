@@ -9,7 +9,7 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
-  grader_model: gpt-5.5
+  judge_model: gpt-5.5
 stimuli:
   - name: rust-keyvault-keys-operations
     prompt: |
