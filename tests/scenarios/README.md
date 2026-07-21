@@ -15,7 +15,7 @@ This directory contains per-skill Vally evaluation scenarios used to validate sk
 
 Install and configure the following tools before running evaluations:
 
-1. Node.js 20+
+1. Node.js 20.17+
 2. Corepack enabled
 3. pnpm version pinned by tests/package.json
 4. Dependencies installed in tests/
