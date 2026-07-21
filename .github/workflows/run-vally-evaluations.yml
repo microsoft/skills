@@ -44,17 +44,13 @@ jobs:
           node-version: "24"
 
       - name: Install Vally CLI
-<<<<<<< HEAD:.github/workflows/vally-evaluation.yml
-        run: npm install -g @microsoft/vally-cli@0.9.0
-=======
-        run: npm install -g @microsoft/vally-cli@0.7.0
+        run: npm install -g @microsoft/vally-cli@0.10.0
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
->>>>>>> main:.github/workflows/run-vally-evaluations.yml
 
       - name: Verify Vally CLI
         run: vally --version
