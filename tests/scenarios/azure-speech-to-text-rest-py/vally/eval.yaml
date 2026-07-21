@@ -29,6 +29,8 @@ stimuli:
 
       Keep credentials in environment variables and avoid hardcoded secrets.
 
+      Save the code to a file named `speech_to_text_core_workflow.py` in the workspace.
+
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

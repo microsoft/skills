@@ -55,6 +55,7 @@ stimuli:
       Write a Python application which shows the legacy API-key authentication path for an existing keyed deployment.
       Use AzureKeyCredential with ConversationAnalysisClient in a context manager.
       Mention this path is for existing deployments.
+      Save the code to a file named `clu_legacy_api_key.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

@@ -57,6 +57,7 @@ stimuli:
     prompt: |-
       Use DefaultAzureCredential with a ShareServiceClient and account_url.
       Create a share client, create a directory, and clean up the share.
+      Save the code to a file named `service_client_default_azure_credential.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Write a python program which demonstrates a minimal example using DefaultAzureCredential to request a token
       for https://management.azure.com/.default.
+      Save the code to a file named `default_credential_basic.py` in the workspace.
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
@@ -55,6 +56,7 @@ stimuli:
     prompt: |-
       Create a ManagedIdentityCredential using a user-assigned client ID from
       AZURE_CLIENT_ID environment variable.
+      Save the code to a file named `managed_identity_user_assigned.py` in the workspace.
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.
