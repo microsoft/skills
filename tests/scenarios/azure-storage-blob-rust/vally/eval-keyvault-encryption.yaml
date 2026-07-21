@@ -9,6 +9,7 @@ defaults:
   runs: 1
   timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-storage-keyvault-encryption-library
     prompt: |
@@ -89,7 +90,6 @@ stimuli:
       - type: prompt
         name: "Key Vault-backed encryption-at-rest design completeness"
         config:
-          model: gpt-5.3-codex
           prompt: |
             Verify the generated Rust solution is a reusable library and includes:
             - Blob Storage client setup with account endpoint + TokenCredential
