@@ -19,15 +19,14 @@ scenarios:
   - hardcoded
   - endpoint=
   - from_connection_string
-  - "Credential("
   tags:
   - basic
   - authentication
   mock_response: "import os\nfrom azure.identity import DefaultAzureCredential\nfrom\
-    \ azure.appconfiguration import AzureAppConfigurationClient\n\nclient = AzureAppConfigurationClient(\n\
+    \ azure.appconfiguration import AzureAppConfigurationClient\n\nwith AzureAppConfigurationClient(\n\
     \    base_url=os.environ[\"AZURE_APPCONFIGURATION_ENDPOINT\"],\n    credential=DefaultAzureCredential()\n\
-    )\n\nsetting = client.get_configuration_setting(key=\"app:message\")\nprint(f\"\
-    {setting.key} = {setting.value}\")\n\nclient.close()"
+    ) as client:\n    setting = client.get_configuration_setting(key=\"app:message\")\n\
+    \    print(f\"{setting.key} = {setting.value}\")"
 - name: key_value_settings
   prompt: Demonstrate key-value configuration management with labels for environment
     isolation. Include creating/updating a ConfigurationSetting, retrieving it by key+label,
