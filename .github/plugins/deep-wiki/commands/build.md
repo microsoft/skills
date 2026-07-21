@@ -531,6 +531,8 @@ Theme variables don't cover everything. Force dark fills on all SVG shapes:
   overflow: hidden;
 }
 .diagram-zoom-controls {
+  position: relative;
+  z-index: 10000;
   display: flex;
   gap: 8px;
   padding: 8px 12px;
