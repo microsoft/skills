@@ -54,6 +54,15 @@ COPILOTSTUDIOAGENT__TENANTID=<tenant-id>
 COPILOTSTUDIOAGENT__AGENTAPPID=<app-id>
 ```
 
+## Authentication & Lifecycle
+
+> **🔑 Two rules apply to every code sample below:**
+>
+> 1. **This SDK is async-first — use `async def` handlers and `async with` throughout.**
+> 2. **Use explicit auth managers and context-managed network resources.** Use `MsalConnectionManager` for agent auth, and wrap per-request HTTP resources in `async with` (for example, `aiohttp.ClientSession`).
+>
+> Snippets may abbreviate this setup, but production code should always follow both rules.
+
 ## Core Workflow: aiohttp-hosted AgentApplication
 
 ```python
@@ -333,7 +342,7 @@ asyncio.run(main())
 
 ## Best Practices
 
-1. **This skill is async-first (aiohttp-based).** Use async handlers and `async with` for aiohttp sessions.
+1. **This SDK is async-first — use `async def` handlers and `async with` throughout.**
 2. **Always use context managers for clients and async credentials.** Wrap every client in `with Client(...) as client:` (sync) or `async with Client(...) as client:` (async). For async `DefaultAzureCredential` from `azure.identity.aio`, also use `async with credential:` so tokens and transports are cleaned up.
 3. Use `microsoft_agents` import prefix (underscores, not dots).
 4. Use `MemoryStorage` only for development; use BlobStorage or CosmosDB in production.
@@ -352,3 +361,9 @@ asyncio.run(main())
 | GitHub samples (Python)       | https://github.com/microsoft/Agents-for-python                                |
 | PyPI packages                 | https://pypi.org/search/?q=microsoft-agents                                   |
 | Integrate with Copilot Studio | https://learn.microsoft.com/en-us/microsoft-365/agents-sdk/integrate-with-mcs |
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |

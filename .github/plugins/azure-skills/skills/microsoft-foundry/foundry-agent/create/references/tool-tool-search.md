@@ -35,5 +35,5 @@ For toolboxes containing many tools, replace the full tool list passed to the mo
 
 For full fields, pinning recipes, the verify-with-`tool_search` flow, and best practices, see [Tool Search tool documentation](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/tool-search).
 
-- [agent-tools.md](agent-tools.md) — tool index
+- [agent-tools.md](tools/prompt-agent/agent-tools.md) — tool index
 - [use-toolbox-in-hosted-agent.md § Recommendation: enable Tool Search](use-toolbox-in-hosted-agent.md#-recommendation-enable-tool-search)

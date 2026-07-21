@@ -27,7 +27,16 @@ APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=xxx;IngestionEndpoint=h
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 
-> **🔑 Auth & lifecycle:** This distro is configured with a connection string by design, but for *AAD-authenticated ingestion* (where supported) prefer `DefaultAzureCredential` via the `credential=` parameter — see the [Azure AD Authentication](#azure-ad-authentication) section. Any Azure SDK clients you create alongside the exporter should be wrapped in `with`/`async with` blocks (and async credentials from `azure.identity.aio` likewise).
+## Authentication & Lifecycle
+
+> **🔑 Two rules apply to every code sample below:**
+>
+> 1. **Prefer `DefaultAzureCredential` for ingestion auth when supported.** `APPLICATIONINSIGHTS_CONNECTION_STRING` identifies the target Application Insights resource, and `credential=DefaultAzureCredential(...)` provides Microsoft Entra authentication.
+>    - Local dev: `DefaultAzureCredential` works as-is.
+>    - Production: set `AZURE_TOKEN_CREDENTIALS=prod` (or `AZURE_TOKEN_CREDENTIALS=<specific_credential>`) to constrain the credential chain to production-safe credentials.
+> 2. **Providers are not context managers.** Flush and shut down telemetry providers explicitly at process exit so buffers are exported deterministically.
+>
+> Snippets may abbreviate this setup, but production code should always follow both rules.
 
 ## Quick Start
 
@@ -236,7 +245,7 @@ configure_azure_monitor(
 ## Best Practices
 
 1. **Pick sync OR async and stay consistent.** Do not mix `azure.xxx` sync clients with `azure.xxx.aio` async clients in the same call path. Choose one mode per module.
-2. **Flush and shut down providers at process exit.** Call the shutdown/flush APIs (e.g. `tracer_provider.shutdown()`, `meter_provider.shutdown()`, `logger_provider.shutdown()`) at process exit to flush telemetry before the process terminates.
+2. **Call `provider.shutdown()` / `force_flush()` at process exit to flush telemetry — providers are not context managers.**
 3. **Call configure_azure_monitor() early** — Before importing instrumented libraries
 4. **Use environment variables** for connection string in production
 5. **Set cloud role name** for multi-service applications
@@ -244,3 +253,10 @@ configure_azure_monitor(
 7. **Use structured logging** for better log analytics queries
 8. **Add custom attributes** to spans for better debugging
 9. **Use Microsoft Entra authentication** for production workloads
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

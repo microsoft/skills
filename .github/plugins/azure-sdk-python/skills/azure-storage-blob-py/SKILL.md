@@ -255,3 +255,10 @@ async def download_async():
 6. **Prefer `readinto()`** over `readall()` for memory efficiency
 7. **Use `walk_blobs()`** for hierarchical listing
 8. **Set appropriate content types** for web-served blobs
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Capability index mapping hero flows and non-hero references. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples (metadata/properties and async patterns). |

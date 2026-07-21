@@ -113,4 +113,3 @@ If the user later says "also save it locally" or "open the PR now", re-run deliv
 | Reserve capacity *before* creating | [capacity-reservation](../capacity-reservation/capacity-reservation.md) |
 | Enroll the new VM in management | [essential-machine-management](../essential-machine-management/essential-machine-management.md) |
 | Compare more SKU / pricing options | [vm-recommender](../vm-recommender/vm-recommender.md) Steps 1–6 |
-| Post-create RDP / SSH issues | [vm-troubleshooter](../vm-troubleshooter/vm-troubleshooter.md) |

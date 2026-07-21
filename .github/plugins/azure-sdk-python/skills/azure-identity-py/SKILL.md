@@ -62,7 +62,20 @@ AZURE_CLIENT_ID=<managed-identity-client-id>
 AZURE_TOKEN_CREDENTIALS=dev|prod|<credential-name>  # Optional, restricts DAC chain
 ```
 
-## DefaultAzureCredential
+## Authentication & Lifecycle
+
+> **🔑 Two rules apply to every code sample below:**
+>
+> 1. **Prefer `DefaultAzureCredential`.** It works locally (Azure CLI / VS Code / Developer CLI) and in Azure (managed identity, workload identity) with no code change. Avoid connection strings, account/API keys — they bypass Entra audit and rotation.
+>    - Local dev: `DefaultAzureCredential` works as-is.
+>    - Production: set `AZURE_TOKEN_CREDENTIALS=prod` (or `AZURE_TOKEN_CREDENTIALS=<specific_credential>`) to constrain the credential chain to production-safe credentials.
+> 2. **Wrap credentials and clients in context managers** when they own token caches / transports:
+>    - Sync: `with DefaultAzureCredential() as credential:`
+>    - Async: `async with DefaultAzureCredential() as credential:` (from `azure.identity.aio`)
+>
+> Snippets may abbreviate this setup, but production code should always follow both rules.
+
+### DefaultAzureCredential
 
 The recommended credential for most scenarios. Tries multiple authentication methods in order:
 
@@ -522,3 +535,10 @@ AZURE_LOG_LEVEL=debug
 | API Reference | https://learn.microsoft.com/python/api/azure-identity |
 | GitHub Source | https://github.com/Azure/azure-sdk-for-python/tree/main/sdk/identity/azure-identity |
 | Credential Chains | https://aka.ms/azsdk/python/identity/credential-chains |
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

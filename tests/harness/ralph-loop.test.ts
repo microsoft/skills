@@ -55,10 +55,11 @@ class MockClient implements CopilotClient {
     _prompt: string,
     _skillName: string,
     _config?: GenerationConfig,
-    _scenarioName?: string
+    _scenarioName?: string,
   ): Promise<GenerationResult> {
     this.callCount++;
-    const code = this.responses.get(this.callCount) ?? "# Default mock response\npass";
+    const code =
+      this.responses.get(this.callCount) ?? "# Default mock response\npass";
     return {
       code,
       prompt: _prompt,
@@ -111,13 +112,15 @@ class MockEvaluator {
       skillName: "test-skill",
       scenario,
       generatedCode: code,
+      rawResponse: code,
       findings,
       matchedCorrect: [],
       matchedIncorrect: score < 70 ? ["some-section"] : [],
       score,
       passed: score >= 50,
       errorCount: findings.filter((f) => f.severity === Severity.ERROR).length,
-      warningCount: findings.filter((f) => f.severity === Severity.WARNING).length,
+      warningCount: findings.filter((f) => f.severity === Severity.WARNING)
+        .length,
     };
   }
 }
@@ -161,7 +164,7 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { qualityThreshold: 80 }
+        { qualityThreshold: 80 },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -184,7 +187,7 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { qualityThreshold: 80, improvementThreshold: 10 }
+        { qualityThreshold: 80, improvementThreshold: 10 },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -197,18 +200,14 @@ describe("RalphLoopController", () => {
     });
 
     it("should stop at max iterations if threshold not met", async () => {
-      mockClient.setResponses([
-        "# Attempt 1",
-        "# Attempt 2",
-        "# Attempt 3",
-      ]);
+      mockClient.setResponses(["# Attempt 1", "# Attempt 2", "# Attempt 3"]);
       mockEvaluator.setScores([30, 40, 50]); // Never reaches 80
 
       const controller = new RalphLoopController(
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { maxIterations: 3, qualityThreshold: 80, improvementThreshold: 5 }
+        { maxIterations: 3, qualityThreshold: 80, improvementThreshold: 5 },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -229,7 +228,7 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { earlyStopOnPerfect: true }
+        { earlyStopOnPerfect: true },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -247,7 +246,7 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { qualityThreshold: 80, improvementThreshold: 5 }
+        { qualityThreshold: 80, improvementThreshold: 5 },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -265,7 +264,7 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { qualityThreshold: 80, improvementThreshold: 5 }
+        { qualityThreshold: 80, improvementThreshold: 5 },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -285,7 +284,7 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { maxIterations: 3, qualityThreshold: 80, improvementThreshold: 0 }
+        { maxIterations: 3, qualityThreshold: 80, improvementThreshold: 0 },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -305,7 +304,7 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { qualityThreshold: 80, improvementThreshold: 10 }
+        { qualityThreshold: 80, improvementThreshold: 10 },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -334,7 +333,11 @@ describe("RalphLoopController", () => {
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
         mockClient,
-        { qualityThreshold: 80, includeFeedback: true, improvementThreshold: 10 }
+        {
+          qualityThreshold: 80,
+          includeFeedback: true,
+          improvementThreshold: 10,
+        },
       );
 
       const result = await controller.run("Generate code", "test-scenario");
@@ -353,7 +356,7 @@ describe("RalphLoopController", () => {
       const controller = new RalphLoopController(
         criteria,
         mockEvaluator as unknown as CodeEvaluator,
-        mockClient
+        mockClient,
       );
 
       const result = await controller.run("Generate code", "test-scenario");

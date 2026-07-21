@@ -342,3 +342,10 @@ for conn in connections:
 7. **Rotate Direct Line keys** periodically
 8. **Use managed identity** when possible for bot connections
 9. **Configure proper CORS** for Web Chat channel
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

@@ -1,127 +1,91 @@
-# Session Management
+# Hosted Session Management with azd
 
-Manage hosted agent sessions — isolated compute environments that provide persistent state across invocations.
+Use azd to manage session-backed compute and filesystem state for Hosted Agents.
 
-This document covers session creation and lifecycle for both HTTP-protocol agents (`responses`, `invocations`) and WebSocket agents (`invocations_ws`).
+## Automatic Session Handling
 
-## Overview
+For `responses` and `invocations`, start with `azd ai agent invoke`. Do not create a session first unless the workflow needs a known session before invocation.
 
-Sessions bind a hosted agent to a dedicated compute instance. Files written to `$HOME` during a session persist across requests for the lifetime of that session. When a session is deleted, its compute resources and stored files are released.
+Within an azd project, azd resolves session state for a normal remote invoke in this order:
 
-## Session Creation
+1. Use and persist an explicit `--session-id`.
+2. Reuse the session saved for the agent endpoint.
+3. If no session exists, let the server assign one, capture the returned session ID, and save it for later commands.
 
-| Protocol | How a session is created | Session id |
-|----------|--------------------------|------------|
-| `responses`, `invocations` (HTTP) | Call the `session_create` MCP tool before invoking the agent | **Server-issued** `sessionId` (or a client-supplied one passed to `session_create`) |
-| `invocations_ws` (WebSocket) | Implicitly, on the first WebSocket upgrade (no `session_create` call) | **Client-supplied** `agent_session_id` query parameter on the upgrade URL — **optional**; if omitted, the platform (or the container) generates a random id |
+`--new-session` ignores the saved session and starts fresh session-backed state. `--version <version>` creates or reuses a session bound to that deployed version. Do not combine `--version` with `--session-id`.
 
-Both ids follow the same format rule: `^[A-Za-z0-9_-]{8,128}$`.
+File and monitor commands automatically use the session saved by invoke or `sessions create`. They also accept `--session-id <id>`.
 
-## Session Lifecycle
+## Session and Conversation State
 
-**HTTP (`responses`, `invocations`):**
+| State | Used by | azd behavior |
+|-------|---------|--------------|
+| Session | All directly invocable Hosted protocols | Persisted per agent; controls compute affinity and filesystem state |
+| Conversation | `responses` | Platform-managed; azd can persist the `conversationId` for reuse |
 
-```text
-session_create → Running → (invoke, file ops) → session_delete
-                    ↓
-               Expired (platform auto-cleanup)
+Use `--new-conversation` to reset responses history without replacing the session. Use `--new-session` to reset session-backed memory for invocations. `--new-conversation` has no effect for invocations. For completely fresh responses state, combine `--new-session` and `--new-conversation`.
+
+## Explicit Session Commands
+
+Create a session when files must be uploaded before the first invoke, when a caller-selected ID is required, or when binding to a specific version:
+
+```bash
+azd ai agent sessions create
+azd ai agent sessions create my-agent <version>
+azd ai agent sessions create --session-id my-session
 ```
 
-**WebSocket (`invocations_ws`):**
+The create command auto-detects a single agent and resolves the deployed version from the azd environment. It prints JSON by default and persists `agent_session_id` as the current session.
 
-```text
-client opens WS upgrade (optionally with ?agent_session_id=<id>)
-  └─► first upgrade for that id ──► sandbox created, handler bound
-        └─► frames flow ──► either side closes ──► WS connection ends
-              └─► sandbox + $HOME persist ──► next WS upgrade with same id re-hydrates
-                    └─► after the idle timeout, compute is deprovisioned; state is persisted
+Inspect and enumerate sessions:
+
+```bash
+azd ai agent sessions show <session-id>
+azd ai agent sessions list
+azd ai agent sessions list --limit 10 --output table
+azd ai agent sessions list --pagination-token <token>
 ```
 
-Key points for `invocations_ws`:
+Use `--agent-name <service-name>` for show, stop, delete, or list when the project has multiple agent services. For header-based isolation, pass the same `--user-identity` on every session, invoke, file, and monitor command.
 
-- There is **no `session_create` / `session_delete`** call. The first upgrade creates the session; the session outlives any individual WebSocket connection.
-- The `agent_session_id` query parameter is **optional**. If you omit it, the platform (or the container) generates a random id; supply it explicitly only when you need a specific id to resume an existing session.
-- The `agent_session_id` is the **affinity key** — the platform routes upgrades with the same id back to the same sandbox.
-- Closing the WebSocket does **not** delete the session. To resume, open a new upgrade with the same `agent_session_id` and the container sees its previous `$HOME` state.
-- After the idle timeout, the platform deprovisions compute but persists session state, so the next reconnect re-hydrates the sandbox.
+## Stop Versus Delete
 
-## Session ID Format
+```bash
+azd ai agent sessions stop <session-id>
+azd ai agent sessions delete <session-id>
+```
 
-Session IDs must match the pattern `^[A-Za-z0-9_-]{8,128}$`.
+`stop` terminates running compute and preserves the persistent filesystem. It is idempotent, and a later invocation can resume the session.
 
-- If you provide a `sessionId` to `session_create`, it must conform to this pattern
-- If you omit `sessionId`, the platform auto-generates one
-- Store the returned `sessionId` — it is required for all subsequent operations
+`delete` synchronously removes compute and filesystem state. If the deleted ID is the saved current session, azd clears it from its session store.
 
-## MCP Tool Details
+## Common Patterns
 
-### Create Session
+Continue a multi-turn interaction:
 
-Use `session_create` to provision a new session:
+```bash
+azd ai agent invoke "First question"
+azd ai agent invoke "Follow-up question"
+```
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `projectEndpoint` | ✅ | AI Foundry project endpoint |
-| `agentName` | ✅ | Name of the hosted agent |
-| `sessionId` | ❌ | Optional custom session ID (8-128 chars, alphanumeric + hyphens/underscores) |
+Reset responses history while keeping session files:
 
-Returns: Session resource with `sessionId`, status, and expiration.
+```bash
+azd ai agent invoke --new-conversation "Start a new topic"
+```
 
-### Get Session
+Reset session-backed memory:
 
-Use `session_get` to check session status:
+```bash
+azd ai agent invoke --new-session "Start fresh"
+```
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `projectEndpoint` | ✅ | AI Foundry project endpoint |
-| `agentName` | ✅ | Name of the hosted agent |
-| `sessionId` | ✅ | The session ID to inspect |
+Preserve files without keeping compute running:
 
-Returns: Session details including status, version, creation time, and expiration.
+```bash
+azd ai agent sessions stop <session-id>
+```
 
-### Delete Session
+## WebSocket Sessions
 
-Use `session_delete` to release compute resources:
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `projectEndpoint` | ✅ | AI Foundry project endpoint |
-| `agentName` | ✅ | Name of the hosted agent |
-| `sessionId` | ✅ | The session ID to delete |
-
-> ⚠️ **Warning:** Deleting a session permanently removes all files stored in `$HOME` for that session.
-
-### List Sessions
-
-Use `session_list` to enumerate sessions:
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `projectEndpoint` | ✅ | AI Foundry project endpoint |
-| `agentName` | ✅ | Name of the hosted agent |
-| `limit` | ❌ | Max results to return (1-100, default 20) |
-| `order` | ❌ | Sort order: `asc` or `desc` (default `asc`) |
-| `after` | ❌ | Cursor for forward pagination |
-| `before` | ❌ | Cursor for backward pagination |
-
-> ⚠️ **Warning:** `after` and `before` are mutually exclusive — do not pass both.
-
-## Session vs Conversation
-
-| Concept | Purpose | Scope |
-|---------|---------|-------|
-| `sessionId` | Binds requests to a compute instance with persistent filesystem state | Hosted agents only |
-| `conversationId` | Tracks conversation history across turns | Responses protocol only |
-
-- A single session can host multiple conversations
-- A conversation does not require a session (prompt agents use `conversationId` without sessions)
-- For hosted agents using `responses` protocol, use **both**: `sessionId` for compute affinity and `conversationId` for history
-
-## Best Practices
-
-1. **Create sessions explicitly** — Always use `session_create` before invoking a hosted agent with `responses` or `invocations` protocol. Do not rely on implicit session creation.
-2. **Reuse sessions** — Keep the same session for related multi-turn interactions to preserve agent state.
-3. **Clean up when done** — Delete sessions after use to release compute resources and avoid quota consumption.
-4. **Handle expiry** — Sessions expire based on platform policies. If `session_get` returns a non-running state, create a new session.
-5. **Version awareness** — The platform auto-resolves the agent version at session creation time. If you need a specific version, ensure it is active before creating the session.
-6. **Debug with logstream** — Use `session_logstream` to stream stdout/stderr from a running session for troubleshooting.
+`invocations_ws` is not called by `azd ai agent invoke`. Its client supplies `agent_session_id` on the WebSocket URL. Follow [Invocations WebSocket](../../invocations-ws/invocations-ws.md) for that connection lifecycle.

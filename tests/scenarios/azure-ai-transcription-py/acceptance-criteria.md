@@ -22,6 +22,18 @@ client = TranscriptionClient(
 )
 ```
 
+#### ✅ CORRECT: Entra ID / DefaultAzureCredential (preferred for production)
+```python
+import os
+from azure.ai.transcription import TranscriptionClient
+from azure.identity import DefaultAzureCredential
+
+client = TranscriptionClient(
+    endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
+    credential=DefaultAzureCredential()
+)
+```
+
 #### ✅ CORRECT: Using environment variables
 ```python
 from azure.ai.transcription import TranscriptionClient
@@ -53,16 +65,6 @@ from azure.ai.transcription.models import (
 ```
 
 ### 1.3 Anti-Patterns (ERRORS)
-
-#### ❌ INCORRECT: Using DefaultAzureCredential
-```python
-# WRONG - TranscriptionClient only supports subscription key auth
-from azure.identity import DefaultAzureCredential
-client = TranscriptionClient(
-    endpoint=endpoint,
-    credential=DefaultAzureCredential()  # This will fail
-)
-```
 
 #### ❌ INCORRECT: Importing from wrong module
 ```python
@@ -593,7 +595,7 @@ job = client.begin_transcription(
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `AuthenticationError` | Wrong credential type | Use `AzureKeyCredential`, not `DefaultAzureCredential` |
+| `AuthenticationError` | Wrong or missing credential | Use `AzureKeyCredential` or `DefaultAzureCredential`; never hardcode keys |
 | `AttributeError: 'NoneType' object` | Result is None | Check `result.status == "succeeded"` first |
 | `IndexError: list index out of range` | No results in list | Check `if result.results:` before indexing |
 | `Stream stuck/hanging` | Not calling `stream.stop()` | Always call `stream.stop()` after sending audio |

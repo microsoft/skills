@@ -7,7 +7,8 @@
     GitHub Copilot app, from two deterministic facts:
       * copilot_app      - is AI_AGENT=github_copilot_app_agent?
       * canvas_installed - is the Foundry Agent Canvas (foundry-agent-canvas)
-                           installed in the project, user, or session location?
+                           installed in the project, user, session, or
+                           plugin-contributed location?
 
     Output lines are prefixed with [OK], [WARN], or [ACTION].
     Exit code is 0 when the gate does not apply (not in the app, or the canvas is
@@ -30,7 +31,7 @@ if ($env:AI_AGENT -ne "github_copilot_app_agent") {
 
 Write-Output "[OK] GitHub Copilot app detected (AI_AGENT=github_copilot_app_agent)."
 
-# Candidate install locations: project (repo), user, session.
+# Candidate install locations: project (repo), user, session, and plugin-contributed.
 $dirs = @()
 try { $root = (& git rev-parse --show-toplevel 2>$null); if ($root) { $dirs += (Join-Path $root ".github/extensions/$ext") } } catch {}
 $dirs += (Join-Path (Get-Location) ".github/extensions/$ext")
@@ -39,10 +40,21 @@ if ($homeDir) { $dirs += (Join-Path $homeDir ".copilot/extensions/$ext") }
 if ($homeDir -and $env:COPILOT_AGENT_SESSION_ID) {
     $dirs += (Join-Path $homeDir ".copilot/session-state/$($env:COPILOT_AGENT_SESSION_ID)/extensions/$ext")
 }
-
+# Plugin-contributed extensions live under ~/.copilot/installed-plugins/<repo>/<plugin>/...
+# The layout varies (some nest the extension under an extensions/ subfolder, others place it
+# directly), but the leaf directory holding extension.mjs is always named after the extension.
 $installedAt = $null
 foreach ($d in $dirs) {
     if (Test-Path (Join-Path $d "extension.mjs")) { $installedAt = $d; break }
+}
+
+if (-not $installedAt -and $homeDir) {
+    $pluginRoot = Join-Path $homeDir ".copilot/installed-plugins"
+    if (Test-Path $pluginRoot) {
+        $installedAt = Get-ChildItem -Path $pluginRoot -Recurse -Depth 4 -Directory -Filter $ext -ErrorAction SilentlyContinue |
+            Where-Object { Test-Path (Join-Path $_.FullName "extension.mjs") -PathType Leaf } |
+            Select-Object -First 1 -ExpandProperty FullName
+    }
 }
 
 if (-not $installedAt) {

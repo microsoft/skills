@@ -240,3 +240,10 @@ request = AnalyzeTextOptions(
 7. **Log analysis results** for audit and improvement
 8. **Consider 8-severity mode** for finer-grained control
 9. **Pre-moderate AI outputs** before showing to users
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

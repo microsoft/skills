@@ -74,7 +74,7 @@ Full working sample: [foundry-toolbox-mcp-skills (C#)](https://github.com/micros
 ## Verify end-to-end
 
 ```bash
-azd ai agent run
+azd ai agent run --no-client
 azd ai agent invoke --local "Hi, can I return my tent within 30 days?"
 ```
 
@@ -86,7 +86,7 @@ The `load_skill` tool is exposed as an MCP tool in the Responses protocol. The s
 
 **Local with Agent Inspector** (`azd ai agent run`) — the Inspector UI shows an approval button to approve the request.
 
-**Local without Inspector** (`azd ai agent run --no-inspector`) — use `curl` against `http://localhost:8088/responses` directly:
+**Local without Inspector** (`azd ai agent run --no-client`) — use `curl` against `http://localhost:8088/responses` directly:
 
 1. Send the initial message:
 

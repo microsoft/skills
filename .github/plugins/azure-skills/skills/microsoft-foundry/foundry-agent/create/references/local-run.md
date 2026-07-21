@@ -27,7 +27,7 @@ For Python agents, prepare the environment from the **agent's service source dir
 2. Create a venv, for example `python -m venv .venv`.
 3. Activate the venv.
 4. Install `uv` inside the active venv: `python -m pip install uv`.
-5. In the same shell with the service-dir `.venv` activated, run `azd ai agent run` (from any cwd in the project); it installs `requirements.txt` itself and uses `uv` from the active venv for faster Python dependency installation.
+5. In the same shell with the service-dir `.venv` activated, run `azd ai agent run --no-client` (from any cwd in the project); it installs `requirements.txt` itself and uses `uv` from the active venv for faster Python dependency installation.
 
 > **Important:** The venv must live next to `requirements.txt`, not in the azd project root. Install `uv` before running `azd ai agent run`, and keep that venv activated when running the command; otherwise the local run falls back to slower dependency installation. Do NOT manually run `pip install -r requirements.txt` / `uv pip install -r requirements.txt --prerelease=allow`; let `azd ai agent run` install dependencies.
 
@@ -36,22 +36,24 @@ For Python agents, prepare the environment from the **agent's service source dir
 Activate the service-dir `.venv`, then in that venv run:
 
 ```bash
-azd ai agent run
+azd ai agent run --no-client
 ```
+
+Use `--no-client` without prompting unless the user explicitly requests a local client UI. If a client is requested, omit the flag.
 
 What this does:
 
 1. Resolves the agent service from `azure.yaml` (auto-picks when only one exists).
-2. Detects the project type (Python, .NET) from files in the service source dir.
+2. Detects the project type (Python, .NET, or Node.js) from files in the service source dir.
 3. Installs dependencies if needed. For Python, `azd ai agent run` installs `requirements.txt` itself and uses `uv` from the active local environment when available.
 4. Starts the agent in the foreground on `localhost:8088` (default).
-5. Opens **Agent Inspector** in your browser (unless `--no-inspector`).
+5. Opens no client when `--no-client` is set. Without that flag, responses and invocations agents open Agent Inspector.
 
 > Wait for the ready log line before sending the first invocation. Poll the log at short intervals; do not pre-sleep on a fixed duration.
 
 `Ctrl+C` stops the agent and clears the saved local session id in an interactive terminal.
 
-For headless or CI runs, pass `--no-inspector` and start the local server in a managed background session that later steps can monitor and stop. Wait for the ready log line, invoke it from a second command, then stop the same background session before deploying or leaving a temporary workspace.
+For headless or CI runs, pass `--no-client` and start the local server in a managed background session that later steps can monitor and stop. Wait for the ready log line, invoke it from a second command, then stop the same background session before deploying or leaving a temporary workspace.
 
 Do **not** start `azd ai agent run` as a detached process that you cannot monitor or stop (for example, a bare `azd ai agent run ... &`, or a popped PowerShell window on Windows). Keep logs, readiness polling, and the PID/process handle for cleanup.
 
@@ -61,12 +63,12 @@ Do **not** start `azd ai agent run` as a detached process that you cannot monito
 |------|---------|
 | `--port <n>` / `-p <n>` | Override the listen port. Useful when 8088 is taken. |
 | `--start-command "<cmd>"` / `-c "<cmd>"` | Override `azure.yaml` and auto-detect. Example: `--start-command "python app.py"`. |
-| `--no-inspector` | Skip opening Agent Inspector. Use in CI / SSH. |
+| `--no-client` | Skip the local client UI. Use by default unless the user requests a client UI. |
 
 Pass the service name when there are multiple `ai.agent` services:
 
 ```bash
-azd ai agent run my-agent
+azd ai agent run my-agent --no-client
 ```
 
 ## Where the start command comes from
@@ -74,7 +76,7 @@ azd ai agent run my-agent
 Resolution order (first non-empty wins):
 
 1. `--start-command` flag.
-2. `azure.yaml services.<name>.config.startupCommand`.
+2. `azure.yaml services.<name>.startupCommand`.
 3. Auto-detected from project type.
 
 Example:
@@ -86,8 +88,7 @@ services:
     project: src/my-agent
     language: python
     host: azure.ai.agent
-    config:
-      startupCommand: "uvicorn app:app --host 0.0.0.0 --port 4001"
+    startupCommand: "uvicorn app:app --host 0.0.0.0 --port 4001"
 ```
 
 If detection fails and no override is set, `run` errors with the project dir and asks for `--start-command` or `startupCommand`.
@@ -98,6 +99,14 @@ If detection fails and no override is set, `run` errors with the project dir and
 azd ai agent invoke --local "hello, are you up?"
 ```
 
+For a multi-agent project, select the service explicitly:
+
+```bash
+azd ai agent invoke my-agent --local "hello, are you up?"
+```
+
+Prefer the named form when multiple agent services exist. Keep the unnamed form for a single-agent project.
+
 Do not use `--output json` with invoke. The invoke command supports `default` and `raw` output only.
 
 If the user did not explicitly specify a prompt, use `"hello, are you up"` for the local smoke test; only verify that the agent can return a response.
@@ -107,9 +116,9 @@ Run one representative local invocation before deploying. If the local invocatio
 `--local` differs from a remote invoke in:
 
 - Targets `http://localhost:<port>` instead of the Foundry endpoint.
-- Skips the confirmation envelope (no billing, no remote mutation).
+- Targets localhost, so it does not authorize or bill a remote invocation.
 - `--version` is rejected (versions are a remote concept).
-- Named-agent invocation is rejected (only one agent runs locally at a time).
+- A name selects the intended service in a multi-agent project.
 
 Other useful flags:
 
@@ -138,9 +147,9 @@ Next step -> [deploy/deploy.md](../../deploy/deploy.md).
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| `could not connect to localhost:<port>` | `run` not started, or wrong port | Start `azd ai agent run`; pass `--port` to `invoke --local` if non-default. |
+| `could not connect to localhost:<port>` | `run` not started, or wrong port | Start `azd ai agent run --no-client`; pass `--port` to `invoke --local` if non-default. |
 | `could not detect project type in <dir>` | Missing project marker file | Set `startupCommand` in `azure.yaml` or pass `--start-command`. |
-| `cannot use --local with a named agent` | Named-agent invoke against localhost | Drop the name; only one local agent at a time. |
 | `cannot use --version with --local` | `--version` is remote-only | Drop `--version`, or remove `--local` to hit the deployed agent. |
-| Inspector never opens | Headless env, or extension install failed | Pass `--no-inspector`, or run `azd extension install azure.ai.inspector`. |
+| Older command uses `--no-inspector` | Deprecated compatibility alias | Replace it with `--no-client`. |
+| Requested client never opens | Agent Inspector extension missing or localhost not ready | Install the Agent Inspector extension with `azd extension install azure.ai.inspector`, then run without `--no-client`. |
 | Auth / connection errors against Azure services | Local credentials not wired | Expected -- `DefaultAzureCredential` falls back to your `az login` / VS Code identity. Use `azd auth login` if needed. |

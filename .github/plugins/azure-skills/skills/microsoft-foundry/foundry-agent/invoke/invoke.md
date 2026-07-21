@@ -1,150 +1,140 @@
 # Invoke Foundry Agent
 
-Invoke deployed agents in Azure AI Foundry. Manage sessions and file operations for hosted agents.
+Invoke Prompt Agents with Foundry MCP. Invoke Hosted Agents and manage their sessions, files, and logs with azd.
 
-## Quick Reference
+## Route by Agent Type
 
-| Property | Value |
-|----------|-------|
-| Agent types | Prompt (LLM-based), Hosted |
-| MCP server | `azure` |
-| Key Foundry MCP tools | `agent_invoke`, `agent_get`, `session_create`, `session_get`, `session_delete`, `session_list` |
-| File operation tools | `session_file_upload`, `session_file_download`, `session_file_list`, `session_file_delete`, `session_file_stat`, `session_file_mkdir` |
-| Conversation support | Single-turn and multi-turn (via `conversationId` for responses protocol, via session state for invocations protocol) |
-| Session support | Managed sessions for hosted agents (via `session_create`) |
-| Protocols | `responses` (OpenAI-compatible), `invocations` (custom payloads) |
+| Agent type | Invoke path | State management |
+|------------|-------------|------------------|
+| Prompt | Foundry MCP `agent_invoke` | `conversationId`; no hosted session or file operations |
+| Hosted | `azd ai agent invoke` | azd sessions, files, conversations, and monitor commands |
 
-## When to Use This Skill
+Treat an `azure.yaml` service with `host: azure.ai.agent` as Hosted. If the type is still unknown, use `agent_get` only to classify the agent. Do not use MCP invoke, session, or file tools for a Hosted Agent.
 
-- Send messages to a deployed agent (single or multi-turn)
-- Create/manage sessions for hosted agents
-- Upload/download files to/from hosted agent sessions
-- Test agent behavior after creation or deployment
+## Hosted Agent Workflow with azd
 
-## MCP Tools
+### Step 1: Verify the Agent
 
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `agent_invoke` | Send a message to an agent and get a response | `projectEndpoint`, `agentName`, `inputText` (required); `agentVersion`, `conversationId`, `sessionId`, `protocol`, `stream` (optional) |
-| `agent_get` | Get agent details to verify existence and type | `projectEndpoint` (required), `agentName` (optional) |
-| `session_create` | Create a new session for a hosted agent | `projectEndpoint`, `agentName` (required); `sessionId` (optional) |
-| `session_get` | Get session status and details | `projectEndpoint`, `agentName`, `sessionId` (required) |
-| `session_delete` | Delete a session and release compute | `projectEndpoint`, `agentName`, `sessionId` (required) |
-| `session_list` | List sessions with pagination | `projectEndpoint`, `agentName` (required); `limit`, `order`, `after`, `before` (optional) |
-| `session_logstream` | Stream console logs (stdout/stderr) from a session | `projectEndpoint`, `agentName`, `sessionId` (required); `maxLines` (optional) |
+Inside an azd project, run:
 
-For session file operation tools (`session_file_upload`, `session_file_download`, `session_file_list`, `session_file_delete`, `session_file_stat`, `session_file_mkdir`), see [File Operations](references/file-operations.md).
+```bash
+azd ai agent show --output json
+```
 
-## Protocols
+Verify that the deployed version is active. When multiple agent services exist, use the service name in subsequent commands.
 
-Hosted agents support three protocols declared at deployment time. They are distinct contracts — pick per use case (an agent may declare more than one and serve them from the same container):
+When invoking outside an azd project with a known protocol endpoint, skip this step.
 
-| Protocol | Recommended Version | Route | Best For |
-|----------|-------------------|-------|----------|
-| `responses` | `1.0.0` | `.../agents/{agentName}/endpoint/protocols/openai/responses` | Conversational agents, OpenAI-compatible |
-| `invocations` | `1.0.0` | `.../agents/{agentName}/endpoint/protocols/invocations` | Custom payloads, protocol bridges, webhook callers |
-| `invocations_ws` | `1.0.0` | `wss://.../api/projects/{project}/agents/{agentName}/endpoint/protocols/invocations_ws` | Duplex WebSocket — voice, WebRTC signaling, custom real-time streams. See the dedicated [invocations-ws skill](../invocations-ws/invocations-ws.md); `agent_invoke` does **not** speak WebSocket. |
+### Step 2: Invoke
 
-Key difference: `responses` takes a natural language `inputText` message with platform-managed history. `invocations` is **bytes in, bytes out** — the request body is forwarded as-is to the container and the raw response is returned. The developer defines the schema; the platform is pure pass-through. See [Invocations Protocol Guide](references/invocations-protocol.md) for I/O details, schema discovery, and examples.
-
-> ⚠️ **Critical for invocations:** `inputText` is forwarded as the raw HTTP request body. The agent developer defines what the container accepts. **Do not guess** — fetch the agent's OpenAPI spec or inspect its source code first.
-
-> 💡 **Tip:** The `agent_invoke` MCP tool supports both `responses` and `invocations` protocols. Set `protocol: 'invocations'` when targeting an invocations-protocol agent.
-
-## Workflow
-
-### Step 1: Verify Agent Readiness
-
-Use `agent_get` to verify the agent exists. For hosted agents, also verify the targeted version is `active`.
-
-### Step 2: Fast smoke test for azd-deployed agents
-
-When the current folder is an azd agent project and deployment just completed, prefer the azd CLI first:
+Single-agent project:
 
 ```bash
 azd ai agent invoke "hello, are you up?"
 ```
 
-Use `azd ai agent show --output json` only when you need structured status, version, endpoints, or troubleshooting details; a successful remote invocation is the fast smoke test.
+Multi-agent project:
 
-If `azd ai agent invoke` returns a `confirmation_required` envelope, summarize the change and proceed only when the user already requested remote invocation or explicitly consents. Prefer the returned `confirmCommand` over inventing flags. If azd cannot resolve the service or agent name, fall back to the MCP workflow below with the resolved `projectEndpoint` and `agentName`.
-
-For a post-deploy smoke test, invoke once unless the user explicitly asked to validate multi-turn/session behavior. If that single invoke returns a successful response, the smoke test passes;
-
-### Step 3: Create Session (Hosted Agents)
-
-For hosted agents, create a session before invoking using `session_create` with `projectEndpoint` and `agentName`. Optionally provide a `sessionId` (must match `^[A-Za-z0-9_-]{8,128}$`). Store the returned `sessionId` for subsequent calls.
-
-> ⚠️ Skip this step for prompt agents — they do not use sessions.
-
-For full session lifecycle details, see [Session Management](references/session-management.md).
-
-### Step 4: Invoke Agent
-
-Use the project endpoint and agent name from the project context. Use `agent_invoke` with:
-- `projectEndpoint`, `agentName`, `inputText` (required)
-- `agentVersion`, `conversationId`, `sessionId`, `protocol`, `stream` (optional)
-
-**Responses protocol** (default): `inputText` is a natural language message string. Multi-turn via `conversationId`.
-
-**Invocations protocol**: Set `protocol: 'invocations'`. This is **bytes in, bytes out** — `inputText` is forwarded as the raw HTTP request body to the container. The developer defines the expected schema.
-
-> ⚠️ **Do not guess the invocations request body.** To discover the expected schema:
-> 1. **Fetch the OpenAPI spec**: `GET {projectEndpoint}/agents/{agentName}/endpoint/protocols/invocations/docs/openapi.json` (if the developer registered one)
-> 2. Inspect the agent's **route handler code** or README for the expected payload shape
-> 3. If unknown, ask the user for the agent's API contract before invoking
-
-Example invocations call (agent expects `{"message": "<text>"}`):
-
-```text
-agent_invoke(projectEndpoint, agentName, inputText: "{\"message\":\"hello\"}", protocol: "invocations", sessionId: "<id>")
+```bash
+azd ai agent invoke my-agent "hello, are you up?"
 ```
 
-See [Invocations Protocol Guide](references/invocations-protocol.md) for full details and examples.
+Protocol examples:
 
-### Step 5: Multi-Turn Conversations
+```bash
+azd ai agent invoke --protocol invocations --input-file request.json
+```
 
-**Responses protocol** → Pass `conversationId` from previous response to continue the thread. Platform manages history.
+For invocations, inspect the agent source or OpenAPI contract before preparing the request body.
 
-**Invocations protocol** → Reuse same `sessionId`; conversation state is agent-managed via `$HOME`. Do **not** pass `conversationId` — it has no effect for invocations.
+Outside an azd project, use a full protocol endpoint supplied by the user or previously returned by `azd ai agent show`:
 
-### Step 6: File Operations (Hosted Agents)
+```bash
+azd ai agent invoke --agent-endpoint "<full-agent-protocol-endpoint>" "Hello!"
+```
 
-Upload/download files to pass data to and retrieve results from agents. All file operations require an active session. See [File Operations](references/file-operations.md).
+Invoke supports `default` and `raw` output. Do not pass `--output json`.
 
-### Step 7: Clean Up
+Remote invocation can incur model usage charges. Run it only when it is within the user's request.
 
-Use `session_delete` to release compute resources when done. Undeleted sessions expire per platform policies.
+### Step 3: Let azd Manage Session State
 
-## Agent Type Differences
+A normal remote invoke does not require a separate session create command. azd reuses the saved session for that agent. If none exists, the server assigns one and azd persists the returned session ID for later invoke, file, and monitor commands.
 
-| Behavior | Prompt Agent | Hosted Agent |
-|----------|--------------|--------------|
-| Readiness | Immediate | After deployment, version must be `active` |
-| Session | Not applicable | Required via `session_create` |
-| Multi-turn | Via `conversationId` | Via `conversationId` (responses) or session state (invocations) |
-| File operations | ❌ | ✅ via session file tools |
-| Protocol | `responses` only | `responses` or `invocations` |
+| Intent | Option |
+|--------|--------|
+| Reuse the current session | No session flag |
+| Select and persist a known session | `--session-id <id>` |
+| Start fresh session-backed state | `--new-session` |
+| Target a deployed version | `--version <version>` |
+
+For the responses protocol, azd creates a platform-managed conversation and can persist its `conversationId` for reuse. Use `--new-conversation` to reset response history or `--conversation-id <id>` to select one. For invocations, memory is session-backed, so `--new-conversation` has no effect.
+
+Use explicit session commands only when a session must exist before invoke or file operations, or when inspecting and controlling its lifecycle. Read [Session Management](references/session-management.md).
+
+### Step 4: Manage Files and Logs
+
+File commands use the session saved by invoke or explicit session creation unless `--session-id` overrides it. Read [File Operations](references/file-operations.md).
+
+Use the same saved session for logs:
+
+```bash
+azd ai agent monitor
+azd ai agent monitor --session-id <id> --follow
+```
+
+### Step 5: Stop or Delete the Session
+
+Use stop when the filesystem must remain available:
+
+```bash
+azd ai agent sessions stop <session-id>
+```
+
+A later invocation can resume the stopped session. Use delete only for permanent cleanup:
+
+```bash
+azd ai agent sessions delete <session-id>
+```
+
+Delete removes both compute and persistent filesystem state.
+
+## Prompt Agent Workflow with Foundry MCP
+
+1. Use `agent_get` to verify the Prompt Agent.
+2. Invoke with `agent_invoke(projectEndpoint, agentName, inputText)`.
+3. Reuse the returned `conversationId` for later turns.
+
+Prompt Agents do not use hosted sessions or hosted file operations.
+
+## Hosted Protocol Selection
+
+| Protocol | Hosted caller | Restriction |
+|----------|---------------|-------------|
+| `responses` | `azd ai agent invoke` | Local and remote |
+| `invocations` | `azd ai agent invoke --protocol invocations` | Local and remote; developer-defined body |
+| `invocations_ws` | WebSocket client | Follow [invocations-ws](../invocations-ws/invocations-ws.md) |
+
+See [Invocations Protocol Guide](references/invocations-protocol.md) for request schema discovery and examples.
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| Agent not found | Invalid name or endpoint | Use `agent_get` to list agents |
-| Hosted agent not active | Version still provisioning or failed | Check version status via `agent_get` |
-| Session not found | Invalid ID or expired | Create new session with `session_create` |
-| `424 FailedDependency` or `session_not_ready` | Hosted agent session is still warming up or readiness has not completed | Wait 15-30 seconds, check `session_logstream` if needed, then retry `agent_invoke` with the same `sessionId` if one was returned; if no `sessionId` was returned, retry `session_create`. If this persists across 3+ retries (with exponential backoff: 15s, 30s, 60s), the container likely cannot start within the readiness probe deadline — redeploy with higher CPU/memory (recommended minimum: `1` CPU / `2Gi` for direct-code deployments). Also verify the model deployment name is correct via `model_deployment_get`. |
-| `could not resolve agent service in azd project: no azure.ai.agent service named '<agentName>' found in azure.yaml` from `azd ai agent invoke` | Name mismatch. | Update the agent name to the deployed agent name. |
-| `invalid value "json" for --output` from `azd ai agent invoke` | Invoke supports only `default` and `raw` currently. | Retry without `--output json`. |
-| Invocation failed | Model error, timeout, or invalid input | Check agent logs, verify model deployment |
-| Invocations schema mismatch | Request body does not match what the agent expects | Inspect agent's route handler or API docs for the correct JSON schema; do not guess |
-| File operation failed | Session not active or invalid path | Verify session with `session_get` |
-| Permission error | Missing RBAC | Follow [troubleshoot skill](../troubleshoot/troubleshoot.md) |
-| Rate limit exceeded | Too many requests | Implement backoff and retry |
+| Error | Resolution |
+|-------|------------|
+| Agent service cannot be resolved | Use the `azure.yaml` service name, correct the service block, or use `--agent-endpoint` outside the project |
+| Hosted version is not active | Inspect `azd ai agent show --output json` and deployment logs |
+| Session is missing or expired | Run `azd ai agent sessions list`, then use a valid ID or invoke with `--new-session` |
+| Conversation is missing after a session was deleted | For the responses protocol, retry with `--new-session --new-conversation` |
+| `session_not_ready` or `424 FailedDependency` | Inspect `azd ai agent monitor`, wait for readiness, and retry the same azd invoke |
+| Invocations schema mismatch | Inspect the handler or OpenAPI contract and correct the input file |
+| File operation fails | Run `azd ai agent sessions show <id>` and verify the path with `azd ai agent files list` or `stat` |
+| Header-based isolation fails | Pass the same `--user-identity` on invoke, session, file, and monitor commands |
+| Permission error | Follow [troubleshoot](../troubleshoot/troubleshoot.md) |
 
-## Additional Resources
+## References
 
 - [Session Management](references/session-management.md)
 - [File Operations](references/file-operations.md)
+- [Invocations Protocol Guide](references/invocations-protocol.md)
 - [Foundry Hosted Agents](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/hosted-agents?view=foundry)
 - [Foundry Samples](https://github.com/azure-ai-foundry/foundry-samples)

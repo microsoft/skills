@@ -24,20 +24,30 @@ pip install azure-ai-transcription
 
 ```bash
 TRANSCRIPTION_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-TRANSCRIPTION_KEY=<your-key>
+TRANSCRIPTION_KEY=<your-key>  # For key auth; not needed when using DefaultAzureCredential/TokenCredential
 ```
 
-## Authentication
+## Authentication & Lifecycle
 
-Use subscription key authentication (DefaultAzureCredential is not supported for this client):
+> **🔑 Two rules apply to every code sample below:**
+>
+> 1. **Two auth modes are supported:** `AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"])` for key-based auth, or `DefaultAzureCredential()` / any `TokenCredential` for Entra ID. Prefer `DefaultAzureCredential` in production; never hardcode credentials in code.
+> 2. **Wrap every client in a context manager** so HTTP transports and sockets are released deterministically:
+>    - Sync: `with <Client>(...) as client:`
+>    - Async: `async with <Client>(...) as client:`
+>
+> Snippets may abbreviate this setup, but production code should always follow both rules.
+
+Use subscription key authentication:
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     transcriptions = list(client.list_transcriptions())
 ```
@@ -46,11 +56,12 @@ with TranscriptionClient(
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     job = client.begin_transcription(
         name="meeting-transcription",
@@ -66,11 +77,12 @@ with TranscriptionClient(
 
 ```python
 import os
+from azure.core.credentials import AzureKeyCredential
 from azure.ai.transcription import TranscriptionClient
 
 with TranscriptionClient(
     endpoint=os.environ["TRANSCRIPTION_ENDPOINT"],
-    credential=os.environ["TRANSCRIPTION_KEY"],
+    credential=AzureKeyCredential(os.environ["TRANSCRIPTION_KEY"]),
 ) as client:
     stream = client.begin_stream_transcription(locale="en-US")
     stream.send_audio_file("audio.wav")
@@ -88,3 +100,10 @@ with TranscriptionClient(
 6. **Specify language** to improve recognition accuracy
 7. **Handle streaming backpressure** for real-time transcription
 8. **Close transcription sessions** when complete
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

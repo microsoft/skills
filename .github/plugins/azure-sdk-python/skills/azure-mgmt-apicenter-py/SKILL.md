@@ -89,7 +89,7 @@ for api_center in api_centers:
 ## Register an API
 
 ```python
-from azure.mgmt.apicenter.models import Api, ApiKind, LifecycleStage
+from azure.mgmt.apicenter.models import Api, ApiKind, ApiProperties
 
 api = client.apis.create_or_update(
     resource_group_name="my-resource-group",
@@ -97,22 +97,23 @@ api = client.apis.create_or_update(
     workspace_name="default",
     api_name="my-api",
     resource=Api(
-        title="My API",
-        description="A sample API for demonstration",
-        kind=ApiKind.REST,
-        lifecycle_stage=LifecycleStage.PRODUCTION,
-        terms_of_service={"url": "https://example.com/terms"},
-        contacts=[{"name": "API Team", "email": "api-team@example.com"}]
-    )
+        properties=ApiProperties(
+            title="My API",
+            description="A sample API for demonstration",
+            kind=ApiKind.REST,
+            terms_of_service={"url": "https://example.com/terms"},
+            contacts=[{"name": "API Team", "email": "api-team@example.com"}],
+        )
+    ),
 )
 
-print(f"Registered API: {api.title}")
+print(f"Registered API: {api.properties.title}")
 ```
 
 ## Create API Version
 
 ```python
-from azure.mgmt.apicenter.models import ApiVersion, LifecycleStage
+from azure.mgmt.apicenter.models import ApiVersion, ApiVersionProperties, LifecycleStage
 
 version = client.api_versions.create_or_update(
     resource_group_name="my-resource-group",
@@ -121,18 +122,20 @@ version = client.api_versions.create_or_update(
     api_name="my-api",
     version_name="v1",
     resource=ApiVersion(
-        title="Version 1.0",
-        lifecycle_stage=LifecycleStage.PRODUCTION
-    )
+        properties=ApiVersionProperties(
+            title="Version 1.0",
+            lifecycle_stage=LifecycleStage.PRODUCTION,
+        )
+    ),
 )
 
-print(f"Created version: {version.title}")
+print(f"Created version: {version.properties.title}")
 ```
 
 ## Add API Definition
 
 ```python
-from azure.mgmt.apicenter.models import ApiDefinition
+from azure.mgmt.apicenter.models import ApiDefinition, ApiDefinitionProperties
 
 definition = client.api_definitions.create_or_update(
     resource_group_name="my-resource-group",
@@ -142,9 +145,11 @@ definition = client.api_definitions.create_or_update(
     version_name="v1",
     definition_name="openapi",
     resource=ApiDefinition(
-        title="OpenAPI Definition",
-        description="OpenAPI 3.0 specification"
-    )
+        properties=ApiDefinitionProperties(
+            title="OpenAPI Definition",
+            description="OpenAPI 3.0 specification",
+        )
+    ),
 )
 ```
 
@@ -154,7 +159,7 @@ definition = client.api_definitions.create_or_update(
 from azure.mgmt.apicenter.models import ApiSpecImportRequest, ApiSpecImportSourceFormat
 
 # Import from inline content
-client.api_definitions.import_specification(
+client.api_definitions.begin_import_specification(
     resource_group_name="my-resource-group",
     service_name="my-api-center",
     workspace_name="default",
@@ -163,9 +168,9 @@ client.api_definitions.import_specification(
     definition_name="openapi",
     body=ApiSpecImportRequest(
         format=ApiSpecImportSourceFormat.INLINE,
-        value='{"openapi": "3.0.0", "info": {"title": "My API", "version": "1.0"}, "paths": {}}'
+        value='{"openapi": "3.0.0", "info": {"title": "My API", "version": "1.0"}, "paths": {}}',
     )
-)
+).result()
 ```
 
 ## List APIs
@@ -184,7 +189,7 @@ for api in apis:
 ## Create Environment
 
 ```python
-from azure.mgmt.apicenter.models import Environment, EnvironmentKind
+from azure.mgmt.apicenter.models import Environment, EnvironmentKind, EnvironmentProperties
 
 environment = client.environments.create_or_update(
     resource_group_name="my-resource-group",
@@ -192,18 +197,20 @@ environment = client.environments.create_or_update(
     workspace_name="default",
     environment_name="production",
     resource=Environment(
-        title="Production",
-        description="Production environment",
-        kind=EnvironmentKind.PRODUCTION,
-        server={"type": "Azure API Management", "management_portal_uri": ["https://portal.azure.com"]}
-    )
+        properties=EnvironmentProperties(
+            title="Production",
+            description="Production environment",
+            kind=EnvironmentKind.PRODUCTION,
+            server={"type": "Azure API Management", "management_portal_uri": ["https://portal.azure.com"]},
+        )
+    ),
 )
 ```
 
 ## Create Deployment
 
 ```python
-from azure.mgmt.apicenter.models import Deployment, DeploymentState
+from azure.mgmt.apicenter.models import Deployment, DeploymentProperties, DeploymentState
 
 deployment = client.deployments.create_or_update(
     resource_group_name="my-resource-group",
@@ -212,28 +219,32 @@ deployment = client.deployments.create_or_update(
     api_name="my-api",
     deployment_name="prod-deployment",
     resource=Deployment(
-        title="Production Deployment",
-        description="Deployed to production APIM",
-        environment_id="/workspaces/default/environments/production",
-        definition_id="/workspaces/default/apis/my-api/versions/v1/definitions/openapi",
-        state=DeploymentState.ACTIVE,
-        server={"runtime_uri": ["https://api.example.com"]}
-    )
+        properties=DeploymentProperties(
+            title="Production Deployment",
+            description="Deployed to production APIM",
+            environment_id="/workspaces/default/environments/production",
+            definition_id="/workspaces/default/apis/my-api/versions/v1/definitions/openapi",
+            state=DeploymentState.ACTIVE,
+            server={"runtime_uri": ["https://api.example.com"]},
+        )
+    ),
 )
 ```
 
 ## Define Custom Metadata
 
 ```python
-from azure.mgmt.apicenter.models import MetadataSchema
+from azure.mgmt.apicenter.models import MetadataSchema, MetadataSchemaProperties
 
 metadata = client.metadata_schemas.create_or_update(
     resource_group_name="my-resource-group",
     service_name="my-api-center",
     metadata_schema_name="data-classification",
     resource=MetadataSchema(
-        schema='{"type": "string", "title": "Data Classification", "enum": ["public", "internal", "confidential"]}'
-    )
+        properties=MetadataSchemaProperties(
+            schema='{"type": "string", "title": "Data Classification", "enum": ["public", "internal", "confidential"]}'
+        )
+    ),
 )
 ```
 
@@ -266,3 +277,10 @@ metadata = client.metadata_schemas.create_or_update(
 6. **Import specifications** to enable API analysis and linting
 7. **Use lifecycle stages** to track API maturity
 8. **Add contacts** for API ownership and support
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

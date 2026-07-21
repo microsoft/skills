@@ -6,10 +6,10 @@ The `invocations` protocol is **bytes in, bytes out**. The platform is pure pass
 
 | Aspect | `responses` | `invocations` |
 |--------|------------|---------------|
-| **Input** | `inputText` is a natural language message (e.g., `"What is the weather?"`) | `inputText` is forwarded as the **raw HTTP request body** — bytes in. Format as whatever the container's invoke handler expects (typically JSON) |
+| **Input** | Natural language message | Raw HTTP request body from `--input-file`; format it as the container's invoke handler expects |
 | **Output** | Structured OpenAI response with `output_text` | **Raw response bytes** from the container — JSON, text, or SSE events. Format is defined by the agent developer |
-| **Conversation history** | Platform-managed via `conversationId` | Agent-managed via session filesystem; `conversationId` does **not** apply |
-| **Streaming** | Platform-managed via `stream: true` | Agent-controlled; `stream` parameter does **not** apply |
+| **Conversation history** | Platform-managed; azd can persist the `conversationId` for reuse | Agent-managed via session filesystem |
+| **Streaming** | Platform-managed | Agent-controlled |
 
 ## Discovering the Expected Input Schema
 
@@ -37,17 +37,17 @@ If neither the OpenAPI spec nor source code is available, ask the user for the e
 
 **Responses protocol** (default):
 
-```text
-agent_invoke(projectEndpoint, agentName, inputText: "What is the weather in Seattle?")
-→ Structured response with output_text
+```bash
+azd ai agent invoke "What is the weather in Seattle?"
 ```
 
 **Invocations protocol** — agent expects `{"message": "<text>"}`:
 
-```text
-agent_invoke(projectEndpoint, agentName, inputText: "{\"message\":\"hello\"}", protocol: "invocations", sessionId: "<session-id>")
-→ Raw bytes from container, e.g.: {"response": "Hi there!", "session_id": "abc123"}
+```bash
+azd ai agent invoke --protocol invocations --input-file request.json
 ```
+
+Use `--output raw` when the unmodified status line, headers, and body are required. azd reuses the saved session automatically; use `--new-session` to reset agent-managed state.
 
 ## Common Use Cases
 
@@ -64,4 +64,4 @@ agent_invoke(projectEndpoint, agentName, inputText: "{\"message\":\"hello\"}", p
 |-------|-------|------------|
 | 400/422 or invocation failed | Request body does not match what the container expects | Fetch OpenAPI spec or inspect handler code for the correct schema |
 | 404 on OpenAPI spec | Developer did not register an `openapi_spec` | Inspect handler source code or ask the user for the API contract |
-| Empty response | Agent returned no content | Check agent logs via `session_logstream`; verify the handler processes the request body correctly |
+| Empty response | Agent returned no content | Check logs with `azd ai agent monitor`; verify the handler processes the request body correctly |

@@ -228,3 +228,10 @@ Stream names follow patterns:
 7. **Use async client** for high-throughput scenarios
 8. **Batch uploads** — SDK handles batching, but send reasonable chunks
 9. **Monitor ingestion** — Check Log Analytics for ingestion status
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

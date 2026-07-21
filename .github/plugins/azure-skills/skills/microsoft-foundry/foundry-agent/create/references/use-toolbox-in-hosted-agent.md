@@ -8,7 +8,7 @@ Hosted agents access Foundry-managed tools through a **Toolbox MCP endpoint**. U
 >
 > 📘 For wiring a remote tool (catalog tile or generic MCP server) into a project connection that a toolbox can attach to, see [foundry-tool-catalog.md](foundry-tool-catalog.md).
 >
-> 📘 For the full list of supported tool types and their per-type fields, see [agent-tools.md](agent-tools.md) and the per-tool `tool-*.md` files.
+> 📘 For the supported tool types and their per-type fields, see the table below and the public [Toolbox docs (Configure tools)](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/toolbox#configure-tools).
 
 > 💡 **This skill is scoped to *consuming* an existing toolbox from agent code** — endpoint resolution, env-var contract, payload shape gathered before agent runtime, verification, and tracing. **Toolbox and connection CRUD belongs in [Foundry Toolkit (VS Code)](https://code.visualstudio.com/docs/intelligentapps/tool-catalog) or the [Foundry Portal](https://ai.azure.com/)** — those surfaces give you tool browsing, metadata, connection wizards, and validation. Use the imperative `azd ai` CLI only for *operational* tasks (retarget the default version, smoke-test an endpoint).
 
@@ -56,29 +56,29 @@ Once the user supplies the toolbox name/endpoint — either an existing one or a
 
 ## Available tool types
 
-The full set is documented in [agent-tools.md](agent-tools.md) and — authoritatively — in the public [Toolbox docs (Configure tools)](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/toolbox#configure-tools). At time of writing the supported `type` values are:
+The full set is documented — authoritatively — in the public [Toolbox docs (Configure tools)](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/toolbox#configure-tools). At time of writing the supported `type` values are:
 
-| `type` | Tool | Connection required? | Detail |
-|---|---|---|---|
-| `mcp` | Remote MCP server (third-party via catalog, BYO OAuth, or generic) | Optional (none / static key / project MI / OAuth) | [tool-mcp.md](tool-mcp.md) |
-| `web_search` | Web search (basic Bing; optional `web_search.custom_search_configuration` for Bing Custom Search to scope grounding to specific domains) | No (basic); Yes for Custom Search | [tool-web-search.md](tool-web-search.md) |
-| `azure_ai_search` | Azure AI Search index | Yes (Search service connection) | [tool-azure-ai-search.md](tool-azure-ai-search.md) |
-| `code_interpreter` | Sandboxed Python execution | No | [tool-code-interpreter.md](tool-code-interpreter.md) |
-| `file_search` | Vector-store-backed retrieval over uploaded files | No (vector store is part of the toolbox) | [tool-file-search.md](tool-file-search.md) |
-| `openapi` | REST API exposed via an OpenAPI 3.x spec | Conditional (`connection` requires `project_connection_id`; `managed_identity` does not — uses project MI + `audience`) | [tool-openapi.md](tool-openapi.md) |
-| `a2a_preview` | Call another Foundry agent as a tool | Optional | [tool-a2a.md](tool-a2a.md) |
-| `work_iq_preview` | Microsoft 365 work context (mail / meetings / files / chats) via Work IQ | Yes (Work IQ `RemoteA2A` OAuth connection; BYO Entra app; M365 Copilot license per user) | [tool-work-iq.md](tool-work-iq.md) |
-| `fabric_iq_preview` | Microsoft Fabric data (Ontology / Fabric data agent / Power BI semantic model) | Yes (Fabric IQ OAuth connection; tenant admin consent) | [tool-fabric-iq.md](tool-fabric-iq.md) |
-| `toolbox_search_preview` | **Tool Search** — a directive (not a tool) that swaps `tools/list` for `tool_search` + `call_tool` meta-tools | No | [tool-tool-search.md](tool-tool-search.md) |
+| `type` | Tool | Connection required? |
+|---|---|---|
+| `mcp` | Remote MCP server (third-party via catalog, BYO OAuth, or generic) | Optional (none / static key / project MI / OAuth) |
+| `web_search` | Web search (basic Bing; optional `web_search.custom_search_configuration` for Bing Custom Search to scope grounding to specific domains) | No (basic); Yes for Custom Search |
+| `azure_ai_search` | Azure AI Search index | Yes (Search service connection) |
+| `code_interpreter` | Sandboxed Python execution | No |
+| `file_search` | Vector-store-backed retrieval over uploaded files | No (vector store is part of the toolbox) |
+| `openapi` | REST API exposed via an OpenAPI 3.x spec | Conditional (`connection` requires `project_connection_id`; `managed_identity` does not — uses project MI + `audience`) |
+| `a2a_preview` | Call another Foundry agent as a tool | Optional |
+| `work_iq_preview` | Microsoft 365 work context (mail / meetings / files / chats) via Work IQ | Yes (Work IQ `RemoteA2A` OAuth connection; BYO Entra app; M365 Copilot license per user) |
+| `fabric_iq_preview` | Microsoft Fabric data (Ontology / Fabric data agent / Power BI semantic model) | Yes (Fabric IQ OAuth connection; tenant admin consent) |
+| `toolbox_search_preview` | **Tool Search** — a directive (not a tool) that swaps `tools/list` for `tool_search` + `call_tool` meta-tools | No |
 
 **Adjacent (not a `type` in a toolbox version):**
 
-- **Agent Memory** — use the `MemorySearchTool` SDK class on prompt agents; for hosted agents, configure the memory store via the project (separate from the toolbox). See [tool-memory.md](tool-memory.md).
+- **Agent Memory** — for hosted agents, configure the memory store at the **project** level (separate from the toolbox); it is not a toolbox `type` and is not wired through agent code. See the public [Memory docs](https://learn.microsoft.com/azure/ai-foundry/agents/how-to/memory-usage?view=foundry).
 - **Routines (preview)** — not a tool; an agent **trigger** (`schedule` / `timer` / `github_issue` / `custom`) that invokes an existing agent. See the [public Routines docs](https://learn.microsoft.com/azure/foundry/agents/how-to/use-routines).
 
 ## Information to Gather Before Building a Toolbox Payload
 
-When the user asks to "add an MCP tool" or similar, **never guess**. Confirm each field before generating any JSON or `azure.yaml` snippet:
+When the user asks to "add an MCP tool" or similar, **never guess**. Confirm each field before generating a toolbox payload:
 
 | # | Question | Why needed |
 |---|----------|------------|
@@ -147,42 +147,6 @@ When the user asks to "add an MCP tool" or similar, **never guess**. Confirm eac
 }
 ```
 
-### Declarative path via `azd`
-
-If the project already uses `azd ai agent init`, prefer declaring the toolbox in `azure.yaml` so `azd deploy` provisions it and injects `TOOLBOX_ENDPOINT` automatically:
-
-```yaml
-# Declare secret parameters first; azd will prompt for the value on `azd up`
-# (or read it from `AZURE_<NAME>` env vars) and never store it in plaintext.
-params:
-  - name: github_pat
-    type: securestring
-
-resources:
-  - kind: connection
-    name: <CONNECTION_NAME>
-    target: <MCP_SERVER_URL>
-    category: remoteTool
-    credentials:
-      type: CustomKeys
-      keys:
-        # Header name comes from the catalog entry's x-ms-connection-parameters.
-        # {{ github_pat }} is resolved from the `params` block above.
-        Authorization: "Bearer {{ github_pat }}"
-
-  - kind: toolbox
-    name: agent-tools
-    tools:
-      - type: toolbox_search_preview   # recommended for any toolbox > ~5 tools
-      - type: web_search
-      - type: mcp
-        server_label: <LABEL>
-        server_url: <MCP_SERVER_URL>
-        project_connection_id: <CONNECTION_NAME>
-```
-
-See [azd `params` reference](https://learn.microsoft.com/azure/developer/azure-developer-cli/azd-schema#params) for the full parameter syntax.
-
 ## Operational helpers via `azd ai` CLI
 
 > The `azd ai` CLI also exposes `connection create`, `toolbox create`, `toolbox list`, and `toolbox delete`. Prefer **Foundry Toolkit (VS Code)** or the **Foundry Portal** for those — the UI gives you tool browsing, connection wizards, and validation. The two commands below are the ones the skill should still drive directly because they're *operational*, not setup.
@@ -227,6 +191,8 @@ $body = @{ jsonrpc = "2.0"; id = 1; method = "tools/list"; params = @{} } | Conv
 ```
 
 `?api-version=v1` is required.
+
+> ⚠️ **Agent-identity-authed tools won't work locally — that's expected, not a blocker.** The token above is your **user** identity, not the deployed agent's.
 
 ## Code Integration Patterns
 

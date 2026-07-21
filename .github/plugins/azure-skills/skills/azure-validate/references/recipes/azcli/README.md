@@ -9,84 +9,54 @@ Validation steps for Azure CLI deployments.
 
 ## Validation Steps
 
-- [ ] 1. Azure CLI Installation
-- [ ] 2. Authentication
-- [ ] 3. Bicep Compilation
-- [ ] 4. Template Validation
-- [ ] 5. What-If Preview
-- [ ] 6. Docker Build (if containerized)
-- [ ] 7. Azure Policy Validation
+- [ ] 1. Core Validation (CLI, auth, build, validate, what-if) — run [`validate-deployment` script](../scripts/validate-deployment.sh)
+- [ ] 2. Docker Build (if containerized)
+- [ ] 3. Azure Policy Validation
 
 ## Validation Details
 
-### 1. Azure CLI Installation
+### 1. Core Validation Script
 
-Verify Azure CLI is installed:
+The core validation checks are a fixed, deterministic sequence. Run the shared
+**validate-deployment** helper instead of executing and parsing each command by hand. It
+confirms the Azure CLI is installed and authenticated, compiles the Bicep template
+(`az bicep build`), validates it against the target scope (`az deployment ... validate`),
+and runs a what-if preview — printing a compact PASS/FAIL summary plus a what-if change
+count (Create/Modify/Delete).
 
-```bash
-az version
-```
+- Bash: [`../scripts/validate-deployment.sh`](../scripts/validate-deployment.sh)
+- PowerShell: [`../scripts/validate-deployment.ps1`](../scripts/validate-deployment.ps1)
 
-**If not installed:**
-```
-mcp_azure_mcp_extension_cli_install(cli-type: "az")
-```
-
-### 2. Authentication
-
-```bash
-az account show
-```
-
-**If not logged in:**
-```bash
-az login
-```
-
-**Set subscription:**
-```bash
-az account set --subscription <subscription-id>
-```
-
-### 3. Bicep Compilation
+**Subscription scope:**
 
 ```bash
-az bicep build --file ./infra/main.bicep
+../scripts/validate-deployment.sh --scope sub --location <location>
+```
+```powershell
+../scripts/validate-deployment.ps1 -Scope sub -Location <location>
 ```
 
-### 4. Template Validation
+**Resource group scope:**
 
 ```bash
-# Subscription scope
-az deployment sub validate \
-  --location <location> \
-  --template-file ./infra/main.bicep \
-  --parameters ./infra/main.parameters.json
-
-# Resource group scope
-az deployment group validate \
-  --resource-group <rg-name> \
-  --template-file ./infra/main.bicep \
-  --parameters ./infra/main.parameters.json
+../scripts/validate-deployment.sh --scope group --resource-group <rg-name>
+```
+```powershell
+../scripts/validate-deployment.ps1 -Scope group -ResourceGroup <rg-name>
 ```
 
-### 5. What-If Preview
+Defaults: `--template ./infra/main.bicep`, `--parameters ./infra/main.parameters.json`
+(skipped if absent). Pass `--subscription <id>` to target a specific subscription.
 
-```bash
-# Subscription scope
-az deployment sub what-if \
-  --location <location> \
-  --template-file ./infra/main.bicep \
-  --parameters ./infra/main.parameters.json
+**Interpreting results:**
 
-# Resource group scope
-az deployment group what-if \
-  --resource-group <rg-name> \
-  --template-file ./infra/main.bicep \
-  --parameters ./infra/main.parameters.json
-```
+- `OVERALL: PASS` — all five checks passed; record the summary in Section 7 (Validation Proof).
+- Any step `FAIL` — the script prints the failing command's error. Remediate:
+  - **Authenticated** fails → `az login`, then `az account set --subscription <id>`.
+  - **Azure CLI installed** fails → install via `mcp_azure_mcp_extension_cli_install(cli-type: "az")`.
+  - Otherwise see [Error handling](./errors.md).
 
-### 6. Docker Build (if containerized)
+### 2. Docker Build (if containerized)
 
 **Before building**, validate the Docker build context:
 
@@ -105,7 +75,7 @@ npm install --package-lock-only
 docker build -t <image>:test ./src/<service>
 ```
 
-### 7. Azure Policy Validation
+### 3. Azure Policy Validation
 
 See [Policy Validation Guide](../../policy-validation.md) for instructions on retrieving and validating Azure policies for your subscription.
 

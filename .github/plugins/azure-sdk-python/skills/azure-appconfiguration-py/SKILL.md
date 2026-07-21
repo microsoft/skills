@@ -256,3 +256,10 @@ async def main():
 7. **Use Entra ID** instead of connection strings in production
 8. **Refresh settings periodically** in long-running applications
 9. **Use feature flags** for gradual rollouts and A/B testing
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |

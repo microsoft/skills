@@ -4,7 +4,7 @@ description: "Prepare azd-based Azure projects for deployment: generates azure.y
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.17"
+  version: "1.2.18"
 ---
 
 # Azure Prepare
@@ -53,7 +53,7 @@ Activate this skill when user wants to:
 >
 > The `.azure/deployment-plan.md` file is the **source of truth** for this workflow and for azure-validate and azure-deploy skills. Without it, those skills will fail.
 >
-> ⚠️ **CRITICAL: `.azure/deployment-plan.md` must be WRITTEN TO DISK inside the workspace root** (e.g., `/tmp/my-project/.azure/deployment-plan.md`), not in the session-state folder. Use a file-write tool to create this file. This is the deployment plan artifact read by azure-validate and azure-deploy. **You MUST create this file — do not proceed without it.** 
+> ⚠️ **CRITICAL: `.azure/deployment-plan.md` must be WRITTEN TO DISK inside the workspace root** (e.g., `<workspace-root>/.azure/deployment-plan.md`), not in the session-state folder. Use a file-write tool to create this file. This is the deployment plan artifact read by azure-validate and azure-deploy. **You MUST create this file — do not proceed without it.** 
 > ⚠️ **CRITICAL: You must create the file with the name `.azure/deployment-plan.md` as is**. You must not use other names such as `.azure/plan.md`.
 >
 > ⛔ **Critical:** Skipping the plan file creation will cause azure-validate and azure-deploy to fail. This requirement has no exceptions.

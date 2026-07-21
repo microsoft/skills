@@ -37,6 +37,17 @@ AZURE_SPEECH_ENDPOINT=https://<region>.stt.speech.microsoft.com
 pip install requests
 ```
 
+## Authentication & Lifecycle
+
+> **🔑 Two rules apply to every code sample below:**
+>
+> 1. **Two auth modes are supported.** Use a subscription key (`Ocp-Apim-Subscription-Key` header) for quick access, or a Microsoft Entra token (including one acquired with `DefaultAzureCredential`) via the `Authorization` request header (see "Option 2" below). Never hardcode credentials in source.
+> 2. **Use context managers for files and HTTP resources** so file handles and network connections are released deterministically:
+>    - Sync: `with open(...) as f:` and (when reusing connections) `with requests.Session() as session:`
+>    - Async: `async with aiohttp.ClientSession() as session:`
+>
+> Snippets may abbreviate this setup, but production code should always follow both rules.
+
 ## Quick Start
 
 ```python
@@ -352,7 +363,7 @@ Common language codes (see [full list](https://learn.microsoft.com/azure/ai-serv
 ## Best Practices
 
 1. **Pick sync OR async and stay consistent.** Do not mix `azure.xxx` sync clients with `azure.xxx.aio` async clients in the same call path. Choose one mode per module.
-2. **Always use context managers for clients.** Use `with httpx.Client(...) as client:` (sync) or `async with httpx.AsyncClient(...) as client:` (async) so connections are pooled and closed deterministically.
+2. **Use context managers for files and HTTP resources.** Use `with open(...) as f:` and (when reusing connections) `with requests.Session() as session:` for sync code, or `async with aiohttp.ClientSession() as session:` for async code.
 3. **Use WAV PCM 16kHz mono** for best compatibility
 4. **Enable chunked transfer** for lower latency
 5. **Cache access tokens** for 9 minutes (valid for 10)

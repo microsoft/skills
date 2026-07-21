@@ -14,33 +14,25 @@ This check is required when **all** of these are true:
 
 ## Detection
 
-Search for `AddAzureFunctionsProject` in the AppHost source file(s):
+Run the scan script — it finds `*.cs` files that call `AddAzureFunctionsProject`, checks whether each one already sets `AzureWebJobsSecretStorageType`, and prints a single verdict so you don't have to parse raw grep output.
 
+**Bash** — [`scripts/scan-aspire-functions-secrets.sh`](scripts/scan-aspire-functions-secrets.sh):
 ```bash
-grep -rn "AddAzureFunctionsProject" . --include="*.cs"
+./scripts/scan-aspire-functions-secrets.sh [directory]   # directory defaults to .
 ```
 
-**PowerShell:**
+**PowerShell** — [`scripts/scan-aspire-functions-secrets.ps1`](scripts/scan-aspire-functions-secrets.ps1):
 ```powershell
-Get-ChildItem -Recurse -Filter "*.cs" | Select-String "AddAzureFunctionsProject" -List
+.\scripts\scan-aspire-functions-secrets.ps1 [-Path <directory>]   # -Path defaults to .
 ```
 
-If found, check whether `AzureWebJobsSecretStorageType` is already configured in those same file(s):
+The script prints one of three verdicts:
 
-```bash
-# Check only the AppHost file(s) that contain AddAzureFunctionsProject
-find . -name "*.cs" -path "*AppHost*" -print0 | xargs -0 grep -l "AddAzureFunctionsProject" 2>/dev/null | xargs grep -l "AzureWebJobsSecretStorageType"
-```
-
-**PowerShell:**
-```powershell
-Get-ChildItem -Recurse -Filter "*.cs" |
-  Where-Object { $_.FullName -match "AppHost" } |
-  Select-String "AddAzureFunctionsProject" -List |
-  ForEach-Object { Select-String "AzureWebJobsSecretStorageType" -Path $_.Path }
-```
-
-**If `AddAzureFunctionsProject` is present but `AzureWebJobsSecretStorageType` is NOT configured in the same file → fix is required.**
+| Verdict | Meaning | Action |
+|---------|---------|--------|
+| `NOT APPLICABLE` | No `AddAzureFunctionsProject` call found | Skip this check |
+| `ALREADY CONFIGURED` | Every matching file already sets `AzureWebJobsSecretStorageType` | No change required |
+| `FIX REQUIRED` | Matching file(s) call `AddAzureFunctionsProject` but omit the setting (file/line listed) | Apply the **Fix** below to each listed file |
 
 ## Fix
 

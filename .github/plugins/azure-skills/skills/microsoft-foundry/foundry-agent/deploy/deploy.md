@@ -90,7 +90,7 @@ azd provision --no-prompt
 What this does:
 
 - Creates the Foundry project (if not present) and supporting resources under `infra/`.
-- Creates any connections/toolboxes declared as top-level `azure.ai.connection` / `azure.ai.toolbox` services (linked from the agent via `uses:`). Most agents instead reference an existing toolbox through a `TOOLBOX_<NAME>_MCP_ENDPOINT` environment variable created with `azd ai connection` / `azd ai toolbox`. `${PARAM_*}` placeholders resolve from the active azd env.
+- Creates connections declared as top-level `azure.ai.connection` services. `${PARAM_*}` placeholders resolve from the active azd env.
 - Wires model deployments, AI Search, ACR, etc. `infra/layers/` provision in parallel when present.
 
 This is a core `azd` command. Skip provision when the user gave you an existing `AZURE_AI_PROJECT_ENDPOINT` via `azd env set` -- the extension uses the existing project as-is.
@@ -129,7 +129,7 @@ Expect `"status": "active"` (or `"deployed"`) and an `agent_endpoints` map. Smok
 azd ai agent invoke "hello, are you up?"
 ```
 
-> `azd ai agent invoke` is billed, so it prints a confirmation envelope on `--no-prompt`. Summarize `changes[]`, then run `confirmCommand` once consented.
+> Remote invocation can incur model usage charges. Run it only as part of the requested deployment or test.
 
 Run one remote invocation only unless the user explicitly asked to test multi-turn/session behavior. A single successful response is enough for the deployment smoke test. Anything other than a completed/successful response -> run `azd ai agent doctor --output json`, then follow [troubleshoot](../troubleshoot/troubleshoot.md).
 
@@ -197,7 +197,7 @@ Each env has its own `AGENT_<SVC>_*` vars.
 | Agent version poll times out | Build still running; retry `azd ai agent show` after a minute. |
 | `session_not_ready` (424) | Cold start or readiness delay. Wait 15-30 seconds and retry. If persistent, use `1` CPU / `2Gi` memory minimum, verify the model deployment name, capability host, and agent identity role. |
 | `invalid value "json" for --output` from `azd ai agent invoke` | Invoke supports only `default` and `raw` currently. Retry without `--output json`. |
-| `could not resolve agent service in azd project: no azure.ai.agent service named '<agentName>' found in azure.yaml` from `azd ai agent invoke` | Name mismatch. Use the service name, update the `azure.yaml` service block, or invoke through the Foundry MCP `agent_invoke` tool. |
+| `could not resolve agent service in azd project: no azure.ai.agent service named '<agentName>' found in azure.yaml` from `azd ai agent invoke` | Name mismatch. Use the service name, update the `azure.yaml` service block, or use `--agent-endpoint` when invoking outside the project. |
 | `subscription quota exceeded` | Ask user to request quota; do not auto-retry. |
 | Bicep deploy errors | Forward `error.details[]` verbatim to the user. |
 | `RoleAssignmentUpdateNotPermitted` during provision | A role assignment already exists but conflicts. Check for existing role assignments with `az role assignment list --scope <resource-scope>`. The provision may have succeeded for all resources except RBAC — verify with `azd ai project show` and manually assign the `Cognitive Services User` role to the agent identity if needed. |
@@ -316,5 +316,5 @@ When local files under `datasets/<suite>/` or `evaluators/<suite>/` change, run 
 
 > Even in `--no-prompt` / `--yolo` mode: if the user named a foundry project or asked to create one, go ahead; otherwise stop and ask before provisioning.
 
-- Hosted: always pass `--no-prompt`. If `azd ai agent invoke` prints a `confirmation_required` envelope, summarize `changes[]` and re-run with `--force` after the user consents -- never auto-append `--force`.
+- Hosted: always pass `--no-prompt`.
 - Prompt: all required values (project endpoint, agent name, model deployment) must come from the user message or `azd env get-values`; missing values should fail loudly rather than prompt.

@@ -272,3 +272,10 @@ except HttpResponseError as e:
 8. **Use Key Vault references** in App Service/Functions config
 9. **Cache secrets** appropriately to reduce API calls
 10. **Use async clients** for high-throughput scenarios
+
+## Reference Files
+
+| File | Contents |
+|------|----------|
+| [references/capabilities.md](references/capabilities.md) | Additional non-hero capabilities, operation-group coverage, and production checklists. |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Dedicated non-hero examples for secondary/advanced scenarios. |
