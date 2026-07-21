@@ -20,7 +20,7 @@ PY_FENCE_RE = re.compile(r"```(?:python|py)\n(.*?)\n```", re.S)
 
 def check_python_file(path: Path, repo_root: Path, errors: list[str]) -> int:
     content = path.read_text(encoding="utf-8")
-    if "{{" in content:
+    if path.name == "template.py" and "{{" in content:
         return 0  # skip template files with placeholder syntax
     try:
         ast.parse(content)
