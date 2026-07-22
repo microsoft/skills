@@ -8,7 +8,7 @@ Creates skill_effectiveness_experiment.yaml files
 for all matching skills in the scenarios directory. Each experiment compares
 performance with and without the skill context (baseline vs. skill variants).
 
-Use -SkillPattern to filter by language (e.g., '*-py' for Python, '*-rs' for Rust)
+Use -SkillPattern to filter by language (e.g., '*-py' for Python, '*-rust' for Rust)
 or by service (e.g., 'azure-cosmos*' for Cosmos DB).
 
 .PARAMETER ScenariosRoot
