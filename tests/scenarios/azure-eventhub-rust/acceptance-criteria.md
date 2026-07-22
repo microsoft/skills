@@ -58,12 +58,14 @@ use azure_identity::DeveloperToolsCredential;
 ### 2.1 ✅ CORRECT: Create Producer with Builder Pattern
 
 ```rust
+use std::sync::Arc;
+use azure_core::credentials::TokenCredential;
 use azure_identity::DeveloperToolsCredential;
 use azure_messaging_eventhubs::ProducerClient;
 
-let credential = DeveloperToolsCredential::new(None)?;
+let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
 let producer = ProducerClient::builder()
-    .open("<namespace>.servicebus.windows.net", "eventhub-name", credential.clone())
+    .open("<namespace>.servicebus.windows.net", "eventhub-name".to_string(), credential.clone())
     .await?;
 ```
 
@@ -74,6 +76,17 @@ let producer = ProducerClient::builder()
 ```rust
 // WRONG - use builder pattern
 let producer = ProducerClient::new(...);
+```
+
+#### ❌ INCORRECT: Untyped credential passed to `.open()`
+
+```rust
+// WRONG - .open() requires Arc<dyn TokenCredential>; an untyped binding resolves to the
+// concrete DeveloperToolsCredential type and fails to compile with a mismatched-types error.
+let credential = DeveloperToolsCredential::new(None)?;
+let producer = ProducerClient::builder()
+    .open("<namespace>.servicebus.windows.net", "eventhub-name", credential.clone())
+    .await?;
 ```
 
 ---
@@ -112,23 +125,51 @@ batch.try_add_event_data(data, None);  // Should check if returned true
 ### 4.1 ✅ CORRECT: Create Consumer with Builder Pattern
 
 ```rust
+use std::sync::Arc;
+use azure_core::credentials::TokenCredential;
 use azure_messaging_eventhubs::ConsumerClient;
 
-let credential = DeveloperToolsCredential::new(None)?;
+let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
 let consumer = ConsumerClient::builder()
-    .open("<namespace>.servicebus.windows.net", "eventhub-name", credential.clone())
+    .open("<namespace>.servicebus.windows.net", "eventhub-name".to_string(), credential.clone())
     .await?;
 ```
 
 ### 4.2 ✅ CORRECT: Receive Events from Partition
 
 ```rust
-let receiver = consumer.open_partition_receiver("0", None).await?;
+use futures::stream::StreamExt;
+use azure_messaging_eventhubs::{OpenReceiverOptions, StartLocation, StartPosition};
 
-let events = receiver.receive_events(100, None).await?;
-for event in events {
-    println!("Event data: {:?}", event.body());
+let receiver = consumer
+    .open_receiver_on_partition(
+        "0".to_string(),
+        Some(OpenReceiverOptions {
+            start_position: Some(StartPosition {
+                location: StartLocation::Earliest,
+                ..Default::default()
+            }),
+            ..Default::default()
+        }),
+    )
+    .await?;
+
+let mut stream = receiver.stream_events();
+while let Some(event_result) = stream.next().await {
+    match event_result {
+        Ok(event) => println!("Event data: {:?}", event.event_data().body()),
+        Err(err) => eprintln!("Error: {:?}", err),
+    }
 }
+```
+
+### 4.3 Anti-Patterns (ERRORS)
+
+#### ❌ INCORRECT: Wrong body accessor
+
+```rust
+// WRONG - body() is not a method on ReceivedEventData; call it via event_data() instead
+println!("Event data: {:?}", event.body());
 ```
 
 ---
@@ -156,7 +197,7 @@ let partition_props = consumer.get_partition_properties("0", None).await?;
 
 ```rust
 let producer = ProducerClient::builder()
-    .open(host, eventhub, credential)
+    .open(host, eventhub.to_string(), credential)
     .await?;
 ```
 

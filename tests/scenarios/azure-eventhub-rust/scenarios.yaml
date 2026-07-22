@@ -23,12 +23,14 @@ scenarios:
       - basic
       - producer
     mock_response: |
+      use std::sync::Arc;
+      use azure_core::credentials::TokenCredential;
       use azure_identity::DeveloperToolsCredential;
       use azure_messaging_eventhubs::ProducerClient;
 
-      let credential = DeveloperToolsCredential::new(None)?;
+      let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
       let producer = ProducerClient::builder()
-          .open("<namespace>.servicebus.windows.net", "eventhub-name", credential.clone())
+          .open("<namespace>.servicebus.windows.net", "eventhub-name".to_string(), credential.clone())
           .await?;
 
   - name: send_single_event
@@ -77,10 +79,12 @@ scenarios:
       - consumer
       - receive
     mock_response: |
+      use std::sync::Arc;
+      use azure_core::credentials::TokenCredential;
       use azure_identity::DeveloperToolsCredential;
       use azure_messaging_eventhubs::ConsumerClient;
 
-      let credential = DeveloperToolsCredential::new(None)?;
+      let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
       let consumer = ConsumerClient::builder()
           .open("<namespace>.servicebus.windows.net", "eventhub-name".to_string(), credential.clone())
           .await?;
@@ -105,5 +109,5 @@ scenarios:
       let mut event_stream = receiver.stream_events();
       while let Some(event_result) = event_stream.next().await {
         let event = event_result?;
-        println!("Event data: {:?}", event.body());
+        println!("Event data: {:?}", event.event_data().body());
       }
