@@ -211,12 +211,12 @@ if (-not $evalFiles) {
 
 New-Item -ItemType Directory -Path $resolvedResultsRoot -Force | Out-Null
 
-$customGraderPluginDir = Join-Path $PSScriptRoot "scenarios\_shared\vally\grader-plugins\rust-cargo-build-failure"
+$customGraderPluginDir = Join-Path $PSScriptRoot "scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure"
 $customGraderSource = Join-Path $customGraderPluginDir "index.ts"
 $customGraderPackage = Join-Path $customGraderPluginDir "package.json"
 $customGraderTsConfig = Join-Path $customGraderPluginDir "tsconfig.json"
-$customGraderDistEntry = Join-Path $customGraderPluginDir "dist\index.js"
-$vallyCmd = Join-Path $PSScriptRoot "node_modules\.bin\vally.cmd"
+$customGraderDistEntry = Join-Path $customGraderPluginDir "dist/index.js"
+$vallyCmd = Join-Path $PSScriptRoot "node_modules/.bin/vally.cmd"
 if (-not (Test-Path -LiteralPath $vallyCmd)) {
     Write-Warning "Local Vally executable not found at $vallyCmd; using 'pnpm exec vally' for this run."
     $vallyCmd = "pnpm-exec"

@@ -80,7 +80,7 @@ From repository root:
 
 From tests/scenarios/<skill>/vally:
 
-- pnpm --dir ../../../.. exec vally experiment run skill_effectiveness_experiment.yaml --variant sonnet_baseline --output-dir ../../../../.vally/smoke/<skill> --workers 1
+- pnpm --dir ../../.. exec vally experiment run scenarios/<skill>/vally/skill_effectiveness_experiment.yaml --variant sonnet_baseline --output-dir .vally/smoke/<skill> --workers 1
 
 ## Scenario Folder Structure
 
