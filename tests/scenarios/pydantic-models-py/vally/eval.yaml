@@ -18,10 +18,10 @@ stimuli:
       Use Field constraints, proper inheritance, and camelCase aliases with populate_by_name.
 
     rubric:
-      - Uses the APIs, imports, and workflow expected by the skill.
-      - Keeps credentials in environment variables and avoids hardcoded secrets.
-      - Provides complete executable Python code with clear control flow and error handling.
-      - Includes explicit try/except exception handling.
+      - Defines Base, Create, Update, Response, and InDB Pydantic models for Document.
+      - Uses Field constraints and inheritance appropriately for the multi-model pattern.
+      - Implements camelCase aliases and enables populate_by_name.
+      - Provides complete executable Python model definitions that match the requested hierarchy.
       - Uses modern Python conventions and readable structure.
     graders:
       - type: run-command
@@ -58,10 +58,10 @@ stimuli:
       Ensure populate_by_name is True to accept both formats.
 
     rubric:
-      - Uses the APIs, imports, and workflow expected by the skill.
-      - Keeps credentials in environment variables and avoids hardcoded secrets.
-      - Provides complete executable Python code with clear control flow and error handling.
-      - Includes explicit try/except exception handling.
+      - Defines a Project Pydantic model with snake_case field names.
+      - Implements camelCase aliases for API responses, including createdAt and updatedAt.
+      - Enables populate_by_name so both snake_case and camelCase inputs are accepted.
+      - Provides complete executable Python model definitions for the requested fields and aliases.
       - Uses modern Python conventions and readable structure.
     graders:
       - type: run-command
@@ -118,4 +118,3 @@ artifacts:
     - "**/*.pyc"
     - "**/.mypy_cache/**"
     - "**/.pytest_cache/**"
-

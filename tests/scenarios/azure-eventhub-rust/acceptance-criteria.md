@@ -11,8 +11,7 @@
 ### 0.1 ✅ CORRECT: Use cargo commands for dependency changes
 
 ```sh
-cargo add azure_messaging_eventhubs azure_identity tokio futures
-cargo add azure_core
+cargo add azure_messaging_eventhubs azure_identity tokio futures azure_core
 cargo remove azure_core
 ```
 
