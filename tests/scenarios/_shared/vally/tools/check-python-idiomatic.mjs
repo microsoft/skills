@@ -58,7 +58,7 @@ function isWindowsStoreStubOutput(text) {
 }
 
 function commandWorks(command, args = []) {
-  const probe = spawnSync(command, [...args, "-V"], { encoding: "utf-8" });
+  const probe = spawnSync(command, [...args, "-V"], { encoding: "utf-8", shell: process.platform === "win32" });
   const combined = `${probe.stdout || ""}\n${probe.stderr || ""}`;
   if (probe.error) return false;
   if (isWindowsStoreStubOutput(combined)) return false;
@@ -188,6 +188,7 @@ const pylintArgs = [
 const pylint = spawnSync(python.command, pylintArgs, {
   encoding: "utf-8",
   cwd,
+  shell: process.platform === "win32",
 });
 
 if (pylint.error) {
