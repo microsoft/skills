@@ -14,8 +14,8 @@ stimuli:
   - name: mlclient_creation_with_env_vars
     prompt: |-
       Write a Python application that demonstrates how to create an MLClient instance using environment variables for authentication.
-      Include proper DefaultAzureCredential usage, and context manager pattern
-      for resource cleanup.
+      Include proper DefaultAzureCredential usage and direct MLClient(...)
+      construction.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
