@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@microsoft/vally": "^0.10.0",
+    "@microsoft/vally-cli": "^0.10.0",
     "@types/node": "^20.14.0",
     "@vitest/coverage-v8": "^4.1.9",
     "eslint": "^9.5.0",
