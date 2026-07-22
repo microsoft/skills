@@ -148,6 +148,40 @@ Decide what goes in SKILL.md vs. `/references/` using these signals:
 
 ---
 
+### Reference File: references/examples.md (Required for all SDK skills)
+
+Every Azure SDK skill MUST include a `references/examples.md` file containing complete, runnable code examples. This file supplements `SKILL.md` (which shows only the core workflow) with comprehensive coverage of all major SDK operations.
+
+**Structure — follow this exact order:**
+
+1. **Title**: `# <Azure Service> <Language> SDK - Examples`
+2. **One-line description**: `"Comprehensive code examples for the <SDK package> for <Language>."`
+3. **Table of Contents**: Markdown links to all H2 sections below
+4. **Dependency/Installation**: Full dependency block (Maven XML, pip, npm, NuGet, Cargo) — include BOM approach where available
+5. **Client Creation**: Show ALL supported auth methods, each as an H3:
+   - Service-specific credential (API key, shared key, connection string)
+   - DefaultAzureCredential (mark as `"Recommended"`)
+   - Async client variant
+6. **Operation Sections** (one H2 per logical group): Complete, copy-paste-ready code for every major API operation the SDK exposes. Each example must:
+   - Import all required classes
+   - Show realistic parameter values (not just `"string"`)
+   - Print or return results so the user sees output
+   - Include inline comments only where behavior is non-obvious
+7. **Error Handling**: Try/catch with HTTP status code switching and service-specific exceptions
+8. **Complete Application Example**: A single end-to-end class/script using multiple operations together (create → use → cleanup)
+9. **Environment Variables**: Bash block listing all required env vars
+10. **Best Practices**: Numbered list (5-8 items) of SDK-specific guidance
+
+**Rules:**
+
+- Use `---` horizontal rules between major sections
+- Every code block must be self-contained (copy-paste-runnable in isolation)
+- Do NOT truncate examples — show complete method bodies
+- Match the language idioms: Builder pattern (Java), async/await (TS/Python), `IDisposable` (C#), `Result<T>` (Rust)
+- Target 400-800 lines total — enough for comprehensive coverage without bloat
+
+---
+
 ### Core Workflow Discipline (REQUIRED)
 
 Every Azure SDK skill must clarify which workflow(s) it documents.
@@ -192,7 +226,7 @@ Follow this structure (based on existing Azure SDK skills):
 5. **Core Workflow** — Minimal viable example (per core workflow discipline above)
 6. **Feature Tables** — Clients, methods, tools
 7. **Best Practices** — Numbered list
-8. **Reference Links** — Table linking to `/references/*.md` (for Azure SDK skills, include `capabilities.md` + `non-hero-scenarios.md`)
+8. **Reference Links** — Table linking to `/references/*.md` (for Azure SDK skills, include `capabilities.md` + `non-hero-scenarios.md` + `examples.md`)
 
 ### Required Authentication & Lifecycle Callout (Python)
 
@@ -687,6 +721,7 @@ item = client.create_item(name="example", data={...})
 | -------------------------------------------------------------------- | ------------------------------------------------------ |
 | [references/capabilities.md](references/capabilities.md)             | Capability index (hero coverage + links to deep-dives) |
 | [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Concrete non-hero examples                             |
+| [references/examples.md](references/examples.md)                     | Comprehensive runnable code examples for all major operations |
 | [references/tools.md](references/tools.md)                           | Tool integrations                                      |
 | [references/streaming.md](references/streaming.md)                   | Event streaming patterns                               |
 ```
@@ -1089,6 +1124,7 @@ Before finalizing any regenerated skill:
 5. For Azure SDK skills, structure `references/` as:
    - `references/capabilities.md` as a concise index that records each hero scenario and where it is covered (`SKILL.md` or a bundled reference), plus links to deeper non-hero references, with no historical/migration narration.
    - `references/non-hero-scenarios.md` for concrete non-hero examples that are intentionally kept out of the main `SKILL.md`.
+   - `references/examples.md` for comprehensive, runnable code examples covering all major SDK operations.
    - Additional `references/*.md` files for specialized deep-dives (operation groups, tools, evaluator matrices, etc.).
 6. If the SDK has broad operation-group coverage (common in management SDKs), include an operation-group table and explicitly call out which groups are covered in snippets vs. referenced only.
 7. Never claim "full API surface" unless the skill genuinely demonstrates all major operation groups; otherwise state that the skill is optimized for hero workflows plus selected secondary scenarios.
