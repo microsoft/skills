@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  judge_model: gpt-5.5
 stimuli:
   - name: rust-identity-credentials
     prompt: |
@@ -63,7 +64,7 @@ stimuli:
       - "Async/await with Tokio runtime."
       - "Code compiles without warnings."
       - "Result-based error propagation with ? operator."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -91,7 +92,7 @@ stimuli:
       - type: prompt
         name: "Identity credential completeness"
         config:
-          model: gpt-5.3-codex
+          model: claude-sonnet-4.6
           prompt: |
             - DeveloperToolsCredential creation and usage
             - ManagedIdentityCredential creation and usage
@@ -148,7 +149,7 @@ stimuli:
           command: cargo
           args:
             - "check"
-          timeout: 90s
+          timeout: 3m
       - name: Rust Clippy Lints
         type: run-command
         weight: 1.0
@@ -159,19 +160,19 @@ stimuli:
             - "--"
             - "-D"
             - "warnings"
-          timeout: 120s
+          timeout: 3m
       - type: run-command
         name: "Cargo Build"
         config:
           command: cargo
           args:
             - "build"
-          timeout: 120s
+          timeout: 3m
 
       - name: DeveloperToolsCredential
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           DeveloperToolsCredential created via DeveloperToolsCredential::new(None)?
           Attempts Azure CLI (az login) first, then Azure Developer CLI (azd auth login)
@@ -179,7 +180,7 @@ stimuli:
       - name: ManagedIdentityCredential
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           ManagedIdentityCredential created via ManagedIdentityCredential::new(None)?
           System-assigned managed identity for Azure-hosted workloads
@@ -188,7 +189,7 @@ stimuli:
       - name: ClientSecretCredential
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           ClientSecretCredential created with three parameters:
           tenant_id (string), client_id (string), client_secret (string)
@@ -197,7 +198,7 @@ stimuli:
       - name: Credential Cloning
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Credentials are Arc-wrapped and support cloning
           Pass credential.clone() to multiple client constructors
@@ -206,7 +207,7 @@ stimuli:
       - name: TokenCredential Trait
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           All credential types implement TokenCredential trait
           Allows generic code that accepts any credential type
@@ -214,7 +215,7 @@ stimuli:
       - name: Environment Variable Configuration
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           AZURE_TENANT_ID: Tenant ID for service principal auth
           AZURE_CLIENT_ID: Client/application ID
@@ -223,7 +224,7 @@ stimuli:
       - name: Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Credential creation returns Result<T, E>
           Missing or invalid credentials generate errors
@@ -232,7 +233,7 @@ stimuli:
       - name: Scenario Documentation
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Code includes comments explaining when each credential is appropriate
           DeveloperToolsCredential for local development

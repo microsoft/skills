@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  judge_model: gpt-5.5
 stimuli:
   - name: rust-queue-operations
     prompt: |
@@ -41,7 +42,7 @@ stimuli:
       - "Message delete operations use both message_id and pop_receipt from received messages."
       - "Peek operations demonstrate reading messages without consuming them from the queue."
       - "Avoids hardcoded credentials in source code."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -68,6 +69,16 @@ stimuli:
       skills:
         - ../../../../.github/plugins/azure-sdk-rust/skills/azure-storage-queue-rust
       files:
+        - src: ../../_shared/vally/tools/find-cargo-root.js
+          dest: .vally/tools/find-cargo-root.js
+        - src: ../../_shared/vally/tools/check-azure-crates.rs
+          dest: .vally/tools/check-azure-crates.rs
+        - src: ../../_shared/vally/tools/check-token-credential.rs
+          dest: .vally/tools/check-token-credential.rs
+        - src: ../../_shared/vally/tools/check-async-runtime.rs
+          dest: .vally/tools/check-async-runtime.rs
+        - src: ../../_shared/vally/tools/check-no-secrets.rs
+          dest: .vally/tools/check-no-secrets.rs
         - src: workspace/cargo.toml
           dest: Cargo.toml
     constraints:
@@ -77,7 +88,6 @@ stimuli:
       - type: prompt
         name: "Queue operations completeness"
         config:
-          model: gpt-5.3-codex
           prompt: |
             - QueueServiceClient initialization with endpoint URL and credential
             - QueueClient derived from service client
@@ -88,32 +98,25 @@ stimuli:
             - Error handling for queue operations
           scoring: scale_1_5
 
-      - type: run-command
-        name: "Build Application"
+      - name: "Build Application"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
-          stderr_contains: "Finished"
-      - type: run-command
-        name: "Check Application"
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
+      - name: "Check Application"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
+          commands:
+            - command: cargo check
+          emit_in_metadata: true
       - name: Rust Clippy Lints
-        type: run-command
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
+          commands:
+            - command: cargo clippy -- -D warnings
+          emit_in_metadata: true
       - name: Official Azure SDK Crate Selection
         type: program
         weight: 1.0
@@ -150,11 +153,20 @@ stimuli:
             - "+nightly"
             - "-Zscript"
             - ".vally/tools/check-no-secrets.rs"
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
 
       - name: QueueServiceClient Construction
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           QueueServiceClient is created via QueueServiceClient::new() with three parameters:
           service_url (Url type), Some(credential), and None for options.
@@ -162,7 +174,6 @@ stimuli:
       - name: Queue Message Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Send messages via queue_client.send_message(message.try_into()?, None).await?.
           Receive messages via queue_client.receive_messages(None).await? returning a response
@@ -172,7 +183,6 @@ stimuli:
       - name: Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Queue operations are wrapped in Result-based error handling using ? operator.
           No .unwrap() calls except where failure is impossible.

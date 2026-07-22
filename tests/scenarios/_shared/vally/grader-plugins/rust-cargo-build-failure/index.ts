@@ -424,7 +424,7 @@ class CargoBuildTrajectoryGrader implements Grader {
     name: "rust-cargo-build-failure-check",
     description:
       "Rust-specific grader: checks trajectory for failed cargo build tool calls, extracts Rust compiler errors (E0XXX), and scales score by failure ratio",
-    behavior: { requiresWorkspace: false },
+    behavior: { requiresWorkspace: true },
     determinism: "static",
     reference: "reference-free",
     temporalScope: "trajectory-level",

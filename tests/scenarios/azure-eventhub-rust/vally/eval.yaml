@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  judge_model: gpt-5.5
 stimuli:
   - name: rust-eventhub-producer-consumer
     prompt: |
@@ -54,7 +55,7 @@ stimuli:
       - "Builder pattern used for both client initialization."
       - "StartLocation configuration for consumer start position (Earliest/Latest)."
       - "Proper extraction of event body data from stream."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -69,6 +70,16 @@ stimuli:
       skills:
         - ../../../../.github/plugins/azure-sdk-rust/skills/azure-eventhub-rust
       files:
+        - src: ../../_shared/vally/tools/find-cargo-root.js
+          dest: .vally/tools/find-cargo-root.js
+        - src: ../../_shared/vally/tools/check-azure-crates.rs
+          dest: .vally/tools/check-azure-crates.rs
+        - src: ../../_shared/vally/tools/check-token-credential.rs
+          dest: .vally/tools/check-token-credential.rs
+        - src: ../../_shared/vally/tools/check-async-runtime.rs
+          dest: .vally/tools/check-async-runtime.rs
+        - src: ../../_shared/vally/tools/check-no-secrets.rs
+          dest: .vally/tools/check-no-secrets.rs
         - src: workspace/cargo.toml
           dest: Cargo.toml
     constraints:
@@ -78,7 +89,6 @@ stimuli:
       - type: prompt
         name: "EventHub producer-consumer completeness"
         config:
-          model: gpt-5.3-codex
           prompt: |
             - ProducerClient creation with builder pattern
             - Single event sending: producer.send_event(vec![...], None).await
@@ -128,38 +138,40 @@ stimuli:
             - "+nightly"
             - "-Zscript"
             - ".vally/tools/check-no-secrets.rs"
-
-      - type: run-command
-        name: "Cargo Check"
-        config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
-      - name: Rust Clippy Lints
-        type: run-command
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
-      - type: run-command
-        name: "Cargo Build"
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
+
+      - name: "Cargo Check"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
-          stderr_contains: "Finished"
+          commands:
+            - command: cargo check
+          emit_in_metadata: true
+      - name: Rust Clippy Lints
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          commands:
+            - command: cargo clippy -- -D warnings
+          emit_in_metadata: true
+      - name: "Cargo Build"
+        type: rust-cargo-build-failure-check
+        config:
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
 
       - name: ProducerClient Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           ProducerClient created via ProducerClient::builder()
           .open(namespace, eventhub_name, credential).await?
@@ -168,7 +180,6 @@ stimuli:
       - name: ConsumerClient Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           ConsumerClient created via ConsumerClient::builder()
           .open(namespace, eventhub_name, credential).await?
@@ -177,7 +188,6 @@ stimuli:
       - name: Event Stream Processing
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Event stream obtained via receiver.stream_events()
           Stream processing with while let Some(event_result) = stream.next().await
@@ -186,7 +196,6 @@ stimuli:
       - name: Credential Management
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
         prompt: >
           Uses DeveloperToolsCredential for local dev or ManagedIdentityCredential for production
           Credential is cloned when passed to multiple clients

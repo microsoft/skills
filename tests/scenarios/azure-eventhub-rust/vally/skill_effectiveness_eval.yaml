@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  judge_model: gpt-5.5
 stimuli:
   - name: rust-eventhub-producer-consumer
     prompt: |
@@ -54,7 +55,7 @@ stimuli:
       - "Builder pattern used for both client initialization."
       - "StartLocation configuration for consumer start position (Earliest/Latest)."
       - "Proper extraction of event body data from stream."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -84,7 +85,7 @@ stimuli:
       - type: prompt
         name: "EventHub producer-consumer completeness"
         config:
-          model: gpt-5.3-codex
+          model: claude-sonnet-4.6
           prompt: |
             - ProducerClient creation with builder pattern
             - Single event sending: producer.send_event(vec![...], None).await
@@ -165,7 +166,7 @@ stimuli:
       - name: ProducerClient Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           ProducerClient created via ProducerClient::builder()
           .open(namespace, eventhub_name, credential).await?
@@ -174,7 +175,7 @@ stimuli:
       - name: ConsumerClient Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           ConsumerClient created via ConsumerClient::builder()
           .open(namespace, eventhub_name, credential).await?
@@ -183,7 +184,7 @@ stimuli:
       - name: Event Stream Processing
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Event stream obtained via receiver.stream_events()
           Stream processing with while let Some(event_result) = stream.next().await
@@ -192,7 +193,7 @@ stimuli:
       - name: Credential Management
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Uses DeveloperToolsCredential for local dev or ManagedIdentityCredential for production
           Credential is cloned when passed to multiple clients

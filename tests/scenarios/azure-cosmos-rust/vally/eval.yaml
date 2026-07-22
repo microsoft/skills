@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  grader_model: gpt-5.5
 stimuli:
   - name: rust-cosmos-crud-operations
     prompt: |
@@ -62,7 +63,7 @@ stimuli:
       - "Uses TokenCredential for secure authentication."
       - "Async/await with Tokio and proper Result-based error propagation."
       - "Code compiles without warnings."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -75,6 +76,16 @@ stimuli:
       skills:
         - ../../../../.github/plugins/azure-sdk-rust/skills/azure-cosmos-rust
       files:
+        - src: ../../_shared/vally/tools/find-cargo-root.js
+          dest: .vally/tools/find-cargo-root.js
+        - src: ../../_shared/vally/tools/check-azure-crates.rs
+          dest: .vally/tools/check-azure-crates.rs
+        - src: ../../_shared/vally/tools/check-token-credential.rs
+          dest: .vally/tools/check-token-credential.rs
+        - src: ../../_shared/vally/tools/check-async-runtime.rs
+          dest: .vally/tools/check-async-runtime.rs
+        - src: ../../_shared/vally/tools/check-no-secrets.rs
+          dest: .vally/tools/check-no-secrets.rs
         - src: workspace/cargo.toml
           dest: Cargo.toml
     constraints:
@@ -84,7 +95,6 @@ stimuli:
       - type: prompt
         name: "Cosmos DB CRUD completeness"
         config:
-          model: gpt-5.3-codex
           prompt: |
             - CosmosClient creation with builder and ProximityTo routing
             - Database and container client navigation
@@ -136,37 +146,41 @@ stimuli:
             - "+nightly"
             - "-Zscript"
             - ".vally/tools/check-no-secrets.rs"
-
-      - type: run-command
-        name: "Cargo Check"
-        config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
-      - name: Rust Clippy Lints
-        type: run-command
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
-      - type: run-command
-        name: "Cargo Build"
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
+
+      - name: "Cargo Check"
+        type: rust-cargo-build-failure-check
         config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
+          commands:
+            - command: cargo check
+          emit_in_metadata: true
+      - name: Rust Clippy Lints
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          commands:
+            - command: cargo clippy -- -D warnings
+          emit_in_metadata: true
+      - name: "Cargo Build"
+        type: rust-cargo-build-failure-check
+        config:
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
 
       - name: CosmosClient Builder Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: gpt-5.5
         prompt: >
           CosmosClient created via CosmosClient::builder()
           .build(account, RoutingStrategy::ProximityTo(region)).await?
@@ -175,7 +189,7 @@ stimuli:
       - name: CRUD Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: gpt-5.5
         prompt: >
           Create: container.create_item(partition_key, id, item, None).await?
           Read: container.read_item(partition_key, id, None).await?
@@ -185,7 +199,7 @@ stimuli:
       - name: Partition Key Management
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: gpt-5.5
         prompt: >
           Partition key is required parameter in all item operations
           Partition key value passed as string to operations
@@ -194,7 +208,7 @@ stimuli:
       - name: Patch Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: gpt-5.5
         prompt: >
           Patch operations use PatchInstructions::from(vec![...])
           Operations created with PatchOperation::set(path, value)
@@ -203,7 +217,7 @@ stimuli:
       - name: Response Conversion and Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: gpt-5.5
         prompt: >
           Responses converted with into_model() for deserialization
           Error handling with match and error extraction

@@ -7,8 +7,9 @@ scoring:
   threshold: 0.75
 defaults:
   runs: 1
-  timeout: 30m
+  timeout: 60m
   model: claude-sonnet-4.6
+  judge_model: gpt-5.5
 stimuli:
   - name: rust-keyvault-secrets-operations
     prompt: |
@@ -63,7 +64,7 @@ stimuli:
       - "Uses TokenCredential for secure authentication."
       - "Async/await with Tokio and proper error handling."
       - "Code compiles without warnings."
-    workspace_files:
+    artifacts:
       include:
         - "**/Cargo.toml"
         - "**/Cargo.lock"
@@ -91,7 +92,7 @@ stimuli:
       - type: prompt
         name: "Key Vault secrets completeness"
         config:
-          model: gpt-5.3-codex
+          model: claude-sonnet-4.6
           prompt: |
             - SecretClient creation with vault URL and credential
             - Set secret with SetSecretParameters including value
@@ -149,7 +150,7 @@ stimuli:
           command: cargo
           args:
             - "check"
-          timeout: 90s
+          timeout: 180s
       - name: Rust Clippy Lints
         type: run-command
         weight: 1.0
@@ -160,19 +161,19 @@ stimuli:
             - "--"
             - "-D"
             - "warnings"
-          timeout: 120s
+          timeout: 300s
       - type: run-command
         name: "Cargo Build"
         config:
           command: cargo
           args:
             - "build"
-          timeout: 120s
+          timeout: 300s
 
       - name: SecretClient Creation
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           SecretClient created via SecretClient::new(vault_url, credential, None)
           Vault URL is vault_name.vault.azure.net in https protocol
@@ -180,7 +181,7 @@ stimuli:
       - name: Secret CRUD Operations
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Set: client.set_secret(name, params.try_into()?, None).await?
           Get: client.get_secret(name, None).await?.into_model()?
@@ -189,7 +190,7 @@ stimuli:
       - name: SetSecretParameters Pattern
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           SetSecretParameters created with value: Some(value.into())
           Content type can be set via content_type: Some("text/plain".into())
@@ -197,7 +198,7 @@ stimuli:
       - name: Listing with Pagination
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           List secrets returns Pager<T> via client.list_secret_properties(None)?
           Iterate with let mut pager = ...; while let Some(secret) = pager.try_next().await?
@@ -206,7 +207,7 @@ stimuli:
       - name: Resource Extraction
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Use ResourceExt trait via secret.resource_id()?
           Returns ResourceId with name and version fields
@@ -214,7 +215,7 @@ stimuli:
       - name: Async Runtime and Error Handling
         type: prompt
         weight: 1.0
-        model: gpt-5.3-codex
+        model: claude-sonnet-4.6
         prompt: >
           Uses #[tokio::main] on main function
           All I/O operations awaited

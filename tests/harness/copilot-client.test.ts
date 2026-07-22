@@ -1,4 +1,12 @@
 import { describe, expect, it } from "vitest";
+import {
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 import {
   CopilotGenerationError,
@@ -46,6 +54,54 @@ describe("SkillCopilotClient.extractCode", () => {
     ).extractCode(response);
 
     expect(extracted).toBe("x = 1\nprint(x)");
+  });
+});
+
+describe("SkillCopilotClient.loadSkillContext", () => {
+  it("loads skill context from nested plugins/<plugin>/skills/<group>/<skill>", () => {
+    const basePath = mkdtempSync(join(tmpdir(), "copilot-client-"));
+    const nestedSkillDir = join(
+      basePath,
+      ".github/plugins/test-plugin/skills/rust/azure-cosmos-rust",
+    );
+    mkdirSync(nestedSkillDir, { recursive: true });
+    writeFileSync(
+      join(nestedSkillDir, "SKILL.md"),
+      "---\nname: azure-cosmos-rust\ndescription: test\n---\n\ncontent",
+      "utf-8",
+    );
+
+    try {
+      const client = new SkillCopilotClient(basePath, true);
+      const context = client.loadSkillContext("azure-cosmos-rust");
+      expect(context).toContain("# Skill: azure-cosmos-rust");
+      expect(context).toContain("content");
+    } finally {
+      rmSync(basePath, { recursive: true, force: true });
+    }
+  });
+
+  it("does not match non-skill nested directories", () => {
+    const basePath = mkdtempSync(join(tmpdir(), "copilot-client-"));
+    const nonMatchingDir = join(
+      basePath,
+      ".github/plugins/test-plugin/skills/rust/not-the-skill",
+    );
+    mkdirSync(nonMatchingDir, { recursive: true });
+    writeFileSync(
+      join(nonMatchingDir, "SKILL.md"),
+      "---\nname: not-the-skill\ndescription: test\n---\n\ncontent",
+      "utf-8",
+    );
+
+    try {
+      const client = new SkillCopilotClient(basePath, true);
+      expect(() => client.loadSkillContext("azure-cosmos-rust")).toThrow(
+        "Skill not found: azure-cosmos-rust",
+      );
+    } finally {
+      rmSync(basePath, { recursive: true, force: true });
+    }
   });
 });
 
