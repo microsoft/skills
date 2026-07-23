@@ -42,12 +42,6 @@ If set, skips vally execution and regenerates narratives/comparisons from existi
 Existing experiment output root to analyze when using -AnalysisOnly.
 If omitted in analysis-only mode, the latest directory under ResultsRoot is used.
 
-.PARAMETER CopilotMaxAttempts
-Maximum retries per copilot invocation path for narrative generation.
-
-.PARAMETER NoNodeLoaderFallback
-Disable node-loader fallback and use only documented copilot invocation methods.
-
 .EXAMPLE
 ./run-skill-experiments.ps1
 # Run all Python skill experiments sequentially
@@ -101,14 +95,6 @@ param(
     ,
     [Parameter(Mandatory = $false)]
     [string]$ExperimentOutputDir
-
-    ,
-    [Parameter(Mandatory = $false)]
-    [ValidateRange(1, 10)]
-    [int]$CopilotMaxAttempts = 2,
-
-    [Parameter(Mandatory = $false)]
-    [switch]$NoNodeLoaderFallback
 )
 
 $ErrorActionPreference = "Stop"
@@ -1011,7 +997,7 @@ if ($AnalysisOnly) {
         exit 1
     }
 
-    $analysisExitCode = Generate-NarrativesOnly -AnalysisRoot $analysisRoot -SkillNamePattern $SkillPattern -NarrativeMaxAttempts $CopilotMaxAttempts -EnableNodeLoaderFallback (-not $NoNodeLoaderFallback)
+    $analysisExitCode = Generate-NarrativesOnly -AnalysisRoot $analysisRoot -SkillNamePattern $SkillPattern
     exit $analysisExitCode
 }
 
@@ -1037,7 +1023,15 @@ if ($DryRun) {
 }
 
 # Validate vally is available via pnpm after dry-run check
-$vallyExe = & pnpm --dir $PSScriptRoot exec which vally 2>$null
+$vallyExeUnix = Join-Path $PSScriptRoot "node_modules/.bin/vally"
+$vallyExeWindows = Join-Path $PSScriptRoot "node_modules/.bin/vally.cmd"
+if (Test-Path -LiteralPath $vallyExeWindows) {
+    $vallyExe = $vallyExeWindows
+} elseif (Test-Path -LiteralPath $vallyExeUnix) {
+    $vallyExe = $vallyExeUnix
+} else {
+    $vallyExe = $null
+}
 if (-not $vallyExe) {
     Write-Error "vally command not found. Please install @microsoft/vally via pnpm."
     exit 1
@@ -1049,7 +1043,7 @@ $vallyCmd = "pnpm", "--dir", $PSScriptRoot, "exec", "vally"
 Write-Information "Vally: $vallyExe"
 
 # Create results directory with timestamp
-$timestamp = Get-Date -Format "yyyy-MM-ddTHH-mm-ss-fffZ"
+$timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ss-fff") + "Z"
 $experimentResultsDir = Join-Path $ResultsRoot $timestamp
 New-Item -ItemType Directory -Path $experimentResultsDir -Force | Out-Null
 
@@ -1484,7 +1478,7 @@ foreach ($result in $results) {
     }
 
     $skillNarrativeDir = Join-Path $experimentResultsDir $result.Skill
-    $generated = Generate-SkillNarratives -SkillName $result.Skill -ExperimentOutputDir $result.ExperimentDir -SkillResultsDir $skillNarrativeDir -NarrativeMaxAttempts $CopilotMaxAttempts -EnableNodeLoaderFallback (-not $NoNodeLoaderFallback)
+    $generated = Generate-SkillNarratives -SkillName $result.Skill -ExperimentOutputDir $result.ExperimentDir -SkillResultsDir $skillNarrativeDir
 
     if ($generated) {
         $narrativeCount++

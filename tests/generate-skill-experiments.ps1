@@ -60,6 +60,36 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function New-SkillEffectivenessEval {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SourceEvalPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$DryRun
+    )
+
+    $evalContent = Get-Content -LiteralPath $SourceEvalPath -Raw
+
+    # Remove constraints.expect_skills blocks from each stimulus.
+    # The block always looks like (with 4-space indent for constraints):
+    #     constraints:
+    #       expect_skills:
+    #         - <skill-name>
+    $strippedContent = $evalContent -replace '(?m)^    constraints:\r?\n      expect_skills:\r?\n        - [^\r\n]+\r?\n', ''
+
+    if ($DryRun) {
+        Write-Verbose "Would create: $OutputPath"
+    }
+    else {
+        Set-Content -Path $OutputPath -Value $strippedContent -Encoding UTF8 -NoNewline
+        Write-Information "✓ Created: $OutputPath"
+    }
+}
+
 function New-ExperimentFile {
     param(
         [Parameter(Mandatory = $true)]
@@ -80,7 +110,7 @@ function New-ExperimentFile {
 # Purpose: Measure skill effectiveness by comparing the same stimulus with and without the corresponding skill.
 name: $experimentName
 evals:
-    - eval.yaml
+    - skill_effectiveness_eval.yaml
 vary:
   - /defaults/model
   - /environment/skills
@@ -151,6 +181,7 @@ foreach ($skillDir in $skillDirs) {
     
     # Paths for experiment files
     $experimentFile = Join-Path $vallyDir "skill_effectiveness_experiment.yaml"
+    $experimentEvalFile = Join-Path $vallyDir "skill_effectiveness_eval.yaml"
     $evalFile = Join-Path $vallyDir "eval.yaml"
     
     # Create experiment file
@@ -166,6 +197,7 @@ foreach ($skillDir in $skillDirs) {
         }
 
         try {
+            New-SkillEffectivenessEval -SourceEvalPath $evalFile -OutputPath $experimentEvalFile -DryRun:$DryRun
             New-ExperimentFile -SkillName $skillName -SkillPath $skillPath -OutputPath $experimentFile -DryRun:$DryRun
             $created++
         }

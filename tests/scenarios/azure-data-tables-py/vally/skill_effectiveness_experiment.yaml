@@ -1,7 +1,7 @@
 # Purpose: Measure skill effectiveness by comparing the same stimulus with and without the corresponding skill.
 name: azure-data-tables-py-skill-experiment
 evals:
-  - eval.yaml
+    - skill_effectiveness_eval.yaml
 vary:
   - /defaults/model
   - /environment/skills

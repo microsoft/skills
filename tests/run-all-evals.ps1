@@ -127,20 +127,23 @@ if (Test-Path -LiteralPath $pnpmWorkspaceYamlPath) {
 }
 
 if (Test-Path -LiteralPath $testsPackageJsonPath) {
+    $requiredPnpmVersion = $null
     try {
         $testsPackageJson = Get-Content -LiteralPath $testsPackageJsonPath -Raw | ConvertFrom-Json -Depth 20
         $packageManagerValue = [string]$testsPackageJson.packageManager
         if ($packageManagerValue -match '^pnpm@([^+]+)') {
             $requiredPnpmVersion = $Matches[1]
-            $activePnpmVersion = (& pnpm --version 2>&1 | Select-Object -First 1).ToString().Trim()
-            if ([string]::IsNullOrWhiteSpace($activePnpmVersion) -or $activePnpmVersion -ne $requiredPnpmVersion) {
-                Write-Error "pnpm version mismatch. Required: $requiredPnpmVersion (from tests/package.json), active: $activePnpmVersion.`nRun:`n  corepack prepare pnpm@$requiredPnpmVersion --activate"
-                exit 1
-            }
         }
     }
     catch {
         Write-Warning "Could not validate pnpm packageManager pin from ${testsPackageJsonPath}: $($_.Exception.Message)"
+    }
+    if ($requiredPnpmVersion) {
+        $activePnpmVersion = (& pnpm --version 2>&1 | Select-Object -First 1).ToString().Trim()
+        if ([string]::IsNullOrWhiteSpace($activePnpmVersion) -or $activePnpmVersion -ne $requiredPnpmVersion) {
+            Write-Error "pnpm version mismatch. Required: $requiredPnpmVersion (from tests/package.json), active: $activePnpmVersion.`nRun:`n  corepack prepare pnpm@$requiredPnpmVersion --activate"
+            exit 1
+        }
     }
 }
 
