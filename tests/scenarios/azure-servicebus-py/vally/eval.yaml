@@ -53,6 +53,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-servicebus-py
   - name: async_queue_send_receive
     prompt: |-
       Create an asynchronous Python example that sends and receives messages from a servicebus queue.
@@ -94,9 +98,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-servicebus-py
+
+    constraints:
+      expect_skills:
+        - azure-servicebus-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-servicebus-py

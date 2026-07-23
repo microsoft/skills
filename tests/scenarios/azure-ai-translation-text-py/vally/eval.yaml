@@ -50,6 +50,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-ai-translation-text-py
   - name: language_detection
     prompt: |-
       Write a Python application that detects the language of provided text using the
@@ -90,9 +94,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-ai-translation-text-py
+
+    constraints:
+      expect_skills:
+        - azure-ai-translation-text-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-ai-translation-text-py

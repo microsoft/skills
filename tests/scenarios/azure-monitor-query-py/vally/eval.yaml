@@ -52,6 +52,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-monitor-query-py
   - name: logs_timespan_tuple
     prompt: |-
       Write a python application that shows how to use a LogsQueryClient example that uses a time range tuple with timezone-aware datetimes.
@@ -92,9 +96,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-monitor-query-py
+
+    constraints:
+      expect_skills:
+        - azure-monitor-query-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-monitor-query-py

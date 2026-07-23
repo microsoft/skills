@@ -52,6 +52,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-monitor-opentelemetry-exporter-py
   - name: metric_exporter_basic
     prompt: |-
       Write a Python application which shows how to configure AzureMonitorMetricExporter with a
@@ -93,9 +97,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-monitor-opentelemetry-exporter-py
+
+    constraints:
+      expect_skills:
+        - azure-monitor-opentelemetry-exporter-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-monitor-opentelemetry-exporter-py

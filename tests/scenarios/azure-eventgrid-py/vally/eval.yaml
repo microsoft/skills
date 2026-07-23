@@ -52,6 +52,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-eventgrid-py
   - name: batch_cloudevent_publish
     prompt: |-
       Write a Python application which shows how to send a batch of CloudEvents to Event Grid using a list.
@@ -93,9 +97,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-eventgrid-py
+
+    constraints:
+      expect_skills:
+        - azure-eventgrid-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-eventgrid-py

@@ -51,6 +51,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - pydantic-models-py
   - name: camel_case_aliases
     prompt: |-
       Create a Pydantic model for a "Project" resource with snake_case fields but camelCase 
@@ -91,9 +95,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - pydantic-models-py
+
+    constraints:
+      expect_skills:
+        - pydantic-models-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/pydantic-models-py

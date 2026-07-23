@@ -52,6 +52,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-mgmt-botservice-py
   - name: bot_retrieval_operations
     prompt: |-
       Write a Python application which shows how to retrieve bot information from Azure Bot Service.
@@ -94,9 +98,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-mgmt-botservice-py
+
+    constraints:
+      expect_skills:
+        - azure-mgmt-botservice-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-mgmt-botservice-py

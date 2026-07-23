@@ -50,6 +50,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-ai-ml-py
   - name: create_and_list_workspaces
     prompt: |-
       Write a Python application that creates a new Azure ML workspace with proper configuration, then lists
@@ -88,9 +92,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-ai-ml-py
+
+    constraints:
+      expect_skills:
+        - azure-ai-ml-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-ai-ml-py

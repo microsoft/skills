@@ -62,9 +62,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-appconfiguration-py
+
+    constraints:
+      expect_skills:
+        - azure-appconfiguration-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-appconfiguration-py

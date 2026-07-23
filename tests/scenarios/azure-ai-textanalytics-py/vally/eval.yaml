@@ -50,6 +50,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-ai-textanalytics-py
   - name: sentiment_with_opinion_mining
     prompt: |-
       Write a Python application that analyzes sentiment with opinion mining (aspect-based sentiment).
@@ -88,9 +92,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-ai-textanalytics-py
+
+    constraints:
+      expect_skills:
+        - azure-ai-textanalytics-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-ai-textanalytics-py

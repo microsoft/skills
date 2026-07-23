@@ -53,6 +53,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-keyvault-py
   - name: list_secret_versions
     prompt: |-
       Write a Python application which shows how to list all secret names and all versions for a specific secret using
@@ -94,9 +98,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-keyvault-py
+
+    constraints:
+      expect_skills:
+        - azure-keyvault-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-keyvault-py

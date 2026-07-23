@@ -51,6 +51,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-monitor-ingestion-py
   - name: async_upload_with_context_manager
     prompt: |-
       Provide an async example using azure.monitor.ingestion.aio LogsIngestionClient.
@@ -89,9 +93,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-monitor-ingestion-py
+
+    constraints:
+      expect_skills:
+        - azure-monitor-ingestion-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-monitor-ingestion-py

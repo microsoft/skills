@@ -50,6 +50,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-ai-language-conversations-py
   - name: clu_legacy_api_key_existing_deployments
     prompt: |-
       Write a Python application which shows the legacy API-key authentication path for an existing keyed deployment.
@@ -90,9 +94,10 @@ stimuli:
             Score 1 if the answer is missing required code output or is largely non-compliant.
             Score 5 only when the response fully satisfies rubric expectations with correct, executable, idiomatic code.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-ai-language-conversations-py
+
+    constraints:
+      expect_skills:
+        - azure-ai-language-conversations-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-ai-language-conversations-py

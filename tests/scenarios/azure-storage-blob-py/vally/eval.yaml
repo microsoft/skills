@@ -53,6 +53,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-storage-blob-py
   - name: upload_blob_with_blob_client
     prompt: |-
       Create a Python application which uploads a local file to Azure Blob Storage using BlobClient.
@@ -94,9 +98,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-storage-blob-py
+
+    constraints:
+      expect_skills:
+        - azure-storage-blob-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-storage-blob-py

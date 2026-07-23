@@ -52,6 +52,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
+
+    constraints:
+      expect_skills:
+        - azure-messaging-webpubsubservice-py
   - name: default_credential_targeted_sends
     prompt: |-
       Write a Python application which shows how to use DefaultAzureCredential with endpoint and hub from environment variables,
@@ -93,9 +97,10 @@ stimuli:
             Treat missing code as an automatic failure when there is no `.py` file in the workspace
             and no substantive Python code in the assistant output.
           scoring: scale_1_5
-constraints:
-  expect_skills:
-    - azure-messaging-webpubsubservice-py
+
+    constraints:
+      expect_skills:
+        - azure-messaging-webpubsubservice-py
 environment:
   skills:
     - ../../../../.github/plugins/azure-sdk-python/skills/azure-messaging-webpubsubservice-py
