@@ -57,14 +57,12 @@ use azure_identity::DeveloperToolsCredential;
 ### 2.1 ✅ CORRECT: Create Producer with Builder Pattern
 
 ```rust
-use std::sync::Arc;
-use azure_core::credentials::TokenCredential;
 use azure_identity::DeveloperToolsCredential;
 use azure_messaging_eventhubs::ProducerClient;
 
-let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
+let credential = DeveloperToolsCredential::new(None)?;
 let producer = ProducerClient::builder()
-    .open("<namespace>.servicebus.windows.net", "eventhub-name".to_string(), credential.clone())
+    .open("<namespace>.servicebus.windows.net", "eventhub-name", credential.clone())
     .await?;
 ```
 
@@ -76,19 +74,6 @@ let producer = ProducerClient::builder()
 // WRONG - use builder pattern
 let producer = ProducerClient::new(...);
 ```
-
-#### ❌ INCORRECT: Untyped credential passed to `.open()`
-
-```rust
-// WRONG - .open() requires Arc<dyn TokenCredential>; an untyped binding resolves to the
-// concrete DeveloperToolsCredential type and fails to compile with a mismatched-types error.
-let credential = DeveloperToolsCredential::new(None)?;
-let producer = ProducerClient::builder()
-    .open("<namespace>.servicebus.windows.net", "eventhub-name", credential.clone())
-    .await?;
-```
-
----
 
 ## 3. Sending Events
 
