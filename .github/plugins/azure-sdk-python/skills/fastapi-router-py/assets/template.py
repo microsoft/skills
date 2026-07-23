@@ -55,7 +55,7 @@ async def list_{{resource_plural}}(
     return await service.list_{{resource_plural}}(limit=limit, offset=offset)
 
 
-@router.get("/{{resource_plural}}/{{{resource_name}}}_id", response_model={{ResourceName}})
+@router.get("/{{resource_plural}}/{{{resource_name}}_id}", response_model={{ResourceName}})
 async def get_{{resource_name}}(
     {{resource_name}}_id: str,
     current_user: Optional[User] = Depends(get_current_user),
@@ -93,7 +93,7 @@ async def create_{{resource_name}}(
     return await service.create_{{resource_name}}(data, current_user.id)
 
 
-@router.patch("/{{resource_plural}}/{{{resource_name}}}_id", response_model={{ResourceName}})
+@router.patch("/{{resource_plural}}/{{{resource_name}}_id}", response_model={{ResourceName}})
 async def update_{{resource_name}}(
     {{resource_name}}_id: str,
     data: {{ResourceName}}Update,
@@ -124,7 +124,7 @@ async def update_{{resource_name}}(
 
 
 @router.delete(
-    "/{{resource_plural}}/{{{resource_name}}}_id",
+    "/{{resource_plural}}/{{{resource_name}}_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_{{resource_name}}(

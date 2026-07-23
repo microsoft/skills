@@ -25,10 +25,10 @@ Use this skill when:
 ## Installation
 
 ```sh
-cargo add azure_messaging_eventhubs azure_identity azure_core tokio futures
+cargo add azure_messaging_eventhubs azure_identity tokio futures
 ```
 
-> `ProducerClient`/`ConsumerClient` `.open()` require the credential as `Arc<dyn TokenCredential>`. Add `azure_core` so you can import `azure_core::credentials::TokenCredential` and type the credential binding explicitly (see Authentication below) — otherwise the compiler infers the concrete credential type and `.open()` fails to compile.
+> `DeveloperToolsCredential::new(None)?` already returns an `Arc<DeveloperToolsCredential>`, so you can pass or clone it directly into `.open()`. Add `azure_core` only when you need direct `azure_core` imports such as `ErrorKind`.
 
 ## Environment Variables
 
@@ -50,23 +50,18 @@ EVENTHUB_NAME=<eventhub-name>                     # Required — name of the Eve
 ## Authentication
 
 ```rust
-use std::sync::Arc;
-use azure_core::credentials::TokenCredential;
 use azure_identity::DeveloperToolsCredential;
 use azure_messaging_eventhubs::ProducerClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Local dev: DeveloperToolsCredential. Production: use ManagedIdentityCredential.
-    // `.open()` requires `Arc<dyn TokenCredential>` — type the binding explicitly so
-    // `DeveloperToolsCredential::new` coerces to the trait object instead of the concrete type.
-    let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
+    let credential = DeveloperToolsCredential::new(None)?;
 
-    // `.open()` takes the hub name as an owned `String`, not `&str`.
     let producer = ProducerClient::builder()
         .open(
             "<namespace>.servicebus.windows.net",
-            "<eventhub-name>".to_string(),
+            "<eventhub-name>",
             credential.clone(),
         )
         .await?;
@@ -95,13 +90,11 @@ producer.send_batch(batch, None).await?;
 ### Receive Events
 
 ```rust
-use std::sync::Arc;
-use azure_core::credentials::TokenCredential;
 use azure_identity::DeveloperToolsCredential;
 use azure_messaging_eventhubs::ConsumerClient;
 
 // Local dev: DeveloperToolsCredential. Production: use ManagedIdentityCredential.
-let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
+let credential = DeveloperToolsCredential::new(None)?;
 let consumer = ConsumerClient::builder()
     .open(
         "<namespace>.servicebus.windows.net",
@@ -158,8 +151,8 @@ For Entra ID auth, assign one of these roles:
 ## Best Practices
 
 1. **Use `cargo add` to manage dependencies, never edit `Cargo.toml` directly.** Add and remove Rust SDK dependencies with cargo commands instead of manual manifest edits.
-2. **Type credentials as `Arc<dyn TokenCredential>`.** `ProducerClient`/`ConsumerClient` `.open()` require the trait object, not the concrete `DeveloperToolsCredential`/`ManagedIdentityCredential` type — import `azure_core::credentials::TokenCredential` and annotate the binding, or the build fails with a mismatched-types error.
-3. **Pass the hub name as an owned `String`.** `.open()` takes `hub_name: String`, not `&str` — call `.to_string()` on `&str` values.
+2. **Pass or clone credentials directly into `.open()`.** `DeveloperToolsCredential::new(None)?` already returns an `Arc`, so you do not need to annotate the binding as `Arc<dyn TokenCredential>` unless you are naming that trait object type explicitly.
+3. **Match the builder signature.** `ProducerClient::builder().open(...)` takes the hub name as `&str`, while `ConsumerClient::builder().open(...)` takes an owned `String`.
 4. **Use `DeveloperToolsCredential`** for local dev, **`ManagedIdentityCredential`** for production — Rust does not provide a single `DefaultAzureCredential` type
 5. **Never hardcode credentials** — use environment variables or managed identity
 6. **Use batching** — `create_batch` + `send_batch` for throughput optimization

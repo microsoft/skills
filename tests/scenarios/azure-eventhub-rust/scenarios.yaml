@@ -23,14 +23,12 @@ scenarios:
       - basic
       - producer
     mock_response: |
-      use std::sync::Arc;
-      use azure_core::credentials::TokenCredential;
       use azure_identity::DeveloperToolsCredential;
       use azure_messaging_eventhubs::ProducerClient;
 
-      let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None)?;
+      let credential = DeveloperToolsCredential::new(None)?;
       let producer = ProducerClient::builder()
-          .open("<namespace>.servicebus.windows.net", "eventhub-name".to_string(), credential.clone())
+          .open("<namespace>.servicebus.windows.net", "eventhub-name", credential.clone())
           .await?;
 
   - name: send_single_event

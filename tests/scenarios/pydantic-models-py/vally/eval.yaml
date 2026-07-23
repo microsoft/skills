@@ -40,6 +40,7 @@ stimuli:
           command: node
           args:
             - .vally/tools/check-python-idiomatic.mjs
+            - .vally/syntax-check-config.json
           timeout: 90s
       - type: prompt
         name: Rubric LLM judge
@@ -84,6 +85,7 @@ stimuli:
           command: node
           args:
             - .vally/tools/check-python-idiomatic.mjs
+            - .vally/syntax-check-config.json
           timeout: 90s
       - type: prompt
         name: Rubric LLM judge
