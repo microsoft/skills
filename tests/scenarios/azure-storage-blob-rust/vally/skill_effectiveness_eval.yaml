@@ -128,6 +128,7 @@ stimuli:
             - "+nightly"
             - "-Zscript"
             - ".vally/tools/check-azure-crates.rs"
+          timeout: 2m
       - name: TokenCredential Authentication
         type: program
         weight: 1.0
