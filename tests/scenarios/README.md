@@ -35,7 +35,10 @@ From repository root:
 3. Install test dependencies:
    pnpm --dir tests install --frozen-lockfile
 
-4. Approve required build scripts (if prompted):
+4. Install Python test dependencies:
+   pip install -r tests/requirements.txt
+
+5. Approve required build scripts (if prompted):
    pnpm --dir tests approve-builds
 
 ## Running Evaluations

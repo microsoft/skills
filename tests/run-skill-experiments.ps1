@@ -1062,7 +1062,7 @@ $skillTimings = @()  # Track timings for ETA calculation
 
 # Execute experiments
 $scriptBlock = {
-    param($SkillDir, $ExperimentResultsDir, $ResultsRoot, $SkillIndex, $TotalSkills)
+    param($SkillDir, $ExperimentResultsDir, $ResultsRoot, $SkillIndex, $TotalSkills, $TestsRoot)
     
     $skillName = $SkillDir.Name
     $vallyDir = Join-Path $SkillDir.FullName "vally"
@@ -1076,7 +1076,7 @@ $scriptBlock = {
         # Note: vally experiment run expects to be run from the scenario directory
         Push-Location $vallyDir
         try {
-            $output = & vally experiment run skill_effectiveness_experiment.yaml --output-dir $skillOutputRoot 2>&1
+            $output = & pnpm --dir $TestsRoot exec vally experiment run skill_effectiveness_experiment.yaml --output-dir $skillOutputRoot 2>&1
             $exitCode = $LASTEXITCODE
         }
         finally {
@@ -1353,7 +1353,7 @@ if ($Workers -eq 1) {
     foreach ($skillDir in $skillDirs) {
         $skillIndex++
 
-        $result = & $scriptBlock $skillDir $experimentResultsDir $ResultsRoot $skillIndex $totalSkills
+        $result = & $scriptBlock $skillDir $experimentResultsDir $ResultsRoot $skillIndex $totalSkills $PSScriptRoot
         $results += $result
         $skillTimings += $result.Duration
 
@@ -1401,7 +1401,10 @@ else {
             [int]$TotalCount,
 
             [Parameter(Mandatory = $true)]
-            [scriptblock]$RunnerScript
+            [scriptblock]$RunnerScript,
+
+            [Parameter(Mandatory = $true)]
+            [string]$TestsRoot
         )
 
         if ($Queue.Count -eq 0) {
@@ -1409,7 +1412,7 @@ else {
         }
 
         $nextSkillDir = $Queue.Dequeue()
-        $newJob = Start-Job -ScriptBlock $RunnerScript -ArgumentList $nextSkillDir, $ExpResultsDir, $ResRoot, $NextIndex, $TotalCount
+        $newJob = Start-Job -ScriptBlock $RunnerScript -ArgumentList $nextSkillDir, $ExpResultsDir, $ResRoot, $NextIndex, $TotalCount, $TestsRoot
 
         return @{
             Job        = $newJob
@@ -1421,7 +1424,7 @@ else {
     # Seed up to worker limit.
     while ($activeJobs.Count -lt $Workers -and $pendingSkills.Count -gt 0) {
         $skillIndex++
-        $jobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock
+        $jobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot
         if ($jobInfo) {
             $activeJobs += $jobInfo
             Write-Host "  queued [$($jobInfo.SkillIndex)/$totalSkills] $($jobInfo.Skill) (active: $($activeJobs.Count)/$Workers)" -ForegroundColor DarkCyan
@@ -1457,7 +1460,7 @@ else {
 
         if ($pendingSkills.Count -gt 0) {
             $skillIndex++
-            $nextJobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock
+            $nextJobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot
             if ($nextJobInfo) {
                 $activeJobs += $nextJobInfo
                 Write-Host "  queued [$($nextJobInfo.SkillIndex)/$totalSkills] $($nextJobInfo.Skill) (active: $($activeJobs.Count)/$Workers)" -ForegroundColor DarkCyan

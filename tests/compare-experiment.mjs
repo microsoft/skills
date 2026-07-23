@@ -292,7 +292,7 @@ console.log(`Score delta                : ${scoreDelta}`);
 console.log(`Token delta                : ${tokenDelta}`);
 console.log(`Wall-time delta            : ${timeDelta}`);
 if (bothPass) {
-  const skillBetter = sS.totalTokens < bS.totalTokens && sS.wallTimeSec < bS.wallTimeSec;
+  const skillBetter = sS.totalTokens < bS.totalTokens && sS.wallTimeSec < bS.wallTimeSec && sS.avgScore >= bS.avgScore;
   const msg = skillBetter
     ? `✅  Skill variant passes with ${tokenDelta} fewer tokens and ${timeDelta} less wall time → SKILL IS BETTER`
     : `⚠️  Skill variant does not uniformly reduce both tokens and time — review per-metric deltas above.`;
