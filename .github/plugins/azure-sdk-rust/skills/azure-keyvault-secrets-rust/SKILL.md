@@ -38,6 +38,8 @@ AZURE_KEYVAULT_URL=https://<vault-name>.vault.azure.net/ # Required for all oper
 
 ## Authentication
 
+Rust Azure SDK code must not use `DefaultAzureCredential`. The Rust identity crate does not provide that type.
+
 ```rust
 use azure_identity::DeveloperToolsCredential;
 use azure_security_keyvault_secrets::SecretClient;
@@ -60,6 +62,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+Prefer the crate README/examples when checking whether pagers yield items directly and how `ResourceExt` is used in public examples.
 
 ## Core Workflow
 
@@ -156,6 +160,7 @@ For Entra ID auth, assign one of these roles:
 5. **Use `..Default::default()`** with `#[allow(clippy::needless_update)]` for model struct updates
 6. **Use `ResourceExt`** to extract resource name/version from secret IDs
 7. **Reuse clients** — `SecretClient` is thread-safe; create once, share across tasks
+8. **Run `cargo clippy -- -D warnings`** when the prompt, eval, or CI expects lint-clean output
 
 ## Reference Links
 

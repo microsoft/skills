@@ -41,6 +41,7 @@ scenarios:
     expected_patterns:
       - "ManagedIdentityCredential"
       - "client_id"
+      - "..Default::default()"
     forbidden_patterns:
       - "tenant_id"
     tags:

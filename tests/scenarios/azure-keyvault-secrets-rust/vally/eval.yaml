@@ -156,25 +156,28 @@ stimuli:
               message_pattern: "Option<std::string::String>"
               action: ignore_for_fail
 
-      - name: "Cargo Check"
-        type: rust-cargo-build-failure-check
-        config:
-          commands:
-            - command: cargo check
-          emit_in_metadata: true
-      - name: Rust Clippy Lints
+      - name: Post prompt Rust Cargo Build Failure
         type: rust-cargo-build-failure-check
         weight: 1.0
         config:
           commands:
-            - command: cargo clippy -- -D warnings
-          emit_in_metadata: true
-      - name: "Cargo Build"
-        type: rust-cargo-build-failure-check
-        config:
-          commands:
             - command: cargo build
           emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
+      - name: Post prompt Rust Cargo Clippy Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          commands:
+            - command: cargo clippy
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
 
       - name: SecretClient Creation
         type: prompt

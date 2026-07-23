@@ -13,29 +13,43 @@ defaults:
 stimuli:
   - name: rust-crud-blobs
     prompt: |
-      Write a Rust program named rust-blob that performs the following blob storage operations:
-      1. Create a blob container called "my-container" if it does not already exist
-      2. Upload a local file "example.txt" as a block blob named "uploads/example.txt"
-      3. List all blobs in the container and print their names and sizes
-      4. Download the blob back to a local file "downloaded-example.txt"
-      5. Delete the blob and then delete the container
+      Create a single Rust binary crate named rust-blob with one focused goal: demonstrate
+      Azure Blob Storage container and blob CRUD using the official Rust SDK.
 
-      Include proper error handling for cases like container already existing
-      or blob not found.
+      Required workflow:
+      1. Run `node .vally/tools/ensure-azure-storage-resources.mjs` once from the workspace root.
+      2. Do not inspect, modify, or troubleshoot that provisioning script. Treat it as a required
+         prerequisite step and move directly to Rust code after it finishes.
+      3. Create container `my-container` if it does not already exist.
+      4. Upload local file `example.txt` as block blob `uploads/example.txt`.
+      5. List all blobs in the container and print blob name plus size.
+      6. Download that blob to `downloaded-example.txt`.
+      7. Delete the blob, then delete the container.
 
-      Before the task is considered complete, ensure that the generated code compiles and
-      runs successfully, demonstrating the CRUD operations on Azure Blob Storage using the 
-      Rust SDK.
+      Inputs:
+      - Read `AZURE_STORAGE_ACCOUNT` when present.
+      - Otherwise read `accountName` from `.vally/state/azure-storage-provisioning.json`.
+      - Read optional `AZURE_STORAGE_CONTAINER`; default to `my-container`.
+      - If `example.txt` is missing, create it with sample content before upload.
 
-      In order to verify correct functionality, you may need to create an Azure Blob Storage 
-      instance and you will have to configure authentication. Make sure to have the necessary 
-      permissions to perform blob operations in the storage account you are using for testing.
+      Implementation constraints:
+      - Do not add Azure CLI provisioning or setup code to the Rust project.
+      - Use TokenCredential-based authentication and fail with clear messages when required
+        configuration is missing.
+      - Keep the implementation compact: one crate, minimal helpers, no extra abstractions.
+      - Prefer the documented skill/README patterns over crate-source exploration.
+      - Run `cargo build` and `cargo clippy -- -D warnings` near the end before finishing.
     rubric:
       - "Implements the full blob CRUD workflow end-to-end: create container, upload, list, download, and delete blob/container."
       - "Uses official Azure Rust SDK crate patterns and a TokenCredential-based authentication flow."
-      - "Uses async Rust with Tokio runtime and idiomatic Result-based error propagation."
+      - "Uses async Rust with Tokio runtime and idiomatic Result-based error propagation; avoids unnecessary unwrap/expect and returns an idiomatic main result type."
       - "Code compiles and passes cargo check for the rust-blob project."
-      - "Uses correct Azure client construction, response handling, and pager usage where applicable."
+      - "Uses correct Azure client construction patterns, including endpoint plus credential and compatible options initialization for forward compatibility."
+      - "Uses correct response handling and model deserialization patterns (for example into_model when appropriate) rather than ad-hoc response parsing."
+      - "Uses correct pager/stream iteration patterns for list operations and handles pagination across all results."
+      - "Uses long-running operation poller patterns correctly when an operation returns a poller; waits for final completion unless status streaming is explicitly required."
+      - "Uses SDK struct initialization patterns that preserve forward compatibility (for example default-update style where applicable)."
+      - "Uses idiomatic ownership and borrowing with minimal unnecessary cloning and appropriate shared ownership patterns for credentials and clients."
       - "Avoids hardcoded secrets in source code or configuration committed to the workspace."
       - "rustfmt compliance is bonus quality signal only and should not block a successful evaluation when all substantive correctness and SDK-usage criteria pass."
     artifacts:
@@ -75,12 +89,36 @@ stimuli:
           dest: .vally/tools/check-async-runtime.rs
         - src: ../../_shared/vally/tools/check-no-secrets.rs
           dest: .vally/tools/check-no-secrets.rs
+        - src: ../../_shared/vally/tools/ensure-azure-storage-resources.mjs
+          dest: .vally/tools/ensure-azure-storage-resources.mjs
+        - src: ../../_shared/vally/tools/check-azure-storage-provisioning-marker.mjs
+          dest: .vally/tools/check-azure-storage-provisioning-marker.mjs
+        - src: ../../_shared/vally/tools/check-azure-storage-preflight.mjs
+          dest: .vally/tools/check-azure-storage-preflight.mjs
         - src: workspace/cargo.toml
           dest: Cargo.toml
     constraints:
       expect_skills:
         - azure-storage-blob-rust
     graders:
+      - type: run-command
+        name: Azure storage preflight
+        weight: 1.0
+        config:
+          command: node
+          args:
+            - .vally/tools/check-azure-storage-preflight.mjs
+          timeout: 2m
+
+      - type: run-command
+        name: Azure storage provisioning command was executed
+        weight: 1.0
+        config:
+          command: node
+          args:
+            - .vally/tools/check-azure-storage-provisioning-marker.mjs
+          timeout: 30s
+
       - type: prompt
         name: "Prompt correctness and completeness of blob storage operations"
         config:
@@ -122,74 +160,6 @@ stimuli:
             - "+nightly"
             - "-Zscript"
             - ".vally/tools/check-async-runtime.rs"
-      - name: Idiomatic Error Handling
-        type: prompt
-        weight: 1.0
-        prompt: >
-          Error handling uses Result<T, E> and the ? operator. Calls to
-          .unwrap() are avoided or used only where failure
-          is impossible. Calls to expect() with a reasonable error message are allowed 
-          only if termination of the application is acceptable. Azure service errors are 
-          matched via azure_core::Error with ErrorKind (e.g.,
-          ErrorKind::HttpResponse { status, error_code, .. } with
-          StatusCode comparison). The main function returns
-          Result<(), Box<dyn std::error::Error>> or azure_core::Result<()>.
-      - name: Correct Client Construction
-        type: prompt
-        weight: 1.0
-        prompt: >
-          Service clients are constructed using the ::new() constructor
-          with an endpoint string, credential, and Option<ClientOptions> parameter.
-          If a ClientOptions parameter is specified, structs use ..Default::default()
-          for forward compatibility. If all the fields in the ClientOptions struct are provided, the
-          #[allow(clippy::needless_update)] annotation is used.
-      - name: Pager and Stream Usage
-        type: prompt
-        weight: 1.0
-        prompt: >
-          List operations return and consume azure_core::Pager<T> using
-          futures::TryStreamExt (try_next/try_collect). Pagination is
-          handled correctly by iterating all items. In most if not all
-          cases, individual items should be iterated over directly rather
-          than page-by-page, demonstrating the SDK's ability to handle 
-          pagination internally. Page-by-page iteration via into_pages()
-          is only necessary when there is an explicit requirement for page-level
-          access.
-      - name: Response Handling
-        type: prompt
-        weight: 1.0
-        prompt: >
-          Calls to service clients correctly handle Response<T>. When service
-          methods return a model type, code calls into_model() to deserialize
-          the response body into the expected model type (not manually parsing
-          JSON). When raw HTTP details are needed, deconstruct() is used to 
-          access status, headers, and body separately.
-      - name: Long-Running Operations
-        type: prompt
-        weight: 1.0
-        prompt: >
-          Long-running operations use azure_core::Poller<T> correctly.
-          If a client calls into an API returning a Poller, code awaits
-          the Poller directly (via IntoFuture) for the final result.
-          The only time that a client should iterate over status updates via
-          futures::TryStreamExt is when there is an explicit requirement for
-          status-level access.
-      - name: Struct Initialization with Default
-        type: prompt
-        weight: 1.0
-        prompt: >
-          If a client initializes a structure for SDK types (client options, method
-          options, model types) the code uses ..Default::default() to protect
-          against future field additions.
-      - name: Ownership and Borrowing
-        type: prompt
-        weight: 1.0
-        prompt: >
-          Code uses references (&str, &T) for borrowed data and avoids
-          unnecessary .clone() calls. Credentials are shared via Arc or
-          clone(). No unnecessary Box or Rc where Arc is appropriate.
-          Parameters that are only used for URL construction borrow
-          rather than own the data.
       - name: No Hardcoded Secrets
         type: program
         weight: 1.0
@@ -215,17 +185,6 @@ stimuli:
         config:
           commands:
             - command: cargo build
-          emit_in_metadata: true
-          error_exceptions:
-            - error_code: E0277
-              message_pattern: "Option<std::string::String>"
-              action: ignore_for_fail
-      - name: Post prompt Rust Cargo Check Failure
-        type: rust-cargo-build-failure-check
-        weight: 1.0
-        config:
-          commands:
-            - command: cargo check
           emit_in_metadata: true
           error_exceptions:
             - error_code: E0277

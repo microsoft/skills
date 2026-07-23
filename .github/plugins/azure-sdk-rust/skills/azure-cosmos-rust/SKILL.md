@@ -37,6 +37,8 @@ COSMOS_ENDPOINT=https://<account>.documents.azure.com/ # Required for all operat
 
 ## Authentication
 
+Rust Azure SDK code must not use `DefaultAzureCredential`. The Rust identity crate does not provide that type.
+
 ```rust
 use azure_identity::DeveloperToolsCredential;
 use azure_data_cosmos::{
@@ -57,13 +59,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+Prefer the crate README/examples when checking builder signatures and CRUD method shapes instead of reconstructing APIs from memory or generated internals.
+
 ## Client Hierarchy
 
-| Client            | Purpose                   | Access                                  |
-| ----------------- | ------------------------- | --------------------------------------- |
+| Client            | Purpose                   | Access                                          |
+| ----------------- | ------------------------- | ----------------------------------------------- |
 | `CosmosClient`    | Account-level operations  | `CosmosClient::builder().build(account).await?` |
-| `DatabaseClient`  | Database operations       | `client.database_client("db")`          |
-| `ContainerClient` | Container/item operations | `database.container_client("c").await` |
+| `DatabaseClient`  | Database operations       | `client.database_client("db")`                  |
+| `ContainerClient` | Container/item operations | `database.container_client("c").await`          |
 
 ## Core Workflow
 
@@ -148,6 +152,8 @@ For Entra ID auth, assign one of these built-in Cosmos DB roles:
 5. **Reuse `CosmosClient`** — clients are thread-safe; create once, share across tasks
 6. **Use `RoutingStrategy::ProximityTo`** — route to the nearest region for lowest latency
 7. **Always specify partition key** for item operations — Cosmos DB requires it for all CRUD
+8. **Run `cargo clippy -- -D warnings`** when the prompt, eval, or CI expects lint-clean output
+9. **Future-proof `#[non_exhaustive]` SDK models** — when constructing SDK model/options structs, end the initializer with `..Default::default()` (add `#[allow(clippy::needless_update)]`) and use a `_` wildcard arm when matching SDK enums, so new service-added fields/variants don't break your build
 
 ## Reference Links
 

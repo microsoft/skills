@@ -49,6 +49,8 @@ EVENTHUB_NAME=<eventhub-name>                     # Required — name of the Eve
 
 ## Authentication
 
+Rust Azure SDK code must not use `DefaultAzureCredential`. The Rust identity crate does not provide that type.
+
 ```rust
 use azure_identity::DeveloperToolsCredential;
 use azure_messaging_eventhubs::ProducerClient;
@@ -68,6 +70,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+Prefer the crate README/examples when checking builder signatures and receive-stream event wrapper shapes.
 
 ## Core Workflow
 
@@ -159,6 +163,7 @@ For Entra ID auth, assign one of these roles:
 7. **Handle errors per event** — match on `Ok`/`Err` in the event stream
 8. **Extract event bodies via `event.event_data().body()`**, not `event.body()` — `ReceivedEventData` wraps the underlying `EventData`.
 9. **Specify start position** — use `StartLocation::Earliest` or `StartLocation::Latest` to control where consumption begins
+10. **Run `cargo clippy -- -D warnings`** when the prompt, eval, or CI expects lint-clean output
 
 ## Reference Links
 

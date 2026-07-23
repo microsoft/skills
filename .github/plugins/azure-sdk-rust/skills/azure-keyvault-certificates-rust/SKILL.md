@@ -38,6 +38,8 @@ AZURE_KEYVAULT_URL=https://<vault-name>.vault.azure.net/ # Required for all oper
 
 ## Authentication
 
+Rust Azure SDK code must not use `DefaultAzureCredential`. The Rust identity crate does not provide that type.
+
 ```rust
 use azure_identity::DeveloperToolsCredential;
 use azure_security_keyvault_certificates::CertificateClient;
@@ -60,6 +62,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+Prefer the crate README/examples when checking LRO and poller usage rather than inferring public behavior from generated internal types.
 
 ## Core Workflow
 
@@ -206,6 +210,7 @@ For Entra ID auth, assign one of these roles:
 6. **Use `ResourceExt`** to extract certificate name/version from IDs
 7. **LROs** — `begin_create_certificate` returns a `Poller`; just `.await` for completion (clients should rarely poll for status)
 8. **Reuse clients** — `CertificateClient` is thread-safe; create once, share across tasks
+9. **Run `cargo clippy -- -D warnings`** when the prompt, eval, or CI expects lint-clean output
 
 ## Reference Links
 

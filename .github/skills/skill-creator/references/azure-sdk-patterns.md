@@ -26,7 +26,7 @@ Reference for creating skills that teach agents to write code following official
 Azure SDKs follow five design principles. Skills should reinforce these:
 
 | Principle | Meaning |
-|-----------|---------|
+| --------- | ------- |
 | **Idiomatic** | Follow language conventions; feel natural to developers |
 | **Consistent** | APIs feel like a single product from a single team |
 | **Approachable** | Great docs, predictable defaults, progressive disclosure |
@@ -58,7 +58,7 @@ For Python SDK skills that provide both sync and async clients, present both for
 `<Azure>.<group>.<service>`
 
 | Group | Area | Examples |
-|-------|------|----------|
+| ----- | ---- | -------- |
 | `ai` | AI/ML services | `Azure.AI.OpenAI`, `azure-ai-agents` |
 | `data` | Databases | `Azure.Data.Cosmos`, `azure-cosmos` |
 | `storage` | Storage services | `Azure.Storage.Blobs`, `@azure/storage-blob` |
@@ -69,7 +69,7 @@ For Python SDK skills that provide both sync and async clients, present both for
 ### Standard Verb Prefixes (All Languages)
 
 | Verb | Behavior | Returns |
-|------|----------|---------|
+| ---- | -------- | ------- |
 | `create` | Create new; fail if exists | Created item |
 | `upsert` | Create or update (database-like) | Item |
 | `set` | Create or update (dictionary-like) | Item |
@@ -84,7 +84,7 @@ For Python SDK skills that provide both sync and async clients, present both for
 
 ## Python Patterns
 
-### Client Naming
+### Python Client Naming
 
 ```python
 # Sync client
@@ -212,7 +212,7 @@ finally:
 
 Skills should show the context-manager form first. Only introduce the explicit `close()` pattern when the scenario genuinely requires a long-lived client (e.g., dependency-injected singletons), and always pair it with `try/finally` or a framework lifecycle hook.
 
-### Error Handling
+### Python Error Handling
 
 ```python
 from azure.core.exceptions import (
@@ -249,7 +249,7 @@ def get_setting(self, key: str, **kwargs) -> "ConfigurationSetting":
 
 ## .NET (C#) Patterns
 
-### Client Naming
+### .NET Client Naming
 
 ```csharp
 namespace Azure.Data.Configuration
@@ -262,7 +262,7 @@ namespace Azure.Data.Configuration
 }
 ```
 
-### Response Wrapper: Response<T>
+### .NET Response Wrapper: `Response<T>`
 
 ```csharp
 // Single item
@@ -274,7 +274,7 @@ public Response DeleteSetting(string key);
 public Task<Response> DeleteSettingAsync(string key);
 ```
 
-### Pagination: Pageable<T> / AsyncPageable<T>
+### .NET Pagination: `Pageable<T>` / `AsyncPageable<T>`
 
 ```csharp
 // Sync
@@ -290,7 +290,7 @@ await foreach (ConfigurationSetting setting in client.GetSettingsAsync())
 }
 ```
 
-### Long-Running Operations: Operation<T>
+### .NET Long-Running Operations: `Operation<T>`
 
 ```csharp
 // With WaitUntil parameter
@@ -324,7 +324,7 @@ public class ConfigurationClient
 }
 ```
 
-### Error Handling
+### .NET Error Handling
 
 ```csharp
 try
@@ -345,7 +345,7 @@ catch (RequestFailedException ex)
 
 ## Java Patterns
 
-### Client Naming
+### Java Client Naming
 
 ```java
 // Sync client
@@ -371,7 +371,7 @@ ConfigurationClient client = new ConfigurationClientBuilder()
     .buildClient();
 ```
 
-### Pagination: PagedIterable<T> / PagedFlux<T>
+### Java Pagination: `PagedIterable<T>` / `PagedFlux<T>`
 
 ```java
 // Sync - standard for loop
@@ -408,7 +408,7 @@ client.beginAnalyze(document)
 ### Reactor Types
 
 | Type | Purpose |
-|------|---------|
+| ---- | ------- |
 | `Mono<T>` | 0 or 1 item |
 | `Flux<T>` | 0 to N items |
 | `PagedFlux<T>` | Paginated collections |
@@ -505,7 +505,7 @@ interface CreateItemOptions {
 }
 ```
 
-### Error Handling
+### TypeScript Error Handling
 
 ```typescript
 import { RestError } from "@azure/core-rest-pipeline";
@@ -529,6 +529,7 @@ try {
 > **Source:** All examples below are derived from the official [azure-sdk-for-rust](https://github.com/Azure/azure-sdk-for-rust) repository README files and examples.
 >
 > **Dependency rule:** If your Rust code imports `azure_core` types directly (for example, `azure_core::http::Url`, `azure_core::http::RequestContent`, or `azure_core::error::ErrorKind`), add `azure_core` to `Cargo.toml`. If you only use types re-exported by service crates, a direct `azure_core` dependency is optional.
+>
 
 ### Installation (Rust)
 
@@ -608,7 +609,6 @@ let secret = client.get_secret("secret-name", None).await?.into_model()?;
 println!("Secret: {:?}", secret.value);
 ```
 
-
 ```rust
 use azure_core::http::Url;
 use azure_identity::DeveloperToolsCredential;
@@ -618,7 +618,6 @@ let credential = DeveloperToolsCredential::new(None)?;
 let service_client = BlobServiceClient::new(service_url, Some(credential), None)?;
 let blob_client = service_client.blob_client("<container_name>", "<blob_name>");
 ```
-
 
 ```rust
 use azure_identity::DeveloperToolsCredential;
@@ -669,6 +668,12 @@ while let Some(secret) = pager.try_next().await? {
 
 ```
 
+Skills should explicitly document the concrete item yielded by `try_next()` for the specific SDK being taught. Do not infer the public iteration shape from generated internal model names alone.
+
+- Some Rust Azure clients expose flattened item iteration, where `try_next()` already yields the item to process.
+- Others expose response pages or wrapper models that require an additional loop.
+- If the service skill is storage-specific, show the exact public `list_*` example from the crate README or examples instead of a generic pager explanation.
+
 The `ResourceExt` trait provides `resource_id()` for parsing names and versions from resource IDs:
 
 ```rust
@@ -711,7 +716,7 @@ let certificate = client
     .into_model()?;
 ```
 
-### Error Handling
+### Rust Error Handling
 
 Key Vault services return structured errors via `err.into_inner()?`:
 
@@ -782,6 +787,46 @@ struct Item {
 }
 ```
 
+When documenting Rust model types, explicitly teach users how to handle `#[non_exhaustive]` structs and enums:
+
+- When constructing SDK model structs, always include `..Default::default()` even if every currently known field is set.
+- When matching SDK enums, include a wildcard arm so future service-added variants do not break the match.
+- If Clippy or the compiler flags those future-proofing patterns in a minimal example, it is acceptable to locally suppress the warning on that example.
+
+```rust
+#![allow(dead_code, unused_variables)]
+
+#[derive(Default)]
+struct Model {
+    one: Option<String>,
+    two: Option<i32>,
+}
+
+enum E {
+    One,
+    Two,
+}
+
+fn main() {
+    // Future-proof struct construction for non-exhaustive SDK models.
+    #[allow(clippy::needless_update)]
+    let model = Model {
+        one: Some("one".into()),
+        two: Some(2),
+        ..Default::default()
+    };
+
+    // Future-proof enum matching for non-exhaustive SDK enums.
+    let value = E::One;
+    match value {
+        E::One => println!("One"),
+        E::Two => println!("Two"),
+        #[allow(unreachable_patterns)]
+        _ => panic!("unexpected variant"),
+    };
+}
+```
+
 ### Async Only
 
 The Rust SDK provides **only async** methods. No sync wrappers:
@@ -799,7 +844,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Key Differences from Other Azure SDKs
 
 | Aspect | Rust | Other Languages |
-|--------|------|----------------|
+| ------ | ---- | --------------- |
 | Auth default | `DeveloperToolsCredential` | `DefaultAzureCredential` |
 | Client creation | `Client::new()` or builder pattern (varies by service) | Constructors or builders |
 | Sync support | Async only (tokio) | Sync + Async |
@@ -811,11 +856,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 | Serialization | `serde` for Cosmos DB documents | Built-in serializers |
 | Thread safety | All clients are `Send + Sync`; reuse is safe | Same guarantee |
 
+### Rust Skill Authoring Guardrails
+
+When writing or refreshing a Rust Azure SDK skill, include explicit anti-pattern callouts for the mistakes most likely to happen when an agent generalizes from other languages:
+
+- Name the exact credential type to use, and name at least one tempting but invalid credential type if cross-language confusion is likely.
+- Show the exact pager item shape for the relevant service client and say whether `try_next()` yields items or pages.
+- Call out optional SDK fields that cannot be printed directly with `{}` and show the idiomatic fallback pattern.
+- If the target scenario or eval expects strict linting, say so explicitly and require `cargo clippy -- -D warnings` as a completion gate.
+- Prefer examples copied from the service crate README or examples directory over reconstructed snippets from generated source.
+
 ---
 
 ## Authentication (All Languages)
 
-**Always use `DefaultAzureCredential` as the primary pattern:**
+**Use the language-idiomatic primary credential pattern:**
 
 ### Python
 
@@ -869,7 +924,7 @@ let producer = ProducerClient::builder()
     .await?;
 ```
 
-> **Note:** Rust does not have `DefaultAzureCredential`. Use `DeveloperToolsCredential` for development (tries Azure CLI, then Azure Developer CLI). Use `ManagedIdentityCredential` for production on Azure-hosted apps. See [Credential structures](https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/identity/azure_identity#credential-structures) for the full list.
+> **Important:** Rust does not have `DefaultAzureCredential`. Skills for Rust should explicitly say “do not use `DefaultAzureCredential`” when there is any chance of cross-language confusion. Use `DeveloperToolsCredential` for development (tries Azure CLI, then Azure Developer CLI). Use `ManagedIdentityCredential` for production on Azure-hosted apps. See [Credential structures](https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/identity/azure_identity#credential-structures) for the full list.
 
 **Rules:**
 
@@ -884,7 +939,7 @@ let producer = ProducerClient::builder()
 ### Client Types by Language
 
 | Pattern | Python | .NET | Java | TypeScript | Rust |
-|---------|--------|------|------|------------|------|
+| ------- | ------ | ---- | ---- | ---------- | ---- |
 | Sync Client | `Client` | `Client` | `Client` | `Client` | N/A (Async only) |
 | Async Client | `AsyncClient` | N/A (Async methods) | `AsyncClient` | N/A (Promise) | `Client` |
 | Builder | N/A | N/A | `ClientBuilder` | N/A | `new()` or builder (varies by service) |
@@ -892,7 +947,7 @@ let producer = ProducerClient::builder()
 ### Pagination Types
 
 | Language | Sync | Async |
-|----------|------|-------|
+| -------- | ---- | ----- |
 | Python | `ItemPaged[T]` | `AsyncItemPaged[T]` |
 | .NET | `Pageable<T>` | `AsyncPageable<T>` |
 | Java | `PagedIterable<T>` | `PagedFlux<T>` |
@@ -902,7 +957,7 @@ let producer = ProducerClient::builder()
 ### LRO Types
 
 | Language | Sync | Async |
-|----------|------|-------|
+| -------- | ---- | ----- |
 | Python | `LROPoller[T]` | `AsyncLROPoller[T]` |
 | .NET | `Operation<T>` | `Operation<T>` |
 | Java | `SyncPoller<T,U>` | `PollerFlux<T,U>` |
@@ -912,7 +967,7 @@ let producer = ProducerClient::builder()
 ### Response Wrappers
 
 | Language | Single Item | Collection |
-|----------|-------------|------------|
+| -------- | ----------- | ---------- |
 | Python | Direct return | `ItemPaged[T]` |
 | .NET | `Response<T>` | `Pageable<T>` |
 | Java | Direct return | `PagedIterable<T>` |

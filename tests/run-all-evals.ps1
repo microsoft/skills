@@ -165,8 +165,13 @@ if ($pnpmInstallCheckExitCode -ne 0) {
 $languageFilter = @($Language | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim().ToLowerInvariant() })
 $serviceFilter = @($AzureService | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim().ToLowerInvariant() })
 
-$evalFiles = Get-ChildItem -Path $resolvedScenariosRoot -Filter "eval.yaml" -File -Recurse |
+$evalFiles = Get-ChildItem -Path $resolvedScenariosRoot -Filter "*eval.yaml" -File -Recurse |
 Where-Object {
+    $fullPath = $_.FullName
+    if ($fullPath -notmatch '[\\/]vally[\\/]') {
+        return $false
+    }
+
     $relativeDir = [System.IO.Path]::GetRelativePath($resolvedScenariosRoot, $_.DirectoryName).TrimStart('\', '/')
     if ([string]::IsNullOrWhiteSpace($relativeDir)) { return $false }
 
@@ -208,7 +213,7 @@ if (-not $evalFiles) {
     if ($languageFilter.Count -gt 0) { $filterSummary += "language=$($languageFilter -join ',')" }
     if ($serviceFilter.Count -gt 0) { $filterSummary += "service=$($serviceFilter -join ',')" }
     if ($filterSummary.Count -eq 0) { $filterSummary += "no filters" }
-    Write-Error "No eval.yaml files found under $resolvedScenariosRoot with $($filterSummary -join '; ')"
+    Write-Error "No Vally *eval.yaml files found under $resolvedScenariosRoot with $($filterSummary -join '; ')"
     exit 1
 }
 
@@ -408,14 +413,14 @@ $evalFiles | ForEach-Object -ThrottleLimit $Workers -Parallel {
     }
 
     $results.Add([pscustomobject]@{
-        Scenario    = $relativeDir
-        EvalSpec    = $evalFile.FullName
-        Status      = if ($passed) { "PASS" } else { "FAIL" }
-        ExitCode    = $exitCode
-        DurationSec = $durationSec
-        RunDir      = if ($runDir) { $runDir.FullName } else { "" }
-        Details     = $details
-    })
+            Scenario    = $relativeDir
+            EvalSpec    = $evalFile.FullName
+            Status      = if ($passed) { "PASS" } else { "FAIL" }
+            ExitCode    = $exitCode
+            DurationSec = $durationSec
+            RunDir      = if ($runDir) { $runDir.FullName } else { "" }
+            Details     = $details
+        })
 }
 
 $results = $results | Sort-Object Scenario

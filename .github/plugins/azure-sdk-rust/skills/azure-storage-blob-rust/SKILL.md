@@ -33,10 +33,27 @@ cargo add azure_storage_blob azure_identity azure_core tokio futures
 ## Environment Variables
 
 ```bash
-AZURE_STORAGE_ENDPOINT=https://<account>.blob.core.windows.net/ # Required for all operations
+AZURE_STORAGE_ACCOUNT=<account-name>                         # Preferred when the caller gives an account name
+AZURE_STORAGE_ENDPOINT=https://<account>.blob.core.windows.net/ # Optional alternative when the caller gives a full endpoint
 ```
 
+When both are available, prefer constructing the endpoint from `AZURE_STORAGE_ACCOUNT` so the code matches common evaluation prompts.
+
 ## Authentication
+
+Rust Azure SDK code must not use `DefaultAzureCredential`. The Rust identity crate does not provide that type.
+
+```rust
+// Correct for local development
+use azure_identity::DeveloperToolsCredential;
+
+let credential = DeveloperToolsCredential::new(None)?;
+```
+
+```rust
+// Incorrect in Rust: this type does not exist in azure_identity
+use azure_identity::DefaultAzureCredential;
+```
 
 ```rust
 use azure_core::http::Url;
@@ -125,12 +142,23 @@ let container_client = service_client.blob_container_client("<container_name>");
 // Create container
 container_client.create(None).await?;
 
-// List blobs (Pager<T> — iterate items directly)
+// List blobs (the pager yields BlobItem values directly for this client pattern)
 let mut pager = container_client.list_blobs(None)?;
 while let Some(blob) = pager.try_next().await? {
-    println!("Blob: {:?}", blob.name);
+    let name = blob.name.as_deref().unwrap_or("<unnamed>");
+    let size = blob
+        .properties
+        .as_ref()
+        .and_then(|properties| properties.content_length);
+
+    match size {
+        Some(size) => println!("Blob: {name} ({size} bytes)"),
+        None => println!("Blob: {name}"),
+    }
 }
 ```
+
+For `azure_storage_blob` 1.x, do not assume you need a nested page loop like `for item in &page.blob_items`. In this usage pattern, `try_next()` already yields the blob item you want to print.
 
 ## Error Handling
 
@@ -201,6 +229,17 @@ For Entra ID auth, assign one of these roles to the identity:
 6. **Assign RBAC roles** — ensure "Storage Blob Data Contributor" for write access
 7. **Reuse clients** — clients are thread-safe; create once, share across tasks
 8. **Prefer `BlobServiceClient` as the entry point** and derive container/blob clients from it
+9. **Treat many storage model fields as optional.** `blob.name` is an `Option<String>` and content length is accessed via `blob.properties.as_ref().and_then(|p| p.content_length)`.
+10. **Run `cargo clippy -- -D warnings` before considering the task complete** when the prompt or CI expects strict lint compliance; fix style lints such as collapsible `if` blocks, not just compiler errors.
+11. **Prefer crate README/examples over generated internal type names** when validating public API shapes such as pagination results
+12. **Future-proof `#[non_exhaustive]` SDK models** — when constructing SDK model/options structs, end the initializer with `..Default::default()` (add `#[allow(clippy::needless_update)]`) and use a `_` wildcard arm when matching SDK enums, so new service-added fields/variants don't break your build
+
+## Common Rust Blob Pitfalls
+
+- Do not import `azure_identity::DefaultAzureCredential`; use `DeveloperToolsCredential` or another real Rust credential type.
+- Do not assume generated internal model names describe the public pager item type; follow the documented `list_blobs` example for this crate.
+- Do not print `blob.name` with `{}` directly; unwrap or provide a fallback because it is optional.
+- Do not stop after `cargo build` passes when the task also requires `cargo clippy -- -D warnings`.
 
 ## Reference Links
 

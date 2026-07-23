@@ -34,6 +34,9 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_COPILOT_API_TOKEN: ${{ github.token }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,6 +57,12 @@ jobs:
         with:
           toolchain: stable
           override: true
+
+      - name: Cache Rust dependencies and build outputs
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure -> target
 
       - name: Verify Vally CLI
         run: vally --version
@@ -131,6 +140,14 @@ jobs:
             } >> "$GITHUB_OUTPUT"
             echo "No eval specs resolved from this event."
           fi
+
+      - name: Azure login (optional)
+        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_SUBSCRIPTION_ID != ''
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Build rust-cargo-build-failure grader plugin
         shell: bash

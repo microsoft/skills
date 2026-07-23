@@ -24,6 +24,11 @@ Use this skill when:
 
 > **Note:** The Rust SDK does not have `DefaultAzureCredential`. Use `DeveloperToolsCredential` for local development and `ManagedIdentityCredential` for production.
 
+```rust
+// Incorrect in Rust: this type does not exist in azure_identity
+use azure_identity::DefaultAzureCredential;
+```
+
 ## Installation
 
 ```sh
@@ -127,6 +132,8 @@ let credential = ClientSecretCredential::new(
 5. **Clone credentials** — pass `credential.clone()` when constructing multiple clients; credentials are `Arc`-wrapped
 6. **Reuse clients** — clients are thread-safe; create once, share across tasks
 7. **Assign RBAC roles** — ensure the identity has appropriate roles for the target service (e.g., "Key Vault Secrets User" for secret reads)
+8. **Run `cargo clippy -- -D warnings`** when the prompt, eval, or CI expects lint-clean output; Rust trajectory graders can fail on style lints even after compiler errors are fixed
+9. **Future-proof `#[non_exhaustive]` SDK models** — when constructing SDK model/options structs, end the initializer with `..Default::default()` (add `#[allow(clippy::needless_update)]`) and use a `_` wildcard arm when matching SDK enums, so new service-added fields/variants don't break your build
 
 ## Reference Links
 

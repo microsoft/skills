@@ -57,6 +57,7 @@ scenarios:
       - "QueueMessage"
       - "send_message"
       - "try_into"
+      - "..Default::default()"
     forbidden_patterns:
       - "receive_messages"
     tags:
@@ -65,8 +66,10 @@ scenarios:
     mock_response: |
       use azure_storage_queue::models::QueueMessage;
 
+      #[allow(clippy::needless_update)]
       let message = QueueMessage {
           message_text: Some("hello world".to_string()),
+          ..Default::default()
       };
       queue_client.send_message(message.try_into()?, None).await?;
 

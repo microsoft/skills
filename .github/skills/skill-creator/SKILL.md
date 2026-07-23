@@ -528,6 +528,8 @@ Add both items verbatim (adapted only for language/SDK specifics) as the **first
 
 6. **Always verify package versions using crates.io.** Before using a package, check its version on [crates.io](https://crates.io/) to ensure you are using a stable and supported release.
 
+7. **Future-proof `#[non_exhaustive]` model structs and enums.** Azure Rust SDK request/response models derive `Default` and are frequently `#[non_exhaustive]`. When constructing an SDK model struct, always end the initializer with `..Default::default()` (even if every currently known field is set), suppressing the lint locally with `#[allow(clippy::needless_update)]` when needed. When matching an SDK enum, include a wildcard (`_`) arm so future service-added variants do not break the match. If a skill documents model construction, its code examples MUST demonstrate this pattern. See `references/azure-sdk-patterns.md` (Model Types) for the full example.
+
 ### Example Effective Skills (Benchmark Only Structure-Compliant Skills)
 
 **Only benchmark Azure SDK skills that already use the required `references/` layout** (`references/capabilities.md` plus `references/non-hero-scenarios.md`). Older skills that predate that structure can still be useful for style ideas, but do not mirror them directly until they are brought into compliance.

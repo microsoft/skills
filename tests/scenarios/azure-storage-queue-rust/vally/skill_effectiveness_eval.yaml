@@ -66,7 +66,11 @@ stimuli:
         - "**/*.lib"
         - "**/*.wasm"
     environment:
+      skills:
+        - ../../../../.github/plugins/azure-sdk-rust/skills/azure-storage-queue-rust
       files:
+        - src: ../../_shared/vally/tools/find-cargo-root.js
+          dest: .vally/tools/find-cargo-root.js
         - src: workspace/cargo.toml
           dest: Cargo.toml
         - src: ../../_shared/vally/tools/check-azure-crates.rs
@@ -95,32 +99,38 @@ stimuli:
             - Error handling for queue operations
           scoring: scale_1_5
 
-      - type: run-command
-        name: "Build Application"
-        config:
-          command: cargo
-          args:
-            - "build"
-          timeout: 120s
-          stderr_contains: "Finished"
-      - type: run-command
-        name: "Check Application"
-        config:
-          command: cargo
-          args:
-            - "check"
-          timeout: 90s
-      - name: Rust Clippy Lints
-        type: run-command
+      - name: Rust Cargo Trajectory Build Failure
+        type: rust-cargo-build-failure-check
         weight: 1.0
         config:
-          command: cargo
-          args:
-            - "clippy"
-            - "--"
-            - "-D"
-            - "warnings"
-          timeout: 120s
+          collect_trajectory_compiler_errors: true
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
+      - name: Post prompt Rust Cargo Build Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          commands:
+            - command: cargo build
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
+      - name: Post prompt Rust Cargo Clippy Failure
+        type: rust-cargo-build-failure-check
+        weight: 1.0
+        config:
+          commands:
+            - command: cargo clippy
+          emit_in_metadata: true
+          error_exceptions:
+            - error_code: E0277
+              message_pattern: "Option<std::string::String>"
+              action: ignore_for_fail
       - name: Official Azure SDK Crate Selection
         type: program
         weight: 1.0

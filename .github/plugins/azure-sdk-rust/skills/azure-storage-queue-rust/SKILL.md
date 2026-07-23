@@ -38,6 +38,8 @@ AZURE_STORAGE_QUEUE_ENDPOINT=https://<account>.queue.core.windows.net/ # Require
 
 ## Authentication
 
+Rust Azure SDK code must not use `DefaultAzureCredential`. The Rust identity crate does not provide that type.
+
 ```rust
 use azure_core::http::Url;
 use azure_identity::DeveloperToolsCredential;
@@ -55,6 +57,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+Do not infer public SDK types from generated internal model names. Prefer the crate README/examples when checking queue client method signatures and message/result shapes.
 
 ## Client Types
 
@@ -79,8 +83,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let service_client = QueueServiceClient::new(service_url, Some(credential), None)?;
     let queue_client = service_client.queue_client("<queue_name>")?;
 
+    #[allow(clippy::needless_update)]
     let message = QueueMessage {
         message_text: Some("hello world".to_string()),
+        ..Default::default()
     };
     queue_client.send_message(message.try_into()?, None).await?;
     Ok(())
@@ -157,6 +163,8 @@ For Entra ID auth, assign one of these roles to the identity:
 6. **Use `QueueServiceClient` as the entry point** and derive `QueueClient` from it via `queue_client()`
 7. **Delete messages after processing** — use the message ID and pop receipt from `receive_messages`
 8. **Reuse clients** — clients are thread-safe; create once, share across tasks
+9. **Run `cargo clippy -- -D warnings`** when the prompt, eval, or CI expects lint-clean output
+10. **Future-proof `#[non_exhaustive]` SDK models** — end model-struct initializers (e.g. `QueueMessage`) with `..Default::default()` (add `#[allow(clippy::needless_update)]`) and use a `_` wildcard arm when matching SDK enums, so new service-added fields/variants don't break your build
 
 ## Reference Links
 
