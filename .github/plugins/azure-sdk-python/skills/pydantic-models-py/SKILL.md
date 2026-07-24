@@ -30,19 +30,21 @@ Copy the template from [assets/template.py](assets/template.py) and replace plac
 ## camelCase Aliases
 
 ```python
+from pydantic import BaseModel, ConfigDict, Field
+
 class MyModel(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     workspace_id: str = Field(..., alias="workspaceId")
     created_at: datetime = Field(..., alias="createdAt")
-    
-    class Config:
-        populate_by_name = True  # Accept both snake_case and camelCase
 ```
 
 ## Optional Update Fields
 
 ```python
 class MyUpdate(BaseModel):
-    """All fields optional for PATCH requests."""
+    model_config = ConfigDict(populate_by_name=True)
+
     name: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = None
 ```
@@ -51,7 +53,6 @@ class MyUpdate(BaseModel):
 
 ```python
 class MyInDB(MyResponse):
-    """Adds doc_type for Cosmos DB queries."""
     doc_type: str = "my_resource"
 ```
 

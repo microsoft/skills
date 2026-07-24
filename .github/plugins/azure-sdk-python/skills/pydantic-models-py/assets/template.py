@@ -1,124 +1,47 @@
-"""
-{{ResourceName}} Models
-
-Pydantic models for {{resource_name}} resource following the multi-model pattern.
-"""
+"""{{ResourceName}} models following the multi-model pattern."""
 
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, Field
-
-
-# ============================================================================
-# Base Model
-# ============================================================================
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class {{ResourceName}}Base(BaseModel):
-    """
-    Base model with common fields.
+    """Common fields shared by all {{resource_name}} models."""
 
-    Used as the foundation for Create, Update, and Response models.
-    """
+    model_config = ConfigDict(populate_by_name=True)
 
-    name: str = Field(
-        ...,
-        min_length=1,
-        max_length=200,
-        description="Display name for the {{resource_name}}",
-    )
-    description: Optional[str] = Field(
-        None,
-        max_length=2000,
-        description="Optional description",
-    )
-    # Add additional common fields here
-
-    class Config:
-        populate_by_name = True  # Allows both snake_case and camelCase
-
-
-# ============================================================================
-# Create Model
-# ============================================================================
+    name: str = Field(..., min_length=1, max_length=200)
+    description: Optional[str] = Field(None, max_length=2000)
 
 
 class {{ResourceName}}Create({{ResourceName}}Base):
-    """
-    Request model for creating a new {{resource_name}}.
+    """Request body for creating a {{resource_name}}."""
 
-    Includes all required fields for creation.
-    """
-
-    # Add required creation-only fields
-    workspace_id: str = Field(
-        ...,
-        alias="workspaceId",
-        description="ID of the parent workspace",
-    )
-
-
-# ============================================================================
-# Update Model
-# ============================================================================
+    workspace_id: str = Field(..., alias="workspaceId")
 
 
 class {{ResourceName}}Update(BaseModel):
-    """
-    Request model for partial updates.
+    """Request body for partial updates (all fields optional)."""
 
-    All fields are optional - only provided fields will be updated.
-    """
+    model_config = ConfigDict(populate_by_name=True)
 
-    name: Optional[str] = Field(
-        None,
-        min_length=1,
-        max_length=200,
-    )
-    description: Optional[str] = Field(
-        None,
-        max_length=2000,
-    )
-    # Add additional updatable fields here
-
-    class Config:
-        populate_by_name = True
-
-
-# ============================================================================
-# Response Model
-# ============================================================================
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    description: Optional[str] = Field(None, max_length=2000)
 
 
 class {{ResourceName}}({{ResourceName}}Base):
-    """
-    Response model with all fields.
+    """API response with all {{resource_name}} fields."""
 
-    Returned from API endpoints.
-    """
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
-    id: str = Field(..., description="Unique identifier")
-    slug: str = Field(..., description="URL-friendly identifier")
+    id: str
     workspace_id: str = Field(..., alias="workspaceId")
     author_id: str = Field(..., alias="authorId")
     created_at: datetime = Field(..., alias="createdAt")
     updated_at: Optional[datetime] = Field(None, alias="updatedAt")
 
-    class Config:
-        from_attributes = True  # Enable ORM mode for SQLAlchemy/etc
-        populate_by_name = True
-
-
-# ============================================================================
-# Database Model
-# ============================================================================
-
 
 class {{ResourceName}}InDB({{ResourceName}}):
-    """
-    Database document model.
-
-    Includes doc_type for Cosmos DB partitioning and queries.
-    """
+    """Database document with doc_type for Cosmos DB queries."""
 
     doc_type: str = "{{resource_name}}"
