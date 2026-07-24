@@ -8,7 +8,7 @@ Executes skill_effectiveness_experiment.yaml files for all or specified skills.
 Each experiment runs two variants (baseline without skill, skill with skill context) and
 stores results organized by timestamp.
 
-Use -SkillPattern to filter by language (e.g., '*-py' for Python, '*-rs' for Rust)
+Use -SkillPattern to filter by language (e.g., '*-py' for Python, '*-rust' for Rust)
 or by service (e.g., 'azure-cosmos*' for Cosmos DB).
 
 Results can be compared using compare-experiment.mjs to analyze skill impact on performance.

@@ -169,7 +169,7 @@ stimuli:
         weight: 1.0
         config:
           commands:
-            - command: cargo clippy
+            - command: cargo clippy -- -D warnings
           emit_in_metadata: true
           error_exceptions:
             - error_code: E0277
