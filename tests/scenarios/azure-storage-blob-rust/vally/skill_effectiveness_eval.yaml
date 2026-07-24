@@ -17,18 +17,14 @@ stimuli:
       Azure Blob Storage container and blob CRUD using the official Rust SDK.
 
       Required workflow:
-      1. Run `node .vally/tools/ensure-azure-storage-resources.mjs` once from the workspace root.
-      2. Do not inspect, modify, or troubleshoot that provisioning script. Treat it as a required
-         prerequisite step and move directly to Rust code after it finishes.
-      3. Create container `my-container` if it does not already exist.
-      4. Upload local file `example.txt` as block blob `uploads/example.txt`.
-      5. List all blobs in the container and print blob name plus size.
-      6. Download that blob to `downloaded-example.txt`.
-      7. Delete the blob, then delete the container.
+      1. Create container `my-container` if it does not already exist.
+      2. Upload local file `example.txt` as block blob `uploads/example.txt`.
+      3. List all blobs in the container and print blob name plus size.
+      4. Download that blob to `downloaded-example.txt`.
+      5. Delete the blob, then delete the container.
 
       Inputs:
       - Read `AZURE_STORAGE_ACCOUNT` when present.
-      - Otherwise read `accountName` from `.vally/state/azure-storage-provisioning.json`.
       - Read optional `AZURE_STORAGE_CONTAINER`; default to `my-container`.
       - If `example.txt` is missing, create it with sample content before upload.
 
@@ -84,36 +80,12 @@ stimuli:
           dest: .vally/tools/check-async-runtime.rs
         - src: ../../_shared/vally/tools/check-no-secrets.rs
           dest: .vally/tools/check-no-secrets.rs
-        - src: ../../_shared/vally/tools/ensure-azure-storage-resources.mjs
-          dest: .vally/tools/ensure-azure-storage-resources.mjs
-        - src: ../../_shared/vally/tools/check-azure-storage-provisioning-marker.mjs
-          dest: .vally/tools/check-azure-storage-provisioning-marker.mjs
-        - src: ../../_shared/vally/tools/check-azure-storage-preflight.mjs
-          dest: .vally/tools/check-azure-storage-preflight.mjs
         - src: workspace/cargo.toml
           dest: Cargo.toml
     constraints:
       expect_skills:
         - azure-storage-blob-rust
     graders:
-      - type: run-command
-        name: Azure storage preflight
-        weight: 1.0
-        config:
-          command: node
-          args:
-            - .vally/tools/check-azure-storage-preflight.mjs
-          timeout: 2m
-
-      - type: run-command
-        name: Azure storage provisioning command was executed
-        weight: 1.0
-        config:
-          command: node
-          args:
-            - .vally/tools/check-azure-storage-provisioning-marker.mjs
-          timeout: 30s
-
       - type: prompt
         name: "Prompt correctness and completeness of blob storage operations"
         config:
