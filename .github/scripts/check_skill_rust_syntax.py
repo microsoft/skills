@@ -88,7 +88,10 @@ def _extract_syntax_errors(stdout: str, stderr: str) -> list[str]:
             continue
 
         rendered = (message.get("rendered") or message.get("message") or "").strip()
-        if rendered and _is_syntax_error_text(rendered):
+        # Parser/lexer diagnostics have no error code; include them unconditionally.
+        # Named errors (E0001, etc.) are filtered to only known syntax patterns.
+        code = message.get("code")
+        if rendered and (code is None or _is_syntax_error_text(rendered)):
             syntax_errors.append(rendered)
 
     if syntax_errors:

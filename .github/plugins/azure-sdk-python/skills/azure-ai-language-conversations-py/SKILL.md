@@ -97,6 +97,7 @@ with ConversationAnalysisClient(endpoint, credential) as client:
     )
 
     print(f"Top intent: {result['result']['prediction']['topIntent']}")
+```
 
 ## Reference Files
 

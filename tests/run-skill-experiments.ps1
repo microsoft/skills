@@ -551,13 +551,7 @@ function Generate-NarrativesOnly {
         [string]$AnalysisRoot,
 
         [Parameter(Mandatory = $true)]
-        [string]$SkillNamePattern,
-
-        [Parameter(Mandatory = $false)]
-        [int]$NarrativeMaxAttempts = 2,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$EnableNodeLoaderFallback = $true
+        [string]$SkillNamePattern
     )
 
     Write-Information ""
@@ -581,7 +575,7 @@ function Generate-NarrativesOnly {
             continue
         }
 
-        $ok = Generate-SkillNarratives -SkillName $skillDir.Name -ExperimentOutputDir $experimentDir -SkillResultsDir $skillDir.FullName -NarrativeMaxAttempts $NarrativeMaxAttempts -EnableNodeLoaderFallback $EnableNodeLoaderFallback
+        $ok = Generate-SkillNarratives -SkillName $skillDir.Name -ExperimentOutputDir $experimentDir -SkillResultsDir $skillDir.FullName
         if ($ok) {
             $generated++
             Write-Host "  ✓ Narratives generated for $($skillDir.Name)" -ForegroundColor Green
@@ -894,14 +888,7 @@ function Generate-SkillNarratives {
         [string]$ExperimentOutputDir,
 
         [Parameter(Mandatory = $true)]
-        [string]$SkillResultsDir,
-
-        [Parameter(Mandatory = $false)]
-        [ValidateRange(1, 10)]
-        [int]$NarrativeMaxAttempts = 2,
-
-        [Parameter(Mandatory = $false)]
-        [bool]$EnableNodeLoaderFallback = $true
+        [string]$SkillResultsDir
     )
 
     if (-not (Test-Path $ExperimentOutputDir)) {
@@ -1623,11 +1610,19 @@ if ($Compare) {
     
     $compareScript = Join-Path $PSScriptRoot "compare-experiment.mjs"
     if (Test-Path $compareScript) {
+        $compareFailed = 0
         foreach ($result in $results) {
             if ($result.ExperimentDir -and (Test-Path $result.ExperimentDir)) {
                 Write-Information "Comparing: $($result.Skill)"
                 & node $compareScript $result.ExperimentDir
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Warning "compare-experiment.mjs failed for $($result.Skill) (exit $LASTEXITCODE)"
+                    $compareFailed++
+                }
             }
+        }
+        if ($compareFailed -gt 0) {
+            $failed += $compareFailed
         }
     }
     else {

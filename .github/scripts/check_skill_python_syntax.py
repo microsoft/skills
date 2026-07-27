@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 
-PY_FENCE_RE = re.compile(r"```(?:python|py)\n(.*?)\n```", re.S)
+PY_FENCE_RE = re.compile(r"```(?:python|py)\n(.*?)(?:\n```|\Z)", re.S)
 
 
 def check_python_file(path: Path, repo_root: Path, errors: list[str]) -> int:

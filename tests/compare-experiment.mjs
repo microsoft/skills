@@ -77,11 +77,15 @@ for (const v of [baselineVariant, skillVariant]) {
 // ── Load results ─────────────────────────────────────────────────────────────
 function loadResults(variantName) {
   const dir  = path.join(experimentDir, variantName);
-  // results.jsonl may be multi-line (one record per stimulus); aggregate them
+  // results.jsonl may be multi-line (one record per stimulus); aggregate only trial-result rows
   const rows = fs.readFileSync(path.join(dir, 'results.jsonl'), 'utf8')
     .split('\n').filter(l => l.trim())
-    .map(l => JSON.parse(l));
-  const summary = JSON.parse(fs.readFileSync(path.join(dir, 'run-summary.jsonl'), 'utf8').trim());
+    .map(l => JSON.parse(l))
+    .filter(r => r.type === 'trial-result');
+  // run-summary.jsonl is JSON Lines; take the last non-empty record
+  const summaryLines = fs.readFileSync(path.join(dir, 'run-summary.jsonl'), 'utf8')
+    .split('\n').filter(l => l.trim());
+  const summary = JSON.parse(summaryLines[summaryLines.length - 1]);
   return { rows, summary, variantName };
 }
 

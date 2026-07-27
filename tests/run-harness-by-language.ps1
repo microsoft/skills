@@ -45,9 +45,7 @@ param(
     [switch]$Mock,
     [switch]$Real,
     [switch]$ShowDetails,
-    [string]$OutputFile,
-    [ValidateRange(1, 100)]
-    [int]$MaxConcurrent = 1  # Sequential by default; set higher for parallel (use with caution)
+    [string]$OutputFile
 )
 
 # Normalize language
