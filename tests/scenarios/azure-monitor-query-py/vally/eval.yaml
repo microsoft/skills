@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Create a python application which shows how to use  LogsQueryClient to query a Log Analytics workspace.
       Use DefaultAzureCredential and a relative timespan.
+      Save the code to a file named `logs_basic_query.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

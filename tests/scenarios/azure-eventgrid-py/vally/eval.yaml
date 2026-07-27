@@ -60,6 +60,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to send a batch of CloudEvents to Event Grid using a list.
       Use DefaultAzureCredential and a topic endpoint from env.
+      Save the code to a file named `batch_cloudevent_publish.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

@@ -181,7 +181,7 @@ let partition_props = consumer.get_partition_properties("0", None).await?;
 
 ```rust
 let producer = ProducerClient::builder()
-    .open(host, eventhub.to_string(), credential)
+    .open(host, eventhub, credential)
     .await?;
 ```
 

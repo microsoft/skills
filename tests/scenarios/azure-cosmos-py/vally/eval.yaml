@@ -16,6 +16,7 @@ stimuli:
       Create a python application which demonstrates creating a basic Cosmos DB NoSQL.
       Get a database and container, upsert an item, and read it back.
       Use token credentials, not connection strings or SAS tokens.
+      Save the code to a file named `basic_aad_client.py` in the workspace.
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

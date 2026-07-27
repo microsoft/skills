@@ -16,6 +16,7 @@ stimuli:
       Create a Python example that uses ConversationAnalysisClient with DefaultAzureCredential.
       Build a valid task payload for Conversation analysis and print the top intent.
       Use a context manager for the client.
+      Save the code to a file named `clu_basic_defaultazurecredential.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
