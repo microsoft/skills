@@ -16,6 +16,7 @@ stimuli:
       Write a python application which analyzes a piece of text with Azure AI Content Safety using API key
       authentication. Include category severity checks for hate, self-harm,
       sexual, and violence.
+      Save the code to `content_safety.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -58,6 +59,7 @@ stimuli:
     prompt: |-
       Write a python application which analyzes text using Microsoft Entra ID authentication with
       DefaultAzureCredential. Include analyze_text usage.
+      Save the code to `content_safety_entra.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

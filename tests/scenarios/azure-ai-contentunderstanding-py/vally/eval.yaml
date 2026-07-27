@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Write a Python application which creates a basic Content Understanding client using DefaultAzureCredential.
       Use the environment variable CONTENTUNDERSTANDING_ENDPOINT.
+      Save the code to `content_understanding.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -57,6 +58,7 @@ stimuli:
     prompt: |-
       Write a Python application which analyzes a PDF document URL using prebuilt-documentSearch and prints the markdown.
       Use begin_analyze with AnalyzeInput.
+      Save the code to `document_extraction.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

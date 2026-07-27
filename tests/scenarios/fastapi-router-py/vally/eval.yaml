@@ -17,6 +17,7 @@ stimuli:
       Include GET (list and single), POST (create), PATCH (update), and DELETE endpoints.
       Use proper status codes, response models, and async/await patterns.
       Include pagination with limit and offset query parameters.
+      Save the code to `projects_router.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -64,6 +65,7 @@ stimuli:
       - POST, PATCH, DELETE endpoints require authentication
       - Use get_current_user for optional and get_current_user_required for required auth
       Include proper type hints and HTTPException for unauthorized access.
+      Save the code to `tasks_router.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

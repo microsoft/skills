@@ -16,6 +16,7 @@ stimuli:
       Write a Python application that creates a minimal async Voice Live connection that configures a session
       using RequestSession with instructions, modalities, and Server VAD.
       Use DefaultAzureCredential and update the session.
+      Save the code to `voice_live.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -58,6 +59,7 @@ stimuli:
     prompt: |-
       Write a Python application that connects to Voice Live using AzureKeyCredential and configures a session
       with text+audio modalities.
+      Save the code to `voice_live_key.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

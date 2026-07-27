@@ -16,6 +16,7 @@ stimuli:
       Write a Python application that creates a basic example translating English text to Spanish and French.
       Include proper authentication with Entra ID credentials, client initialization,
       and proper handling of the translation results.
+      Save the code to `text_translation.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -60,6 +61,7 @@ stimuli:
       Azure AI Text Translation service. Use the translate method with the source
       language omitted to trigger automatic language detection, and print the detected
       source language from the translation result.
+      Save the code to `language_detection.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

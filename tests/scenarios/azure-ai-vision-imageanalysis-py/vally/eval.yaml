@@ -16,6 +16,7 @@ stimuli:
       Write a Python application that analyzes an image from a URL to generate a caption.
       Include proper authentication with DefaultAzureCredential, context manager for cleanup,
       and extract the caption text with confidence score.
+      Save the code to `image_analysis.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -59,6 +60,7 @@ stimuli:
       Write a Python application that extracts text from an image using OCR.
       Include handling the READ visual feature to get text blocks, lines, and words.
       Display text with confidence scores and bounding polygons.
+      Save the code to `ocr_extraction.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

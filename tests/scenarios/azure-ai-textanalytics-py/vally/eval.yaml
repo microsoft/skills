@@ -16,6 +16,7 @@ stimuli:
       Write a Python application that demonstrates basic Azure Text Analytics sentiment analysis
       of multiple documents. Include proper authentication with DefaultAzureCredential,
       error handling, and cleanup.
+      Save the code to `sentiment_analysis.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -58,6 +59,7 @@ stimuli:
     prompt: |-
       Write a Python application that analyzes sentiment with opinion mining (aspect-based sentiment).
       Extract both the target and assessments for each opinion.
+      Save the code to `opinion_mining.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

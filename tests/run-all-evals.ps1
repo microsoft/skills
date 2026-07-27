@@ -310,7 +310,8 @@ $evalFiles | ForEach-Object -ThrottleLimit $Workers -Parallel {
     $relativeDir = [System.IO.Path]::GetRelativePath($resolvedScenariosRoot, $evalFile.DirectoryName).TrimStart('\', '/')
     if ([string]::IsNullOrWhiteSpace($relativeDir)) { $relativeDir = "root" }
 
-    $safeOutDirName = $relativeDir -replace '[\\/:*?"<>|]', "_"
+    $evalBaseName = [System.IO.Path]::GetFileNameWithoutExtension($evalFile.Name)
+    $safeOutDirName = ($relativeDir + "/" + $evalBaseName) -replace '[\\/:*?"<>|]', "_"
     $scenarioOutDir = Join-Path $resolvedResultsRoot $safeOutDirName
     New-Item -ItemType Directory -Path $scenarioOutDir -Force | Out-Null
 
