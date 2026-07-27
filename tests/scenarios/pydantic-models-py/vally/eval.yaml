@@ -61,6 +61,7 @@ stimuli:
       Create a Pydantic model for a "Project" resource with snake_case fields but camelCase 
       aliases for API responses. Include created_at and updated_at with aliases.
       Ensure populate_by_name is True to accept both formats.
+      Save the Python code to `models/project.py` in the current workspace.
 
     rubric:
       - Defines a Project Pydantic model with snake_case field names.
