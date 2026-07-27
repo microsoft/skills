@@ -16,6 +16,7 @@ stimuli:
       Create a complete set of Pydantic models for a "Document" resource following the 
       multi-model pattern. Include Base, Create, Update, Response, and InDB models.
       Use Field constraints, proper inheritance, and camelCase aliases with populate_by_name.
+      Save the complete model code to `models/document.py` in the current workspace.
 
     rubric:
       - Defines Base, Create, Update, Response, and InDB Pydantic models for Document.

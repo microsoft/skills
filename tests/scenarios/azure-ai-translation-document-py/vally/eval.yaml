@@ -15,7 +15,8 @@ stimuli:
     prompt: |-
       Write a Python application that submits a batch of documents for translation from a
       source Azure Storage container to a target container. Show proper client
-      initialization and job submission.
+      initialization and job submission. Save the code to `translate_documents.py`
+      in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -58,7 +59,8 @@ stimuli:
     prompt: |-
       Write a Python application that translates a batch of documents to multiple languages
       (Spanish, French, German) in a single translation job. Show how to specify
-      different target containers for each language.
+      different target containers for each language. Save the code to
+      `translate_multilang.py` in the current workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

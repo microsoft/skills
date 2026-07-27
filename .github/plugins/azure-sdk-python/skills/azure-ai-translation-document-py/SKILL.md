@@ -50,7 +50,7 @@ from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 from azure.ai.translation.document import DocumentTranslationClient
 
 # Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
-credential = DefaultAzureCredential(require_envvar=True)
+credential = DefaultAzureCredential()
 # Or use a specific credential directly in production:
 # See https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#credential-classes
 # credential = ManagedIdentityCredential()
@@ -83,32 +83,45 @@ with DocumentTranslationClient(
 ## Basic Document Translation
 
 ```python
-from azure.ai.translation.document import DocumentTranslationInput, TranslationTarget
+import os
+from azure.ai.translation.document import DocumentTranslationClient, DocumentTranslationInput, TranslationTarget
+from azure.core.exceptions import HttpResponseError
+from azure.identity import DefaultAzureCredential
 
-source_url = os.environ["AZURE_SOURCE_CONTAINER_URL"]
-target_url = os.environ["AZURE_TARGET_CONTAINER_URL"]
+credential = DefaultAzureCredential()
 
-# Start translation job
-poller = client.begin_translation(
-    inputs=[
-        DocumentTranslationInput(
-            source_url=source_url,
-            targets=[
-                TranslationTarget(
-                    target_url=target_url,
-                    language="es"  # Translate to Spanish
+with DocumentTranslationClient(
+    endpoint=os.environ["AZURE_DOCUMENT_TRANSLATION_ENDPOINT"],
+    credential=credential,
+) as client:
+    source_url = os.environ["AZURE_SOURCE_CONTAINER_URL"]
+    target_url = os.environ["AZURE_TARGET_CONTAINER_URL"]
+
+    try:
+        # Start translation job
+        poller = client.begin_translation(
+            inputs=[
+                DocumentTranslationInput(
+                    source_url=source_url,
+                    targets=[
+                        TranslationTarget(
+                            target_url=target_url,
+                            language="es"  # Translate to Spanish
+                        )
+                    ]
                 )
             ]
         )
-    ]
-)
 
-# Wait for completion
-result = poller.result()
+        # Wait for completion
+        result = poller.result()
 
-print(f"Status: {poller.status()}")
-print(f"Documents translated: {poller.details.documents_succeeded_count}")
-print(f"Documents failed: {poller.details.documents_failed_count}")
+        print(f"Status: {poller.status()}")
+        print(f"Documents translated: {poller.details.documents_succeeded_count}")
+        print(f"Documents failed: {poller.details.documents_failed_count}")
+    except HttpResponseError as e:
+        print(f"Translation failed: {e.message}")
+        raise
 ```
 
 ## Multiple Target Languages
