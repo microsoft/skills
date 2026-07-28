@@ -4,7 +4,7 @@ description: "Azure VM/VMSS router. WHEN: create / provision / deploy / spin-up 
 license: MIT
 metadata:
   author: Microsoft
-  version: "2.4.5"
+  version: "2.4.1"
 ---
 
 # Azure Compute Skill

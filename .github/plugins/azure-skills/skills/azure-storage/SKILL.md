@@ -4,7 +4,7 @@ description: "Azure Storage Services including Blob Storage, File Shares, Queue 
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.2"
+  version: "1.1.1"
 ---
 
 # Azure Storage Services

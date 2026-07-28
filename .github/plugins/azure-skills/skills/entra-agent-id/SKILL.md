@@ -4,7 +4,7 @@ description: "Provision Microsoft Entra Agent Identity Blueprints, BlueprintPrin
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.0.2"
+  version: "1.0.1"
 ---
 
 # Microsoft Entra Agent ID

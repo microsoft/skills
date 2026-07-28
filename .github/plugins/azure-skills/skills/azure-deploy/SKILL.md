@@ -4,7 +4,7 @@ description: "Execute Azure deployments for ALREADY-PREPARED applications that h
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.2"
+  version: "1.1.1"
 ---
 
 # Azure Deploy

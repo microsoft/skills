@@ -4,7 +4,7 @@ description: "List, find, and show Azure resources across subscriptions or resou
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.3"
+  version: "1.1.1"
 ---
 
 # Azure Resource Lookup

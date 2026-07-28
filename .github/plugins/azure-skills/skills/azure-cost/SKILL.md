@@ -4,7 +4,7 @@ description: "Azure cost management: query costs, forecast spending, optimize to
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.2"
+  version: "1.2.1"
 ---
 
 # Azure Cost Management Skill

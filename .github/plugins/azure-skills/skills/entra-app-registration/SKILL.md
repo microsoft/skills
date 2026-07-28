@@ -4,7 +4,7 @@ description: "Guides Microsoft Entra ID app registration, OAuth 2.0 authenticati
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.2"
+  version: "1.1.1"
 ---
 
 ## Overview

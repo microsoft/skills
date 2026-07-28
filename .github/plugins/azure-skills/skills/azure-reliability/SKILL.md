@@ -4,7 +4,7 @@ description: "Assess and improve the reliability posture of PaaS Applications (A
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.0.2"
+  version: "1.0.1"
 ---
 
 # Azure Reliability Assessment & Configuration

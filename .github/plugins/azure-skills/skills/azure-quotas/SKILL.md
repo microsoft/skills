@@ -4,7 +4,7 @@ description: "Check/manage Azure quotas and usage across providers. For deployme
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.2"
+  version: "1.1.1"
 ---
 
 

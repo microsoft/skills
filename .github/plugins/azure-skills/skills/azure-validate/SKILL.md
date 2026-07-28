@@ -4,7 +4,7 @@ description: "Pre-deployment validation for Azure readiness. Run deep checks on 
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.7"
+  version: "1.1.1"
 ---
 
 # Azure Validate
