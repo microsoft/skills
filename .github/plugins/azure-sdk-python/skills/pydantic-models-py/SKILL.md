@@ -30,6 +30,8 @@ Copy the template from [assets/template.py](assets/template.py) and replace plac
 ## camelCase Aliases
 
 ```python
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 class MyModel(BaseModel):

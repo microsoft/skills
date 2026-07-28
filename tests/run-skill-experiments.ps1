@@ -1029,6 +1029,81 @@ $vallyCmd = "pnpm", "--dir", $PSScriptRoot, "exec", "vally"
 
 Write-Information "Vally: $vallyExe"
 
+# Detect and build the shared rust-cargo-build-failure grader plugin if any experiment uses it
+$customGraderPluginDir = Join-Path $PSScriptRoot "scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure"
+$customGraderSource = Join-Path $customGraderPluginDir "index.ts"
+$customGraderPackage = Join-Path $customGraderPluginDir "package.json"
+$customGraderTsConfig = Join-Path $customGraderPluginDir "tsconfig.json"
+$customGraderDistEntry = Join-Path $customGraderPluginDir "dist/index.js"
+
+$requiresRustCustomGrader = $false
+foreach ($skillDir in $skillDirs) {
+    $vallyFiles = Get-ChildItem -Path (Join-Path $skillDir.FullName "vally") -Filter "*.yaml" -ErrorAction SilentlyContinue
+    foreach ($vallyFile in $vallyFiles) {
+        $match = Select-String -Path $vallyFile.FullName -Pattern 'type:\s*rust-cargo-build-failure-check' -CaseSensitive:$false -ErrorAction SilentlyContinue
+        if ($match) {
+            $requiresRustCustomGrader = $true
+            break
+        }
+    }
+    if ($requiresRustCustomGrader) { break }
+}
+
+if ($requiresRustCustomGrader) {
+    if (-not (Test-Path $customGraderPluginDir)) {
+        Write-Error "Custom grader plugin directory not found: $customGraderPluginDir"
+        exit 1
+    }
+
+    $customGraderRebuildReasons = @()
+    if (-not (Test-Path $customGraderDistEntry)) {
+        $customGraderRebuildReasons += "dist/index.js is missing"
+    }
+    else {
+        $distTime = (Get-Item $customGraderDistEntry).LastWriteTimeUtc
+        foreach ($sourcePath in @($customGraderSource, $customGraderTsConfig, $customGraderPackage)) {
+            if (Test-Path $sourcePath) {
+                $sourceTime = (Get-Item $sourcePath).LastWriteTimeUtc
+                if ($sourceTime -gt $distTime) {
+                    $customGraderRebuildReasons += "$(Split-Path -Leaf $sourcePath) is newer than dist/index.js"
+                }
+            }
+        }
+    }
+
+    if ($customGraderRebuildReasons.Count -gt 0) {
+        Write-Host "Custom grader plugin rebuild required: $($customGraderRebuildReasons -join '; ')"
+
+        $buildOutput = $null
+        $buildExitCode = 1
+
+        $pnpmCmd = Get-Command pnpm -ErrorAction SilentlyContinue
+        if ($pnpmCmd) {
+            Write-Host "Rebuilding custom grader plugin via pnpm exec tsc..."
+            $buildOutput = & pnpm --dir $PSScriptRoot exec tsc --project $customGraderTsConfig 2>&1
+            $buildExitCode = $LASTEXITCODE
+        }
+        else {
+            Write-Host "pnpm not found; rebuilding custom grader plugin via npx tsc..."
+            $buildOutput = & npx tsc --project $customGraderTsConfig 2>&1
+            $buildExitCode = $LASTEXITCODE
+        }
+
+        if ($buildExitCode -ne 0 -or -not (Test-Path $customGraderDistEntry)) {
+            if ($buildOutput) {
+                $buildOutput | ForEach-Object { Write-Error $_ }
+            }
+            Write-Error "Failed to build custom grader plugin at $customGraderPluginDir"
+            exit 1
+        }
+
+        Write-Host "Custom grader plugin rebuilt successfully."
+    }
+    else {
+        Write-Host "Custom grader plugin is up to date."
+    }
+}
+
 # Create results directory with timestamp
 $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ss-fff") + "Z"
 $experimentResultsDir = Join-Path $ResultsRoot $timestamp
@@ -1049,7 +1124,7 @@ $skillTimings = @()  # Track timings for ETA calculation
 
 # Execute experiments
 $scriptBlock = {
-    param($SkillDir, $ExperimentResultsDir, $ResultsRoot, $SkillIndex, $TotalSkills, $TestsRoot)
+    param($SkillDir, $ExperimentResultsDir, $ResultsRoot, $SkillIndex, $TotalSkills, $TestsRoot, $RequiresRustCustomGrader, $CustomGraderPluginDir)
     
     $skillName = $SkillDir.Name
     $vallyDir = Join-Path $SkillDir.FullName "vally"
@@ -1063,7 +1138,9 @@ $scriptBlock = {
         # Note: vally experiment run expects to be run from the scenario directory
         Push-Location $vallyDir
         try {
-            $output = & pnpm --dir $TestsRoot exec vally experiment run skill_effectiveness_experiment.yaml --output-dir $skillOutputRoot 2>&1
+            $vallyArgs = @("experiment", "run", "skill_effectiveness_experiment.yaml", "--output-dir", $skillOutputRoot)
+            if ($RequiresRustCustomGrader) { $vallyArgs += @("--grader-plugin", $CustomGraderPluginDir) }
+            $output = & pnpm --dir $TestsRoot exec vally @vallyArgs 2>&1
             $exitCode = $LASTEXITCODE
         }
         finally {
@@ -1340,7 +1417,7 @@ if ($Workers -eq 1) {
     foreach ($skillDir in $skillDirs) {
         $skillIndex++
 
-        $result = & $scriptBlock $skillDir $experimentResultsDir $ResultsRoot $skillIndex $totalSkills $PSScriptRoot
+        $result = & $scriptBlock $skillDir $experimentResultsDir $ResultsRoot $skillIndex $totalSkills $PSScriptRoot $requiresRustCustomGrader $customGraderPluginDir
         $results += $result
         $skillTimings += $result.Duration
 
@@ -1391,7 +1468,13 @@ else {
             [scriptblock]$RunnerScript,
 
             [Parameter(Mandatory = $true)]
-            [string]$TestsRoot
+            [string]$TestsRoot,
+
+            [Parameter(Mandatory = $false)]
+            [bool]$RequiresRustCustomGrader = $false,
+
+            [Parameter(Mandatory = $false)]
+            [string]$CustomGraderPluginDir = ""
         )
 
         if ($Queue.Count -eq 0) {
@@ -1399,7 +1482,7 @@ else {
         }
 
         $nextSkillDir = $Queue.Dequeue()
-        $newJob = Start-Job -ScriptBlock $RunnerScript -ArgumentList $nextSkillDir, $ExpResultsDir, $ResRoot, $NextIndex, $TotalCount, $TestsRoot
+        $newJob = Start-Job -ScriptBlock $RunnerScript -ArgumentList $nextSkillDir, $ExpResultsDir, $ResRoot, $NextIndex, $TotalCount, $TestsRoot, $RequiresRustCustomGrader, $CustomGraderPluginDir
 
         return @{
             Job        = $newJob
@@ -1411,7 +1494,7 @@ else {
     # Seed up to worker limit.
     while ($activeJobs.Count -lt $Workers -and $pendingSkills.Count -gt 0) {
         $skillIndex++
-        $jobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot
+        $jobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot -RequiresRustCustomGrader $requiresRustCustomGrader -CustomGraderPluginDir $customGraderPluginDir
         if ($jobInfo) {
             $activeJobs += $jobInfo
             Write-Host "  queued [$($jobInfo.SkillIndex)/$totalSkills] $($jobInfo.Skill) (active: $($activeJobs.Count)/$Workers)" -ForegroundColor DarkCyan
@@ -1447,7 +1530,7 @@ else {
 
         if ($pendingSkills.Count -gt 0) {
             $skillIndex++
-            $nextJobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot
+            $nextJobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot -RequiresRustCustomGrader $requiresRustCustomGrader -CustomGraderPluginDir $customGraderPluginDir
             if ($nextJobInfo) {
                 $activeJobs += $nextJobInfo
                 Write-Host "  queued [$($nextJobInfo.SkillIndex)/$totalSkills] $($nextJobInfo.Skill) (active: $($activeJobs.Count)/$Workers)" -ForegroundColor DarkCyan

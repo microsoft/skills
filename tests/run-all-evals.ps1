@@ -321,7 +321,7 @@ $evalFiles | ForEach-Object -ThrottleLimit $Workers -Parallel {
     $start = Get-Date
     $vallyArgs = @("eval", "--eval-spec", $evalFile.FullName, "--output-dir", $scenarioOutDir, "--workers", "1")
     if ($requiresRustCustomGrader) { $vallyArgs += @("--grader-plugin", $customGraderPluginDir) }
-    if ($JUnit) { $vallyArgs += @("--junit", (Join-Path $scenarioOutDir "results.xml")) }
+    if ($JUnit) { $vallyArgs += @("--junit") }
 
     $evalOutput = @()
     $exitCode = 1
