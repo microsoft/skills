@@ -60,6 +60,7 @@ stimuli:
   - name: logs_timespan_tuple
     prompt: |-
       Write a python application that shows how to use a LogsQueryClient example that uses a time range tuple with timezone-aware datetimes.
+      Save the code to a file named `logs_timespan_tuple.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

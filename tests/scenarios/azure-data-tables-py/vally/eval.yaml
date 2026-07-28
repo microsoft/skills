@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to create a TableServiceClient using DefaultAzureCredential, create a table
       if it doesn't exist, and get a TableClient for that table.
+      Save the code to a file named `basic_table_service_client.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -60,6 +61,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to create a TableClient and perform entity CRUD operations using
       PartitionKey/RowKey, including update with UpdateMode.
+      Save the code to a file named `table_client_entity_crud.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

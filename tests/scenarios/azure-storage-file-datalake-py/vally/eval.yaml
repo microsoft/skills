@@ -16,6 +16,7 @@ stimuli:
       Create a basic python application which authenticates with DefaultAzureCredential,
       creates a DataLakeServiceClient, and creates/gets a file system.
       Include listing file systems.
+      Save the code to a file named `basic_service_client_and_filesystem.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -61,6 +62,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to create a directory, get a directory client,
       create a subdirectory, and rename the directory.
+      Save the code to a file named `directory_operations.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

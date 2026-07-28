@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Create a Python application which shows how to create a basic Azure Fabric Management client that connects to Azure
       using DefaultAzureCredential. Include proper authentication and cleanup.
+      Save the code to a file named `basic_client_creation.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -60,6 +61,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to create a new Fabric capacity with the Azure Fabric Management SDK.
       Include the SKU configuration, location, and proper LRO handling.
+      Save the code to a file named `create_fabric_capacity.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

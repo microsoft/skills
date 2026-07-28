@@ -16,6 +16,7 @@ stimuli:
       Write a Python application which shows how to create a basic Azure Key Vault secrets example that authenticates with
       DefaultAzureCredential, sets a secret, gets it, then deletes and purges it.
       Use AZURE_KEYVAULT_URL for the vault URL.
+      Save the code to a file named `secret_crud_basic.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -61,6 +62,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to list all secret names and all versions for a specific secret using
       SecretClient.list_properties_of_secrets and list_properties_of_secret_versions.
+      Save the code to a file named `list_secret_versions.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

@@ -16,6 +16,7 @@ stimuli:
       Create a synchronous Event Hub producer in Python that authenticates with
       DefaultAzureCredential, creates a batch, handles batch size limits,
       and sends the batch.
+      Save the code to a file named `producer_batch_send.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

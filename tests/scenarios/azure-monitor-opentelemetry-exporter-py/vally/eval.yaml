@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows a minimal trace exporter example using AzureMonitorTraceExporter.
       Use BatchSpanProcessor, TracerProvider, and emit a span.
+      Save the code to a file named `trace_exporter_basic.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -60,6 +61,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to configure AzureMonitorMetricExporter with a
       PeriodicExportingMetricReader and record a counter metric.
+      Save the code to a file named `metric_exporter_basic.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

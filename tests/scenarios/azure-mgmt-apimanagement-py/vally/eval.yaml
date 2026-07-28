@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to create a basic Azure API Management client with proper authentication
       and environment variable handling. Show how to connect to an APIM service.
+      Save the code to a file named `basic_apim_client_creation.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -60,6 +61,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to create an Azure API Management service with Developer SKU.
       Include publisher email and name. Handle the long-running operation properly.
+      Save the code to a file named `apim_service_creation_with_sku.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

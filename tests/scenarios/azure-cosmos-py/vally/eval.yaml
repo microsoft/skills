@@ -61,6 +61,7 @@ stimuli:
     prompt: |-
       Create a python application using a CosmosClient with a connection string which retrieve
       an existing database.
+      Save the code to a file named `connection_string_client.py` in the workspace.
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
       - Keeps credentials in environment variables and avoids hardcoded secrets.

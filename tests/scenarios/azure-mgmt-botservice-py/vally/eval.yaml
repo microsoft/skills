@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Write a Python application which shows how to create a basic Azure Bot Service using the management SDK.
       Include proper authentication, bot creation with F0 SKU, and cleanup.
+      Save the code to a file named `basic_bot_creation.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -61,6 +62,7 @@ stimuli:
       Write a Python application which shows how to retrieve bot information from Azure Bot Service.
       Include getting a specific bot, listing bots in a resource group,
       and accessing bot properties.
+      Save the code to a file named `bot_retrieval_operations.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

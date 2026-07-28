@@ -16,6 +16,7 @@ stimuli:
       Create a basic Python application which authenticates with
       DefaultAzureCredential and initializes a BlobServiceClient. Then
       create a container client and create the container.
+      Save the code to a file named `basic_blob_service_client.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -61,6 +62,7 @@ stimuli:
     prompt: |-
       Create a Python application which uploads a local file to Azure Blob Storage using BlobClient.
       Use overwrite=True when uploading.
+      Save the code to a file named `upload_blob_with_blob_client.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

@@ -16,6 +16,7 @@ stimuli:
       Write a Python application which shows how to create a basic Azure API Center service with proper authentication,
       specify a location (eastus), and include resource cleanup.
       Use environment variables for configuration.
+      Save the code to a file named `basic_api_center_creation.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.
@@ -62,6 +63,7 @@ stimuli:
       Write a Python application which shows how to register a REST API in the API Center with metadata.
       Include the API kind (REST), lifecycle stage, and description.
       Use the "default" workspace for API operations.
+      Save the code to a file named `api_registration_workflow.py` in the workspace.
 
     rubric:
       - Uses the APIs, imports, and workflow expected by the skill.

@@ -15,6 +15,7 @@ stimuli:
     prompt: |-
       Create a python application which uses ShareServiceClient using a connection string and demonstrate
       creating a share, listing shares, and deleting the share.
+      Save the code to a file named `service_client_connection_string.py` in the workspace.
 
       CRITICAL: Include explicit exception handling:
         * Wrap credential/client initialization and all storage operations in try/except blocks
