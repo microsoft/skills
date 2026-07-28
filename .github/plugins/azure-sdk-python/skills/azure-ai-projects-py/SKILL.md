@@ -45,7 +45,7 @@ from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 from azure.ai.projects import AIProjectClient
 
 # Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
-credential = DefaultAzureCredential(require_envvar=True)
+credential = DefaultAzureCredential()
 # Or use a specific credential directly in production:
 # See https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#credential-classes
 # credential = ManagedIdentityCredential()
@@ -115,7 +115,7 @@ agent = client.agents.create_agent(
 ### Create Agent with Tools
 
 ```python
-from azure.ai.agents import CodeInterpreterTool, FileSearchTool
+from azure.ai.agents.models import CodeInterpreterTool, FileSearchTool
 
 agent = client.agents.create_agent(
     model=os.environ["AZURE_AI_MODEL_DEPLOYMENT_NAME"],

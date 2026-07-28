@@ -215,7 +215,7 @@ run = project_client.agents.runs.create_and_process(
 ### Streaming Run
 
 ```python
-from azure.ai.agents import AgentEventHandler
+from azure.ai.agents.models import AgentEventHandler
 
 class MyHandler(AgentEventHandler):
     def on_message_delta(self, delta):
