@@ -53,17 +53,26 @@ configure_azure_monitor(
 # Your application code...
 ```
 
-## Explicit Configuration
+## Explicit Connection String
+
+Pass the connection string explicitly by reading it from the environment variable.
+The value includes both `InstrumentationKey` and `IngestionEndpoint`.
 
 ```python
-from azure.identity import DefaultAzureCredential
+import os
 from azure.monitor.opentelemetry import configure_azure_monitor
 
-# Reads APPLICATIONINSIGHTS_CONNECTION_STRING from env to identify the resource;
-# DefaultAzureCredential authenticates ingestion via Microsoft Entra ID.
-configure_azure_monitor(
-    credential=DefaultAzureCredential(),
-)
+# Read the full connection string from the environment.
+# Format: "InstrumentationKey=<key>;IngestionEndpoint=https://<id>.in.applicationinsights.azure.com/"
+connection_string = os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"]
+
+try:
+    configure_azure_monitor(
+        connection_string=connection_string,
+    )
+    # Your application code...
+except Exception as exc:
+    raise RuntimeError(f"Azure Monitor configuration failed: {exc}") from exc
 ```
 
 ## With Flask
@@ -204,8 +213,8 @@ configure_azure_monitor(
 from azure.monitor.opentelemetry import configure_azure_monitor
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 
-# Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
-credential = DefaultAzureCredential(require_envvar=True)
+# Local dev: DefaultAzureCredential. In production, set AZURE_TOKEN_CREDENTIALS=prod or use a specific credential.
+credential = DefaultAzureCredential()
 # Or use a specific credential directly in production:
 # See https://learn.microsoft.com/python/api/overview/azure/identity-readme?view=azure-python#credential-classes
 # credential = ManagedIdentityCredential()

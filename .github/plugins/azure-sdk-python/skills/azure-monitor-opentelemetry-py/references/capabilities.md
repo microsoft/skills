@@ -6,7 +6,7 @@ This index maps hero scenarios in `SKILL.md` and links non-hero scenarios docume
 
 ## Hero scenarios covered in SKILL.md
 
-- `Explicit Configuration`
+- `Explicit Connection String`
 - `With Flask`
 - `With Django`
 - `With FastAPI`
