@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.8
+
+- feat: add Foundry skill dependency check and setup scripts ([#2956](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2956))
+
 ## 1.2.7
 
 - chore: bump all skill versions ([#2985](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2985))
