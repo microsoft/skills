@@ -158,7 +158,7 @@ This step runs automatically after deploy. Ask the user which source to use and 
 
 Other useful flags on `generate`: `--dataset <path-or-name>` to reuse an existing dataset instead of generating one, `--evaluator <name>` (repeatable) to pin built-in or custom evaluators, `--eval-model <name>` to choose the model used for generation and evaluation, `--reset-defaults` to overwrite an existing eval config, `--name <suite-name>` and `--out-file <path>` (default `eval.yaml`).
 
-Then proceed to Step 6. See [After Deployment — Auto-Generate Evaluation Suite](#after-deployment--auto-generate-evaluation-suite) for run/refresh details.
+Then proceed to Step 6. See [After Deployment — Auto-Generate Evaluation Suite](#after-deployment--auto-generate-evaluation-suite) for run/refresh details. Run `azd ai agent eval run` only after the user explicitly agrees.
 
 ### Step 6 -- Hand off
 
