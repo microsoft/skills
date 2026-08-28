@@ -47,7 +47,7 @@ jobs:
         run: python -m pip install -r tests/requirements.txt
 
       - name: Install Vally CLI
-        run: npm install -g @microsoft/vally-cli@0.10.0
+        run: npm install -g @microsoft/vally-cli@0.14.0
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
