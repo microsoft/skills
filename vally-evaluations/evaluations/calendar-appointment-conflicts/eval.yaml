@@ -1,0 +1,141 @@
+name: calendar-appointment-conflicts
+description: Evaluate an agent adding appointment conflict validation to the Daymark calendar fixture.
+version: "1.0"
+type: capability
+
+scoring:
+  weights: {}
+  threshold: 0.8
+
+defaults:
+  runs: 1
+  timeout: 30m
+  model: gpt-5.6-terra
+  judge_model: claude-sonnet-4.6
+
+stimuli:
+  - name: prevent-overlapping-appointments
+    tags:
+      fixture: calendar
+      priority: p0
+    artifacts:
+      include:
+        - src/**/*.ts
+        - src/**/*.tsx
+        - src/**/*.css
+        - server/**/*.ts
+        - package.json
+        - package-lock.json
+        - tsconfig*.json
+        - vite.config.ts
+        - README.md
+        - .gitignore
+      exclude:
+        - node_modules/**
+        - dist/**
+        - dist-server/**
+        - coverage/**
+    prompt: |
+      Enhance the existing Daymark React and TypeScript calendar application so users
+      cannot create or edit an appointment that overlaps another appointment on the
+      same date.
+
+      Requirements:
+      1. Treat time ranges as half-open intervals: an appointment ending at 10:00 does
+         not conflict with one starting at 10:00.
+      2. When editing, exclude the appointment being edited from conflict detection.
+      3. Keep the editor open after a conflict and show an accessible, actionable error
+         that names the conflicting appointment and its time range.
+      4. Preserve the existing end-after-start validation and all current behavior.
+      5. Put the overlap logic in a small testable TypeScript helper and add focused
+         unit tests for overlap, adjacent appointments, different dates, and edit mode.
+      6. Match the application's existing visual language and accessibility patterns.
+      7. Run the existing tests, build, and lint before finishing.
+
+      Do not replace the application or change its persistence architecture. Make the smallest complete
+      change that satisfies the requirements.
+    rubric:
+      - Overlapping appointments on the same date are rejected for both create and edit.
+      - Adjacent half-open time ranges and appointments on different dates remain valid.
+      - Edit validation excludes the appointment currently being edited.
+      - The conflict message is accessible, actionable, and identifies the conflicting appointment and time.
+      - Conflict logic is isolated in a typed helper with focused unit test coverage.
+      - Existing calendar behavior, styling, API persistence, and end-after-start validation are preserved.
+      - The TypeScript application tests, production build, and lint all succeed.
+    graders:
+      - type: run-command
+        name: Unit tests
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - test
+          timeout: 2m
+      - type: run-command
+        name: TypeScript production build
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - build
+          timeout: 2m
+      - type: run-command
+        name: Lint
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - lint
+          timeout: 2m
+      - type: prompt
+        name: Appointment conflict behavior
+        weight: 2
+        config:
+          prompt: |
+            Evaluate the implementation and tests against every stimulus requirement.
+            Pay special attention to half-open interval semantics, same-date filtering,
+            edit exclusion, preservation of existing validation, and whether the user
+            receives an accessible message naming the actual conflicting appointment.
+            Score 5 only when the feature is complete, tested, and integrated without
+            replacing or substantially restructuring the fixture.
+          scoring: scale_1_5
+
+environment:
+  commands:
+    - npm ci
+  commandTimeout: 5m
+  skills: []
+  files:
+    - src: ../../tools/run-npm.mjs
+      dest: .vally/tools/run-npm.mjs
+    - src: ../../fixtures/calendar-base/src
+      dest: src
+    - src: ../../fixtures/calendar-base/server
+      dest: server
+    - src: ../../fixtures/calendar-base/index.html
+      dest: index.html
+    - src: ../../fixtures/calendar-base/package.json
+      dest: package.json
+    - src: ../../fixtures/calendar-base/package-lock.json
+      dest: package-lock.json
+    - src: ../../fixtures/calendar-base/tsconfig.json
+      dest: tsconfig.json
+    - src: ../../fixtures/calendar-base/tsconfig.app.json
+      dest: tsconfig.app.json
+    - src: ../../fixtures/calendar-base/tsconfig.node.json
+      dest: tsconfig.node.json
+    - src: ../../fixtures/calendar-base/tsconfig.server.json
+      dest: tsconfig.server.json
+    - src: ../../fixtures/calendar-base/vite.config.ts
+      dest: vite.config.ts
+    - src: ../../fixtures/calendar-base/.oxlintrc.json
+      dest: .oxlintrc.json
+    - src: ../../fixtures/calendar-base/.gitignore
+      dest: .gitignore
+    - src: ../../fixtures/calendar-base/README.md
+      dest: README.md

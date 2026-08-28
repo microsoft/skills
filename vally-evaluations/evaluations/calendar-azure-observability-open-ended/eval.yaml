@@ -1,0 +1,144 @@
+name: calendar-azure-observability-open-ended
+description: Evaluate an agent adding queryable Azure logging and tracing to the Terra-generated Blob-backed Daymark application.
+version: "1.0"
+type: capability
+
+scoring:
+  weights: {}
+  threshold: 0.8
+
+defaults:
+  runs: 1
+  timeout: 45m
+  model: gpt-5.6-terra
+  judge_model: claude-sonnet-4.6
+
+stimuli:
+  - name: add-queryable-azure-observability
+    tags:
+      fixture: calendar-azure-blob-storage-open-ended-gpt-5.6-terra
+      priority: p0
+      service: azure-observability
+      scope: open-ended
+    artifacts:
+      include:
+        - src/**/*.ts
+        - src/**/*.tsx
+        - src/**/*.css
+        - server/**/*.ts
+        - package.json
+        - package-lock.json
+        - tsconfig*.json
+        - vite.config.ts
+        - README.md
+        - .env.example
+        - .gitignore
+      exclude:
+        - node_modules/**
+        - dist/**
+        - dist-server/**
+        - coverage/**
+        - .env
+    prompt: |
+      Enhance the existing Daymark application so its operational logs and
+      distributed traces are sent to an Azure cloud service where the telemetry
+      can be queried later.
+
+      Choose the Azure service, logging technology, tracing technology, and
+      instrumentation approach. Preserve the existing calendar experience and
+      Azure Blob Storage persistence. Treat the browser as an untrusted client,
+      keep credentials and privileged configuration out of it, and add automated
+      tests for the new observability behavior.
+
+      This evaluation covers application instrumentation only. Do not perform a
+      live Azure deployment or add infrastructure provisioning.
+    rubric:
+      - The original Daymark experience and existing server-side Azure Blob Storage persistence remain functional.
+      - Application telemetry is exported to a queryable Azure cloud service rather than existing only in local files or console output.
+      - Structured logs and distributed traces capture meaningful API request, appointment persistence, failure, and latency information.
+      - Logs and traces carry useful correlation context so a calendar operation can be followed across the server and its storage interaction.
+      - Telemetry configuration and authentication are appropriate for local and hosted environments, remain server-side, and do not hardcode or expose secrets.
+      - Telemetry avoids appointment notes, credentials, connection strings, and other sensitive payload data while retaining useful operational dimensions.
+      - Instrumentation initialization, exporter failures, and application shutdown are handled without breaking normal calendar operations or silently claiming telemetry delivery.
+      - Automated tests isolate external telemetry calls and verify representative success, failure, and correlation behavior without requiring Azure access.
+      - Documentation identifies the chosen technologies, required configuration, emitted telemetry, and how future operators can query or locate it.
+      - Unit tests, the complete TypeScript production build, and lint succeed.
+    graders:
+      - type: run-command
+        name: Unit tests
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - test
+          timeout: 3m
+      - type: run-command
+        name: Complete TypeScript production build
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - build
+          timeout: 3m
+      - type: run-command
+        name: Lint
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - lint
+          timeout: 3m
+      - type: prompt
+        name: Azure observability architecture
+        weight: 2
+        config:
+          prompt: |
+            Evaluate the implementation against every rubric criterion without
+            preferring a particular Azure telemetry service, logging library,
+            tracing library, or instrumentation standard. Verify from the code
+            that telemetry reaches a queryable Azure destination, useful logs and
+            traces are correlated across API and Blob operations, sensitive data
+            is excluded, configuration stays server-side, and focused tests
+            isolate the external exporter. Score 5 only for a complete, secure,
+            testable integration that preserves the existing application.
+          scoring: scale_1_5
+
+environment:
+  commands:
+    - npm ci
+  commandTimeout: 5m
+  skills: []
+  files:
+    - src: ../../tools/run-npm.mjs
+      dest: .vally/tools/run-npm.mjs
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/src
+      dest: src
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/server
+      dest: server
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/index.html
+      dest: index.html
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/package.json
+      dest: package.json
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/package-lock.json
+      dest: package-lock.json
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/tsconfig.json
+      dest: tsconfig.json
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/tsconfig.app.json
+      dest: tsconfig.app.json
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/tsconfig.node.json
+      dest: tsconfig.node.json
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/tsconfig.server.json
+      dest: tsconfig.server.json
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/vite.config.ts
+      dest: vite.config.ts
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/.oxlintrc.json
+      dest: .oxlintrc.json
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/.gitignore
+      dest: .gitignore
+    - src: ../../fixtures/calendar-azure-blob-storage-open-ended-gpt-5.6-terra/README.md
+      dest: README.md

@@ -1,0 +1,130 @@
+name: calendar-azure-blob-storage-open-ended
+description: Evaluate the base model's Azure Blob Storage SDK knowledge.
+version: "1.0"
+type: capability
+
+scoring:
+  weights: {}
+  threshold: 0.8
+
+defaults:
+  runs: 1
+  timeout: 45m
+  model: gpt-5.6-terra
+  judge_model: claude-sonnet-4.6
+
+stimuli:
+  - name: add-azure-blob-calendar-persistence-open-ended
+    tags:
+      fixture: calendar
+      priority: p0
+      service: azure-blob-storage
+      scope: sdk-baseline
+    artifacts:
+      include:
+        - src/**/*.ts
+        - src/**/*.tsx
+        - src/**/*.css
+        - server/**/*.ts
+        - api/**/*.ts
+        - package.json
+        - package-lock.json
+        - tsconfig*.json
+        - vite.config.ts
+        - README.md
+        - .env.example
+        - .gitignore
+      exclude:
+        - node_modules/**
+        - dist/**
+        - dist-server/**
+        - coverage/**
+        - .env
+    prompt: |
+      Enhance Daymark so its calendar data is stored in Azure Blob Storage.
+      Preserve the existing experience, treat the browser as an untrusted client,
+      and add automated tests for the new persistence behavior.
+    rubric:
+      - The original Daymark feature set is preserved while appointment data is persisted through Azure Blob Storage.
+      - The implementation uses the Azure Blob Storage SDK correctly and keeps credentials and privileged Azure operations out of the browser.
+      - Authentication is appropriate for local and hosted environments and does not hardcode secrets or expose durable credentials to clients.
+      - Blob upload and download behavior correctly handles JSON content type, missing data, malformed stored data, and service failures.
+      - Azure storage code is isolated behind a typed, testable boundary.
+      - Automated tests exercise storage success and failure paths with isolated external storage calls.
+      - Unit tests, the complete TypeScript production build, and lint succeed.
+    graders:
+      - type: run-command
+        name: Unit tests
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - test
+          timeout: 3m
+      - type: run-command
+        name: Complete TypeScript production build
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - build
+          timeout: 3m
+      - type: run-command
+        name: Lint
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - lint
+          timeout: 3m
+      - type: prompt
+        name: Azure Blob application architecture
+        weight: 2
+        config:
+          prompt: |
+            Evaluate whether the implementation demonstrates correct, secure knowledge
+            of the Azure Blob Storage TypeScript SDK. Verify real appointment reads and
+            writes use Blob Storage, Azure code and credentials stay out of the browser,
+            stored JSON and service failures are handled correctly, and focused tests do
+            isolate external storage calls.
+          scoring: scale_1_5
+
+environment:
+  commands:
+    - npm ci
+  commandTimeout: 5m
+  skills: []
+  files:
+    - src: ../../tools/run-npm.mjs
+      dest: .vally/tools/run-npm.mjs
+    - src: ../../fixtures/calendar-base/src
+      dest: src
+    - src: ../../fixtures/calendar-base/server
+      dest: server
+    - src: ../../fixtures/calendar-base/index.html
+      dest: index.html
+    - src: ../../fixtures/calendar-base/package.json
+      dest: package.json
+    - src: ../../fixtures/calendar-base/package-lock.json
+      dest: package-lock.json
+    - src: ../../fixtures/calendar-base/tsconfig.json
+      dest: tsconfig.json
+    - src: ../../fixtures/calendar-base/tsconfig.app.json
+      dest: tsconfig.app.json
+    - src: ../../fixtures/calendar-base/tsconfig.node.json
+      dest: tsconfig.node.json
+    - src: ../../fixtures/calendar-base/tsconfig.server.json
+      dest: tsconfig.server.json
+    - src: ../../fixtures/calendar-base/vite.config.ts
+      dest: vite.config.ts
+    - src: ../../fixtures/calendar-base/.oxlintrc.json
+      dest: .oxlintrc.json
+    - src: ../../fixtures/calendar-base/.gitignore
+      dest: .gitignore
+    - src: ../../fixtures/calendar-base/README.md
+      dest: README.md

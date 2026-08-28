@@ -1,0 +1,195 @@
+name: calendar-azure-blob-storage
+description: Evaluate an agent adding secure Azure Blob Storage persistence and provisioning to the Daymark calendar fixture.
+version: "1.0"
+type: capability
+
+scoring:
+  weights: {}
+  threshold: 0.8
+
+defaults:
+  runs: 1
+  timeout: 45m
+  model: gpt-5.6-terra
+  judge_model: claude-sonnet-4.6
+
+stimuli:
+  - name: add-azure-blob-calendar-persistence
+    tags:
+      fixture: calendar
+      priority: p0
+      service: azure-blob-storage
+    artifacts:
+      include:
+        - src/**/*.ts
+        - src/**/*.tsx
+        - src/**/*.css
+        - server/**/*.ts
+        - api/**/*.ts
+        - infra/**/*.bicep
+        - infra/**/*.json
+        - package.json
+        - package-lock.json
+        - tsconfig*.json
+        - vite.config.ts
+        - README.md
+        - .env.example
+        - .gitignore
+      exclude:
+        - node_modules/**
+        - dist/**
+        - dist-server/**
+        - coverage/**
+        - .env
+    prompt: |
+      Enhance the existing Daymark React and TypeScript calendar application so
+      appointment data is persisted in Azure Blob Storage instead of the local JSON
+      store. Include repeatable Azure infrastructure-as-code that provisions
+      the storage resources needed by the application.
+
+      Application requirements:
+      1. Preserve the current calendar UI and appointment create, edit, delete,
+         search, category, date-navigation, and starter-data behavior.
+      2. Preserve the existing same-origin Node.js TypeScript API. The browser must
+         continue to use it to load and save appointments; it must never receive
+         Azure credentials, storage account keys, connection strings, or long-lived
+         SAS tokens.
+      3. Use the current @azure/storage-blob and @azure/identity packages on the
+         server. Construct BlobServiceClient with DefaultAzureCredential and a blob
+         service endpoint supplied through environment configuration.
+      4. Store the complete appointment collection as versioned JSON in a private
+         container. Use a stable blob name, set application/json content type, treat
+         a missing blob as an empty collection that is initialized with the existing
+         starter appointments, and validate downloaded JSON before returning it.
+      5. Surface initial loading, saving, and actionable storage/API error states in
+         the existing accessible visual language. Do not silently fall back to
+         localStorage after an Azure failure.
+      6. Keep Azure SDK code behind a typed repository/service boundary. Add focused
+         tests using a mocked storage boundary; tests must not require Azure access.
+      7. Provide integrated development and production scripts so the frontend and
+         API can be run and built together. Document required environment variables,
+         local authentication with az login, and deployment steps.
+
+      Provisioning requirements:
+      1. Add Bicep under infra/ that creates a uniquely named Standard_LRS StorageV2
+         account and a private blob container for the calendar data.
+      2. Require HTTPS, TLS 1.2 or newer, disallow blob public access, and disable
+         Shared Key authorization. Do not output account keys or connection strings.
+      3. Accept a Microsoft Entra principal object ID as a parameter and assign that
+         principal Storage Blob Data Contributor at container scope using a
+         deterministic role-assignment name. Output only non-secret values needed by
+         the app, including the blob service endpoint and container name.
+      4. Include concise deployment instructions and an example parameter file that
+         contains placeholders, never real subscription IDs, tenant IDs, principal
+         IDs, credentials, or secrets.
+
+      Do not perform a live Azure deployment during this task. Generate and validate
+      the application and infrastructure files locally. Run the unit tests, complete
+      TypeScript production build, and lint before finishing.
+
+      Base implementation and security decisions on current official guidance:
+      - https://learn.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-nodejs-typescript
+      - https://learn.microsoft.com/azure/storage/blobs/assign-azure-role-data-access
+      - https://learn.microsoft.com/azure/templates/microsoft.storage/storageaccounts
+    rubric:
+      - The original Daymark feature set is preserved while appointment reads and writes flow through a same-origin TypeScript API.
+      - Azure Blob SDK and DefaultAzureCredential are used only on the server behind a typed storage boundary; no browser bundle or source contains account keys, connection strings, or long-lived SAS credentials.
+      - The repository correctly handles JSON upload/download, application/json content type, missing-blob initialization, malformed data, and explicit Azure/API errors.
+      - The UI represents loading, saving, and actionable failure states accessibly and never disguises an Azure failure as successful local persistence.
+      - Bicep provisions a unique Standard_LRS StorageV2 account and private container with HTTPS-only traffic, TLS 1.2 or newer, public blob access disabled, and Shared Key authorization disabled.
+      - Bicep creates a deterministic container-scoped Storage Blob Data Contributor role assignment for a parameterized Microsoft Entra principal and emits no secrets.
+      - Configuration, local az login authentication, provisioning commands, non-secret outputs, and deployment workflow are documented with placeholder-only example parameters.
+      - Focused tests mock the storage boundary and cover successful persistence, first-run initialization, malformed stored JSON, and service failure without requiring Azure.
+      - Frontend and API development/build scripts are integrated, and unit tests, the complete TypeScript production build, and lint succeed.
+    graders:
+      - type: run-command
+        name: Unit tests
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - test
+          timeout: 3m
+      - type: run-command
+        name: Complete TypeScript production build
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - build
+          timeout: 3m
+      - type: run-command
+        name: Lint
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - lint
+          timeout: 3m
+      - type: prompt
+        name: Azure Blob application architecture
+        weight: 2
+        config:
+          prompt: |
+            Evaluate the implementation against the application requirements and
+            official Azure Blob Storage TypeScript guidance. Inspect package
+            placement and imports to ensure Azure Identity and Blob clients execute
+            only on the server and cannot enter the browser bundle. Verify that the
+            UI really uses the API for all persistence, reports failures honestly,
+            and that storage behavior is tested through a mockable typed boundary.
+            Score 5 only for a complete, secure, working integration that preserves
+            the original Daymark experience.
+          scoring: scale_1_5
+      - type: prompt
+        name: Azure provisioning security
+        weight: 2
+        config:
+          prompt: |
+            Evaluate all infrastructure and deployment files against the provisioning
+            requirements. Verify the Bicep creates the storage account and private
+            container, explicitly enforces secure transport and keyless authorization,
+            and scopes Storage Blob Data Contributor to the container for the supplied
+            principal. Reject hardcoded identifiers, secrets, key/connection-string
+            outputs, non-deterministic role assignment names, or instructions that
+            depend on manual portal provisioning.
+          scoring: scale_1_5
+
+environment:
+  commands:
+    - npm ci
+  commandTimeout: 5m
+  skills: []
+  files:
+    - src: ../../tools/run-npm.mjs
+      dest: .vally/tools/run-npm.mjs
+    - src: ../../fixtures/calendar-base/src
+      dest: src
+    - src: ../../fixtures/calendar-base/server
+      dest: server
+    - src: ../../fixtures/calendar-base/index.html
+      dest: index.html
+    - src: ../../fixtures/calendar-base/package.json
+      dest: package.json
+    - src: ../../fixtures/calendar-base/package-lock.json
+      dest: package-lock.json
+    - src: ../../fixtures/calendar-base/tsconfig.json
+      dest: tsconfig.json
+    - src: ../../fixtures/calendar-base/tsconfig.app.json
+      dest: tsconfig.app.json
+    - src: ../../fixtures/calendar-base/tsconfig.node.json
+      dest: tsconfig.node.json
+    - src: ../../fixtures/calendar-base/tsconfig.server.json
+      dest: tsconfig.server.json
+    - src: ../../fixtures/calendar-base/vite.config.ts
+      dest: vite.config.ts
+    - src: ../../fixtures/calendar-base/.oxlintrc.json
+      dest: .oxlintrc.json
+    - src: ../../fixtures/calendar-base/.gitignore
+      dest: .gitignore
+    - src: ../../fixtures/calendar-base/README.md
+      dest: README.md

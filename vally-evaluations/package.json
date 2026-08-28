@@ -1,0 +1,18 @@
+{
+  "name": "skills-vally-evaluations",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "run": "pwsh -File ./run-evaluations.ps1",
+    "report": "node ./scripts/summarize-results.mjs",
+    "test": "node --test ./scripts/*.test.mjs"
+  },
+  "devDependencies": {
+    "@microsoft/vally": "0.14.0",
+    "@microsoft/vally-cli": "0.14.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

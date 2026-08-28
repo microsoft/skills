@@ -1,0 +1,16 @@
+:root {
+  color: #24231f;
+  font-family: Avenir, 'Avenir Next', 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}

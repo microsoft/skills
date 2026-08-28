@@ -1,0 +1,28 @@
+paths:
+  skills: []
+  evals: evaluations
+  results: results
+  evalFilenames:
+    - eval.yaml
+
+suites:
+  all:
+    description: Run every evaluation in this fixture-based series.
+    evals:
+      - evaluations/**/eval.yaml
+  calendar:
+    description: Run evaluations based on the Daymark calendar fixture.
+    evals:
+      - evaluations/calendar-*/eval.yaml
+  azure:
+    description: Run calendar evaluations that add Azure services.
+    evals:
+      - evaluations/calendar-azure-*/eval.yaml
+  azure-sdk-baseline:
+    description: Evaluate base-model Azure Blob Storage SDK knowledge.
+    evals:
+      - evaluations/calendar-azure-blob-storage-open-ended/eval.yaml
+  azure-observability:
+    description: Evaluate adding queryable Azure logging and tracing to an Azure Blob-backed calendar.
+    evals:
+      - evaluations/calendar-azure-observability-open-ended/eval.yaml

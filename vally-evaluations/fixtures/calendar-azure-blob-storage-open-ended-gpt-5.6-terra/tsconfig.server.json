@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "outDir": "dist-server",
+    "rootDir": ".",
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "server/**/*.ts",
+    "src/appointments.ts",
+    "src/calendar.ts"
+  ],
+  "exclude": ["server/**/*.test.ts"]
+}
