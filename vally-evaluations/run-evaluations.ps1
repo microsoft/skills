@@ -179,14 +179,15 @@ try {
         New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
 
         $modelRuns = if ($modelsToRun.Count -gt 0) { $modelsToRun } else { @("") }
-        for ($modelIndex = 0; $modelIndex -lt $modelRuns.Count; $modelIndex++) {
-            $currentModel = $modelRuns[$modelIndex]
+        $modelIndex = 0
+        foreach ($currentModel in $modelRuns) {
+            $modelIndex++
             $workspaceDirectory = Join-Path $outputDirectory "workspaces"
             $runLabel = $name
 
             if (-not [string]::IsNullOrWhiteSpace($currentModel)) {
                 $safeModelName = $currentModel -replace '[^A-Za-z0-9._-]', '_'
-                $workspaceDirectory = Join-Path $workspaceDirectory ("{0:D2}-{1}" -f ($modelIndex + 1), $safeModelName)
+                $workspaceDirectory = Join-Path $workspaceDirectory ("{0:D2}-{1}" -f $modelIndex, $safeModelName)
                 $runLabel = "$name [$currentModel]"
             }
 

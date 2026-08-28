@@ -26,3 +26,7 @@ suites:
     description: Evaluate adding queryable Azure logging and tracing to an Azure Blob-backed calendar.
     evals:
       - evaluations/calendar-azure-observability-open-ended/eval.yaml
+  azure-live-integration:
+    description: Evaluate the observable calendar against live Azure backing services.
+    evals:
+      - evaluations/calendar-azure-live-integration-tests/eval.yaml

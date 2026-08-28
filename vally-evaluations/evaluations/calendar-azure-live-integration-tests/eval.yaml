@@ -1,0 +1,208 @@
+name: calendar-azure-live-integration-tests
+description: Evaluate whether the Terra-generated observable Daymark application works correctly with its real Azure backing services.
+version: "1.0"
+type: capability
+
+scoring:
+  weights: {}
+  threshold: 0.8
+
+defaults:
+  runs: 1
+  timeout: 45m
+  model: gpt-5.6-terra
+  judge_model: claude-sonnet-4.6
+
+stimuli:
+  - name: verify-daymark-with-live-azure-services
+    tags:
+      fixture: calendar-azure-observability-open-ended-gpt-5.6-terra
+      priority: p0
+      service: azure-live-integration
+      scope: live
+    artifacts:
+      include:
+        - src/**/*.ts
+        - src/**/*.tsx
+        - src/**/*.css
+        - server/**/*.ts
+        - tests/**/*
+        - scripts/**/*
+        - test-results/**/*
+        - package.json
+        - package-lock.json
+        - tsconfig*.json
+        - vite.config.ts
+        - README.md
+        - .env.example
+        - .gitignore
+      exclude:
+        - node_modules/**
+        - dist/**
+        - dist-server/**
+        - coverage/**
+        - .azure/**
+        - .env
+    prompt: |
+      Verify that the existing Daymark application code works correctly when
+      connected to the real Azure services it already integrates with.
+
+      Provision the minimum disposable Azure resources required for verification,
+      run Daymark locally against those resources, and add and execute automated
+      live integration tests. Use the currently authenticated Azure context. Both
+      successful resource provisioning and successful live application tests are
+      required outcomes of this evaluation.
+
+      Keep Daymark running locally throughout verification. Use focused setup and
+      cleanup automation for the disposable test resources.
+
+      Requirements:
+      1. Preserve the existing calendar behavior, Azure Blob Storage implementation,
+         and Azure Monitor Application Insights OpenTelemetry implementation.
+      2. Add a repeatable test-resource setup script that creates a uniquely named
+         disposable resource group containing the private Blob Storage container,
+         Application Insights resource, required Log Analytics workspace, and only
+         the other Azure backing resources the existing code needs. Do not reuse
+         or modify existing resources.
+      3. Supply resource configuration to the locally running Node.js server at
+         runtime. Never commit or print credentials, storage connection strings,
+         SAS tokens, or other secrets.
+      4. Add a distinct live-Azure test entry point that starts or targets the
+         locally running application with Azure persistence enabled. The test must
+         create a uniquely identifiable appointment through the Daymark API, read
+         it back, and independently verify that the expected JSON and content type
+         are present in the provisioned private Blob rather than the local file
+         fallback.
+      5. Generate application activity through the live test and query the
+         provisioned Application Insights data, using bounded retries for ingestion
+         delay. Verify that Daymark request telemetry and Blob read/write telemetry
+         were exported and can be correlated to the tested operation.
+      6. Live tests must fail clearly when Azure authentication, resource
+         configuration, Blob persistence, telemetry ingestion, or an assertion is
+         unavailable. They must not silently skip, use mocked Azure clients, or
+         substitute local backing services.
+      7. Keep test data isolated, use bounded waits, terminate the local server, and
+         delete the disposable resource group after recording the test result.
+         Also clean up after failures so no billable resources are left behind.
+      8. Document the live-test prerequisites, command, expected assertions,
+         troubleshooting, and cleanup.
+      9. Run the existing unit tests, complete TypeScript build, and lint in
+         addition to the live-Azure integration tests.
+
+      If Azure authentication, authorization, quota, regional availability, or
+      telemetry ingestion blocks verification, report the exact observed blocker
+      and do not fabricate successful test results. A blocker is not a passing
+      live integration test.
+    rubric:
+      - The work provisions the required disposable Azure backing resources and exercises Daymark from a local process.
+      - A repeatable test-resource setup creates a unique disposable resource group, private Blob Storage container, Application Insights resource, and required Log Analytics workspace.
+      - The recorded trajectory contains authentic Azure command outputs proving that every required backing resource was successfully provisioned; plans, scripts, or documentation without successful execution do not satisfy provisioning.
+      - Daymark runs locally with Azure configuration supplied only at runtime, uses the provisioned Blob rather than local JSON fallback, and exposes no credentials or privileged configuration to the browser, repository, or test logs.
+      - A distinct automated live test exercises the local Daymark API, round-trips a uniquely identifiable appointment, and independently verifies the stored Azure Blob JSON and content type.
+      - The live test generates a unique correlation marker and queries Application Insights with bounded ingestion retries to verify queryable Daymark request and Blob-operation telemetry from that operation.
+      - The live test uses real Azure services rather than mocks or local substitutes, fails instead of skipping when prerequisites or assertions are missing, and uses bounded process and polling timeouts.
+      - The recorded execution evidence demonstrates that all Azure-backed assertions actually passed; an honestly reported external blocker remains an incomplete result.
+      - Test processes and data are isolated, the local server is stopped, disposable Azure resources are deleted after success or failure, and no secrets are persisted or printed.
+      - Existing unit tests, the complete TypeScript production build, and lint continue to succeed.
+    graders:
+      - type: run-command
+        name: Unit tests
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - test
+          timeout: 5m
+      - type: run-command
+        name: Complete TypeScript production build
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - build
+          timeout: 5m
+      - type: run-command
+        name: Lint
+        weight: 1
+        config:
+          command: node
+          args:
+            - .vally/tools/run-npm.mjs
+            - run
+            - lint
+          timeout: 5m
+      - type: prompt
+        name: Azure test-resource provisioning
+        weight: 2
+        config:
+          prompt: |
+            Evaluate only the Azure test-resource provisioning requirement. Require
+            a repeatable setup that actually created a uniquely named disposable
+            resource group, private Blob Storage container, Application Insights
+            resource, and required Log Analytics workspace. Inspect the recorded
+            trajectory for authentic successful Azure command outputs and resource
+            identifiers; scripts or documentation that were never run do not pass.
+            Reject reuse of existing resources, leaked credentials, excessive
+            unrelated resources, fabricated success, and failure to clean up after
+            testing. An external Azure blocker is honest but does not pass
+            provisioning. Score 5 only when all required backing resources were
+            demonstrably created and later removed.
+          scoring: scale_1_5
+      - type: prompt
+        name: Live Azure application verification
+        weight: 2
+        config:
+          prompt: |
+            Evaluate only whether the existing Daymark application was proven to
+            work from a local process against the newly provisioned Azure Blob
+            Storage and Application Insights resources.
+
+            Inspect the tests, supporting scripts, application changes, and recorded
+            trajectory. Require authentic Azure resource creation and test outputs,
+            a local API appointment round trip, independent Blob JSON and content
+            type verification, and a successful query for correlated Daymark
+            request and Blob-operation telemetry after bounded retries. Reject
+            mocks, local service substitutes, silent skips, unbounded polling,
+            fabricated or documentation-only success, leaked secrets, or resources
+            left running. An evidenced Azure platform blocker is honest but does
+            not pass the live integration criteria. Score 5 only when all live
+            application assertions actually succeeded and cleanup completed.
+          scoring: scale_1_5
+
+environment:
+  commands:
+    - npm ci
+  commandTimeout: 5m
+  skills: []
+  files:
+    - src: ../../tools/run-npm.mjs
+      dest: .vally/tools/run-npm.mjs
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/src
+      dest: src
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/server
+      dest: server
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/index.html
+      dest: index.html
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/package.json
+      dest: package.json
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/package-lock.json
+      dest: package-lock.json
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/tsconfig.json
+      dest: tsconfig.json
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/tsconfig.app.json
+      dest: tsconfig.app.json
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/tsconfig.node.json
+      dest: tsconfig.node.json
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/tsconfig.server.json
+      dest: tsconfig.server.json
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/vite.config.ts
+      dest: vite.config.ts
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/.oxlintrc.json
+      dest: .oxlintrc.json
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/.gitignore
+      dest: .gitignore
+    - src: ../../fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/README.md
+      dest: README.md

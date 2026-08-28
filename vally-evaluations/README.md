@@ -75,6 +75,7 @@ Create `evaluations/<name>/eval.yaml`. The runner discovers it automatically. Fi
 | `calendar-azure-blob-storage` | Detailed prompt for replacing browser-only persistence with Azure Blob Storage and provisioning its infrastructure. |
 | `calendar-azure-blob-storage-open-ended` | Minimal Azure Blob Storage service prompt for measuring the base model's SDK knowledge, with no deployment requirements. |
 | `calendar-azure-observability-open-ended` | Add queryable Azure logging and distributed tracing while allowing the model to choose the service and instrumentation technologies. |
+| `calendar-azure-live-integration-tests` | Verify the generated observable application locally against disposable live Blob Storage and Application Insights resources, then clean up. |
 
 The first three evaluations seed their workspaces from `fixtures/calendar-base/`.
 The observability evaluation instead uses the source-only snapshot under
@@ -83,6 +84,18 @@ is derived from the final workspace produced by the `gpt-5.6-terra` trial in
 run `2026-08-28T21-07-01-120Z` of `calendar-azure-blob-storage-open-ended`.
 It includes the generated server-side Azure Blob Storage implementation and tests,
 but excludes installed dependencies, build output, and Vally session data.
+
+The live-integration evaluation uses
+`fixtures/calendar-azure-observability-open-ended-gpt-5.6-terra/`, derived from
+the final `gpt-5.6-terra` workspace in run `2026-08-28T21-45-58-038Z` of
+`calendar-azure-observability-open-ended`. It includes that trial's Azure Monitor
+Application Insights OpenTelemetry instrumentation on top of the Blob-backed
+application. This stage is solely about proving that the existing application code
+works from a local process against its real Azure Blob Storage and Application
+Insights dependencies. The evaluation independently requires and grades successful
+provisioning of disposable test resources and successful application assertions
+against them. Application hosting, deployment, containerization, and production
+infrastructure are reserved for later evaluations.
 
 The Azure evaluations intentionally have different scopes: the detailed evaluation includes provisioning requirements, while the SDK baseline contains only the Azure Blob Storage service request. Neither evaluation exposes skills or repository instructions. All evaluations use `gpt-5.6-terra` as the evaluated agent and `claude-sonnet-4.6` as the judge. Run the SDK baseline with:
 
@@ -94,4 +107,12 @@ Run the follow-on observability evaluation with:
 
 ```powershell
 ./run-evaluations.ps1 -EvaluationPattern "calendar-azure-observability-open-ended"
+```
+
+Run the live-integration evaluation only when the Azure CLI is authenticated to a
+subscription in which the evaluated agent may create role assignments and
+disposable resource groups:
+
+```powershell
+./run-evaluations.ps1 -EvaluationPattern "calendar-azure-live-integration-tests"
 ```
