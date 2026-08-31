@@ -116,3 +116,11 @@ disposable resource groups:
 ```powershell
 ./run-evaluations.ps1 -EvaluationPattern "calendar-azure-live-integration-tests"
 ```
+
+This evaluation includes a second remediation turn and then runs the generated
+`npm run test:live-azure` command again as a deterministic grader. Expect more
+than one disposable resource-group lifecycle. The run must write
+`test-results/live-azure-result.json`; static metric assertions and an
+authenticity judge cross-check that artifact against the repository and recorded
+execution evidence. Its isolated dependency installation has a 15-minute setup
+budget to tolerate slow package-feed responses.
