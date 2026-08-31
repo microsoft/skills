@@ -1,1263 +1,1430 @@
 {
   "title": "Microsoft Foundry",
-  "base_url": "https://learn.microsoft.com/en-us/azure/ai-foundry/",
-  "source": "https://raw.githubusercontent.com/MicrosoftDocs/azure-ai-docs/main/articles/foundry/toc.yml",
+  "base_url": "https://learn.microsoft.com/en-us/azure/foundry/",
   "sections": {
-    "General": [
+    "Overview": [
       {
         "title": "What is Microsoft Foundry (new)?",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-foundry?view=foundry"
+        "href": "what-is-foundry",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/what-is-foundry"
       }
     ],
-    "Get started": [
+    "Getting Started": [
       {
-        "title": "\"Quickstart: Create resources\"",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/quickstart-create-foundry-resources?view=foundry"
+        "title": "Quickstart: Create resources",
+        "href": "tutorials/quickstart-create-foundry-resources",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/tutorials/quickstart-create-foundry-resources"
       },
       {
-        "title": "\"Quickstart: Chat with an agent\"",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/quickstarts/get-started-code?view=foundry"
+        "title": "Quickstart: Chat with an agent",
+        "href": "quickstarts/get-started-code",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/quickstarts/get-started-code"
       },
       {
-        "title": "\"Tutorial: Idea to prototype\"",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/developer-journey-idea-to-prototype?view=foundry"
+        "title": "Tutorial: Idea to prototype",
+        "href": "tutorials/developer-journey-idea-to-prototype",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/tutorials/developer-journey-idea-to-prototype"
       },
+      {
+        "title": "Use Microsoft Foundry with a screen reader",
+        "href": "tutorials/screen-reader",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/tutorials/screen-reader"
+      }
+    ],
+    "Concepts": [
       {
         "title": "Ask AI",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/ask-ai?view=foundry"
-      }
-    ],
-    "Agent development": [
-      {
-        "title": "Agent development overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview?view=foundry"
-      },
-      {
-        "title": "FAQ",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/faq?view=foundry"
-      },
-      {
-        "title": "Quotas, limits, models and region support",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/limits-quotas-regions?view=foundry"
-      },
-      {
-        "title": "Development lifecycle",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/development-lifecycle?view=foundry"
-      },
-      {
-        "title": "Agent runtime components",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/runtime-components?view=foundry"
-      },
-      {
-        "title": "Agent identity",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/agent-identity?view=foundry"
-      },
-      {
-        "title": "Hosted agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/hosted-agents?view=foundry"
-      },
-      {
-        "title": "Capability hosts",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/capability-hosts?view=foundry"
-      },
-      {
-        "title": "Create a workflow",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/workflow?view=foundry"
-      },
-      {
-        "title": "Quickstart - Deploy your first hosted agent",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/quickstarts/quickstart-hosted-agent?view=foundry"
-      },
-      {
-        "title": "Deploy a hosted agent",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/deploy-hosted-agent?view=foundry"
-      },
-      {
-        "title": "Manage hosted agent lifecycle",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/manage-hosted-agent?view=foundry"
-      },
-      {
-        "title": "System message design",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/advanced-prompt-engineering?view=foundry"
-      },
-      {
-        "title": "Safety system messages",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/system-message?view=foundry"
-      },
-      {
-        "title": "Safety system message templates",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/safety-system-message-templates?view=foundry"
-      },
-      {
-        "title": "Publish and share agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/publish-agent?view=foundry"
-      },
-      {
-        "title": "Publish to Microsoft 365 Copilot and Teams",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/publish-copilot?view=foundry"
-      },
-      {
-        "title": "Agent 365",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/agent-365?view=foundry"
-      },
-      {
-        "title": "Invoke your Agent Application using the Responses API protocol",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/publish-responses?view=foundry"
-      },
-      {
-        "title": "Service monitoring",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/metrics?view=foundry"
-      },
-      {
-        "title": "Monitor agents in the dashboard",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/how-to-monitor-agents-dashboard?view=foundry"
-      },
-      {
-        "title": "Trace agent overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/concepts/trace-agent-concept?view=foundry"
-      },
-      {
-        "title": "Set up tracing",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/trace-agent-setup?view=foundry"
-      },
-      {
-        "title": "Tracing integrations",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/trace-agent-framework?view=foundry"
-      }
-    ],
-    "Agent tools & integration": [
-      {
-        "title": "Tool catalog (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/tool-catalog?view=foundry"
-      },
-      {
-        "title": "Create a private tool catalog (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/private-tool-catalog?view=foundry"
-      },
-      {
-        "title": "Tool best practices",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/tool-best-practice?view=foundry"
-      },
-      {
-        "title": "Tool governance",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/governance?view=foundry"
-      },
-      {
-        "title": "Quickstart - Talk to a voice agent",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/voice-live-agents-quickstart?view=foundry"
-      },
-      {
-        "title": "How to build a voice agent",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/how-to-voice-agent-integration?view=foundry"
-      },
-      {
-        "title": "Code interpreter",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/code-interpreter?view=foundry"
-      },
-      {
-        "title": "Custom code interpreter (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/custom-code-interpreter?view=foundry"
-      },
-      {
-        "title": "Browser automation (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/browser-automation?view=foundry"
-      },
-      {
-        "title": "Computer Use (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/computer-use?view=foundry"
-      },
-      {
-        "title": "Image generation (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/image-generation?view=foundry"
-      },
-      {
-        "title": "What is memory?",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/what-is-memory?view=foundry"
-      },
-      {
-        "title": "Create and use memory",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/memory-usage?view=foundry"
+        "href": "concepts/ask-ai",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/ask-ai"
       },
       {
         "title": "Retrieval Augmented Generation (RAG) overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/retrieval-augmented-generation?view=foundry"
-      },
-      {
-        "title": "Azure AI Search",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/ai-search?view=foundry"
-      },
-      {
-        "title": "File search",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/file-search?view=foundry"
-      },
-      {
-        "title": "Vector stores for file search",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/vector-stores?view=foundry"
-      },
-      {
-        "title": "SharePoint (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/sharepoint?view=foundry"
-      },
-      {
-        "title": "Web search overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/web-overview?view=foundry"
-      },
-      {
-        "title": "Web search tool (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/web-search?view=foundry"
-      },
-      {
-        "title": "Grounding with Bing tools",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/bing-tools?view=foundry"
-      },
-      {
-        "title": "Fabric data agent (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/fabric?view=foundry"
-      },
-      {
-        "title": "What is Foundry IQ?",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/what-is-foundry-iq?view=foundry"
-      },
-      {
-        "title": "FAQ",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/foundry-iq-faq?view=foundry"
-      },
-      {
-        "title": "Connect knowledge base to agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/foundry-iq-connect?view=foundry"
-      },
-      {
-        "title": "Azure Speech in Foundry Tools",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/azure-ai-speech?view=foundry"
-      },
-      {
-        "title": "Azure Language tools and agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/concepts/foundry-tools-agents?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Try CLU multi-turn conversations",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/conversational-language-understanding/how-to/quickstart-multi-turn-conversations?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Detect Personally Identifiable Information (PII)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/personally-identifiable-information/quickstart?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Try Azure Language detection",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/language-detection/quickstart?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Azure text translation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/translator/text-translation/overview?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Azure document translation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/translator/document-translation/overview?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Connect to MCP server",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/model-context-protocol?view=foundry"
-      },
-      {
-        "title": "MCP authentication",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/mcp-authentication?view=foundry"
-      },
-      {
-        "title": "Build your own MCP server",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/build-your-own-mcp-server?view=foundry"
-      },
-      {
-        "title": "Agent2Agent (A2A) tool (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/agent-to-agent?view=foundry"
-      },
-      {
-        "title": "Agent2Agent (A2A) authentication (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/agent-to-agent-authentication?view=foundry"
-      },
-      {
-        "title": "OpenAPI tool",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/openapi?view=foundry"
-      },
-      {
-        "title": "Function calling",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/function-calling?view=foundry"
-      }
-    ],
-    "Model catalog": [
-      {
-        "title": "Foundry Models sold directly by Azure",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/models-sold-directly-by-azure?view=foundry"
-      },
-      {
-        "title": "Foundry Models from partners and community",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/models-from-partners?view=foundry"
-      },
-      {
-        "title": "Model versions",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/model-versions?view=foundry"
-      },
-      {
-        "title": "Marketplace configuration for partner models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/configure-marketplace?view=foundry"
-      },
-      {
-        "title": "GPT-5 vs GPT-4.1",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/model-choice-guide?view=foundry"
-      },
-      {
-        "title": "Automatic model updates",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/working-with-models?view=foundry"
-      },
-      {
-        "title": "Legacy models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/legacy-models?view=foundry"
-      },
-      {
-        "title": "Overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/model-router?view=foundry"
-      },
-      {
-        "title": "What's new",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/whats-new-model-router?view=foundry"
-      },
-      {
-        "title": "Get started with model router",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/model-router?view=foundry"
-      },
-      {
-        "title": "Responses API with Foundry Models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/generate-responses?view=foundry"
-      },
-      {
-        "title": "Use blocklists",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/use-blocklists?view=foundry"
-      },
-      {
-        "title": "Image generation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/dall-e?view=foundry"
-      },
-      {
-        "title": "Video generation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/video-generation?view=foundry"
-      },
-      {
-        "title": "Vision-enabled chats",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/gpt-with-vision?view=foundry"
-      },
-      {
-        "title": "Image prompt engineering techniques",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/gpt-4-v-prompt-engineering?view=foundry"
-      },
-      {
-        "title": "Realtime API for speech and audio",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio?view=foundry"
-      },
-      {
-        "title": "Realtime API for speech and audio quickstart",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio.md#quickstart?view=foundry"
-      },
-      {
-        "title": "Realtime API via WebRTC",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-webrtc?view=foundry"
-      },
-      {
-        "title": "Realtime API via WebSockets",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-websockets?view=foundry"
-      },
-      {
-        "title": "Realtime API via SIP",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-sip?view=foundry"
-      },
-      {
-        "title": "Realtime API migration from Preview to GA",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-preview-api-migration-guide?view=foundry"
-      },
-      {
-        "title": "Speech to text with Whisper",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/whisper-quickstart?view=foundry"
-      }
-    ],
-    "Model capabilities": [
-      {
-        "title": "Deploy Foundry Models in the portal",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/deploy-foundry-models?view=foundry"
-      },
-      {
-        "title": "Deploy Foundry Models using code",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/create-model-deployments?view=foundry"
-      },
-      {
-        "title": "Deployment types",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/deployment-types?view=foundry"
-      },
-      {
-        "title": "Upgrade GitHub Models to Foundry Models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/quickstart-github-models?view=foundry"
-      },
-      {
-        "title": "Azure OpenAI in Foundry Models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/supported-languages?view=foundry"
-      },
-      {
-        "title": "Claude in Foundry Models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/use-foundry-models-claude?view=foundry"
-      },
-      {
-        "title": "Priority processing",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/priority-processing?view=foundry"
-      },
-      {
-        "title": "Provisioned Throughput offering (PTU)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/provisioned-throughput?view=foundry"
-      },
-      {
-        "title": "Understanding and calculating PTU costs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/provisioned-throughput-onboarding?view=foundry"
-      },
-      {
-        "title": "Get started with Provisioned Deployments",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/provisioned-get-started?view=foundry"
-      },
-      {
-        "title": "Provisioned spillover",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/spillover-traffic-management?view=foundry"
-      },
-      {
-        "title": "Chat completions API",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/chatgpt?view=foundry"
-      },
-      {
-        "title": "Responses API",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/responses?view=foundry"
-      },
-      {
-        "title": "Reasoning models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/reasoning?view=foundry"
-      },
-      {
-        "title": "Batch processing",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/batch?view=foundry"
-      },
-      {
-        "title": "Deep research",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/deep-research?view=foundry"
-      },
-      {
-        "title": "Function calling",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/function-calling?view=foundry"
-      },
-      {
-        "title": "Structured outputs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/structured-outputs?view=foundry"
-      },
-      {
-        "title": "JSON mode",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/json-mode?view=foundry"
-      },
-      {
-        "title": "Web search",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/web-search?view=foundry"
-      },
-      {
-        "title": "Predicted outputs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/predicted-outputs?view=foundry"
-      },
-      {
-        "title": "Prompt caching",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/prompt-caching?view=foundry"
-      },
-      {
-        "title": "Embeddings",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/embeddings?view=foundry"
-      },
-      {
-        "title": "Embeddings tutorial",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/tutorials/embeddings?view=foundry"
-      },
-      {
-        "title": "Audio generation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/audio-completions-quickstart?view=foundry"
-      },
-      {
-        "title": "Speech to text",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/get-started-speech-to-text.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Text to speech",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/get-started-text-to-speech.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Text to speech avatar",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/text-to-speech-avatar/batch-synthesis-avatar.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Voice Live",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/voice-live-quickstart.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Vision-enabled chats",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/gpt-with-vision?view=foundry"
-      },
-      {
-        "title": "Image prompt engineering techniques",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/gpt-4-v-prompt-engineering?view=foundry"
-      },
-      {
-        "title": "Image prompt transformation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/prompt-transformation?view=foundry"
-      },
-      {
-        "title": "Video generation (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/video-generation?view=foundry"
-      },
-      {
-        "title": "Video translation (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/video-translation-get-started.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Codex",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/codex?view=foundry"
-      },
-      {
-        "title": "Webhooks",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/webhooks?view=foundry"
+        "href": "concepts/retrieval-augmented-generation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/retrieval-augmented-generation"
       },
       {
         "title": "Playgrounds and quick evaluation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/concept-playgrounds?view=foundry"
+        "href": "concepts/concept-playgrounds",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/concept-playgrounds"
       },
       {
         "title": "Model leaderboards",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/model-benchmarks?view=foundry"
+        "href": "concepts/model-benchmarks",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/model-benchmarks"
       },
       {
-        "title": "Compare models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/benchmark-model-in-catalog?view=foundry"
+        "title": "Observability overview",
+        "href": "concepts/observability",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/observability"
+      },
+      {
+        "title": "Rate limits, region support, and enterprise features",
+        "href": "concepts/evaluation-regions-limits-virtual-network",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-regions-limits-virtual-network"
+      },
+      {
+        "title": "Transparency Note for safety evaluations",
+        "href": "concepts/safety-evaluations-transparency-note",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/safety-evaluations-transparency-note"
+      },
+      {
+        "title": "Built-in evaluators reference",
+        "href": "concepts/built-in-evaluators",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/built-in-evaluators"
+      },
+      {
+        "title": "General purpose evaluators",
+        "href": "concepts/evaluation-evaluators/general-purpose-evaluators",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/general-purpose-evaluators"
+      },
+      {
+        "title": "Textual similarity evaluators",
+        "href": "concepts/evaluation-evaluators/textual-similarity-evaluators",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/textual-similarity-evaluators"
+      },
+      {
+        "title": "Retrieval Augmented Generation (RAG) evaluators",
+        "href": "concepts/evaluation-evaluators/rag-evaluators",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/rag-evaluators"
+      },
+      {
+        "title": "Risk and safety evaluators",
+        "href": "concepts/evaluation-evaluators/risk-safety-evaluators",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/risk-safety-evaluators"
+      },
+      {
+        "title": "Agent evaluators",
+        "href": "concepts/evaluation-evaluators/agent-evaluators",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/agent-evaluators"
+      },
+      {
+        "title": "Azure OpenAI evaluators",
+        "href": "concepts/evaluation-evaluators/azure-openai-graders",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/azure-openai-graders"
+      },
+      {
+        "title": "Custom evaluators",
+        "href": "concepts/evaluation-evaluators/custom-evaluators",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/custom-evaluators"
+      },
+      {
+        "title": "AI red teaming agent overview",
+        "href": "concepts/ai-red-teaming-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/ai-red-teaming-agent"
+      },
+      {
+        "title": "Playgrounds and quick evaluation",
+        "href": "concepts/concept-playgrounds",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/concept-playgrounds"
+      },
+      {
+        "title": "Plan rollout",
+        "href": "concepts/planning",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/planning"
+      },
+      {
+        "title": "Authentication and authorization",
+        "href": "concepts/authentication-authorization-foundry",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/authentication-authorization-foundry"
+      },
+      {
+        "title": "Disable preview features with role-based access control",
+        "href": "concepts/disable-preview-features-with-rbac",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/disable-preview-features-with-rbac"
+      },
+      {
+        "title": "Role-based access control",
+        "href": "concepts/rbac-foundry",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/rbac-foundry"
+      },
+      {
+        "title": "Configure customer-managed keys",
+        "href": "concepts/encryption-keys-portal",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/encryption-keys-portal"
+      },
+      {
+        "title": "Plan and manage costs",
+        "href": "concepts/manage-costs",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/manage-costs"
+      },
+      {
+        "title": "Service architecture",
+        "href": "concepts/architecture",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/architecture"
+      },
+      {
+        "title": "Model lifecycle and retirement",
+        "href": "concepts/model-lifecycle-retirement",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/concepts/model-lifecycle-retirement"
+      }
+    ],
+    "Agent Development": [
+      {
+        "title": "Agent development overview",
+        "href": "agents/overview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/overview"
+      },
+      {
+        "title": "FAQ",
+        "href": "agents/faq",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/faq"
+      },
+      {
+        "title": "Quotas, limits, models and region support",
+        "href": "agents/concepts/limits-quotas-regions",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/limits-quotas-regions"
+      },
+      {
+        "title": "Development lifecycle",
+        "href": "agents/concepts/development-lifecycle",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/development-lifecycle"
+      },
+      {
+        "title": "Agent runtime components",
+        "href": "agents/concepts/runtime-components",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/runtime-components"
+      },
+      {
+        "title": "Agent identity",
+        "href": "agents/concepts/agent-identity",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/agent-identity"
+      },
+      {
+        "title": "Hosted agents",
+        "href": "agents/concepts/hosted-agents",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/hosted-agents"
+      },
+      {
+        "title": "Capability hosts",
+        "href": "agents/concepts/capability-hosts",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/capability-hosts"
+      },
+      {
+        "title": "Create a workflow",
+        "href": "agents/concepts/workflow",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/workflow"
+      },
+      {
+        "title": "Quickstart - Deploy your first hosted agent",
+        "href": "agents/quickstarts/quickstart-hosted-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/quickstart-hosted-agent"
+      },
+      {
+        "title": "Deploy a hosted agent",
+        "href": "agents/how-to/deploy-hosted-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent"
+      },
+      {
+        "title": "Manage hosted agent lifecycle",
+        "href": "agents/how-to/manage-hosted-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/manage-hosted-agent"
+      },
+      {
+        "title": "Publish and share agents",
+        "href": "agents/how-to/publish-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/publish-agent"
+      },
+      {
+        "title": "Publish to Microsoft 365 Copilot and Teams",
+        "href": "agents/how-to/publish-copilot",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/publish-copilot"
+      },
+      {
+        "title": "Agent 365",
+        "href": "agents/how-to/agent-365",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/agent-365"
+      },
+      {
+        "title": "Invoke your Agent Application using the Responses API protocol",
+        "href": "agents/how-to/publish-responses",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/publish-responses"
+      },
+      {
+        "title": "Service monitoring",
+        "href": "agents/how-to/metrics",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/metrics"
+      },
+      {
+        "title": "Tool catalog (preview)",
+        "href": "agents/concepts/tool-catalog",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog"
+      },
+      {
+        "title": "Create a private tool catalog (preview)",
+        "href": "agents/how-to/private-tool-catalog",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/private-tool-catalog"
+      },
+      {
+        "title": "Tool best practices",
+        "href": "agents/concepts/tool-best-practice",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-best-practice"
+      },
+      {
+        "title": "Tool governance",
+        "href": "agents/how-to/tools/governance",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/governance"
+      },
+      {
+        "title": "Code interpreter",
+        "href": "agents/how-to/tools/code-interpreter",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/code-interpreter"
+      },
+      {
+        "title": "Custom code interpreter (preview)",
+        "href": "agents/how-to/tools/custom-code-interpreter",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/custom-code-interpreter"
+      },
+      {
+        "title": "Browser automation (preview)",
+        "href": "agents/how-to/tools/browser-automation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/browser-automation"
+      },
+      {
+        "title": "Computer Use (preview)",
+        "href": "agents/how-to/tools/computer-use",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/computer-use"
+      },
+      {
+        "title": "Image generation (preview)",
+        "href": "agents/how-to/tools/image-generation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/image-generation"
+      },
+      {
+        "title": "What is memory?",
+        "href": "agents/concepts/what-is-memory",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/what-is-memory"
+      },
+      {
+        "title": "Create and use memory",
+        "href": "agents/how-to/memory-usage",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/memory-usage"
+      },
+      {
+        "title": "Azure AI Search",
+        "href": "agents/how-to/tools/ai-search",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/ai-search"
+      },
+      {
+        "title": "File search",
+        "href": "agents/how-to/tools/file-search",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/file-search"
+      },
+      {
+        "title": "Vector stores for file search",
+        "href": "agents/concepts/vector-stores",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/vector-stores"
+      },
+      {
+        "title": "SharePoint (preview)",
+        "href": "agents/how-to/tools/sharepoint",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/sharepoint"
+      },
+      {
+        "title": "Web search overview",
+        "href": "agents/how-to/tools/web-overview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/web-overview"
+      },
+      {
+        "title": "Web search tool (preview)",
+        "href": "agents/how-to/tools/web-search",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/web-search"
+      },
+      {
+        "title": "Grounding with Bing tools",
+        "href": "agents/how-to/tools/bing-tools",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/bing-tools"
+      },
+      {
+        "title": "Fabric data agent (preview)",
+        "href": "agents/how-to/tools/fabric",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric"
+      },
+      {
+        "title": "What is Foundry IQ?",
+        "href": "agents/concepts/what-is-foundry-iq",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/what-is-foundry-iq"
+      },
+      {
+        "title": "FAQ",
+        "href": "agents/concepts/foundry-iq-faq",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/foundry-iq-faq"
+      },
+      {
+        "title": "Connect knowledge base to agents",
+        "href": "agents/how-to/foundry-iq-connect",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/foundry-iq-connect"
+      },
+      {
+        "title": "Azure Speech in Foundry Tools",
+        "href": "agents/how-to/tools/azure-ai-speech",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-ai-speech"
+      },
+      {
+        "title": "Connect to MCP server",
+        "href": "agents/how-to/tools/model-context-protocol",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/model-context-protocol"
+      },
+      {
+        "title": "MCP authentication",
+        "href": "agents/how-to/mcp-authentication",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/mcp-authentication"
+      },
+      {
+        "title": "Agent2Agent (A2A) tool (preview)",
+        "href": "agents/how-to/tools/agent-to-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/agent-to-agent"
+      },
+      {
+        "title": "Agent2Agent (A2A) authentication (preview)",
+        "href": "agents/concepts/agent-to-agent-authentication",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/agent-to-agent-authentication"
+      },
+      {
+        "title": "OpenAPI tool",
+        "href": "agents/how-to/tools/openapi",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/openapi"
+      },
+      {
+        "title": "Function calling",
+        "href": "agents/how-to/tools/function-calling",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/function-calling"
+      },
+      {
+        "title": "Govern MCP tools by using an AI gateway",
+        "href": "agents/how-to/tools/governance",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/governance"
+      },
+      {
+        "title": "Use declarative agent workflows in the Visual Studio Code extension",
+        "href": "agents/how-to/vs-code-agents-workflow-low-code",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/vs-code-agents-workflow-low-code"
+      },
+      {
+        "title": "Use hosted agent workflows in the Visual Studio Code extension",
+        "href": "agents/how-to/vs-code-agents-workflow-pro-code",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/vs-code-agents-workflow-pro-code"
+      },
+      {
+        "title": "Set up your agent resources",
+        "href": "agents/environment-setup",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/environment-setup"
+      },
+      {
+        "title": "Standard agent setup",
+        "href": "agents/concepts/standard-agent-setup",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/standard-agent-setup"
+      },
+      {
+        "title": "Use your own Azure resources",
+        "href": "agents/how-to/use-your-own-resources",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/use-your-own-resources"
+      },
+      {
+        "title": "Migrate agents",
+        "href": "agents/how-to/migrate",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/migrate"
+      },
+      {
+        "title": "Virtual networks",
+        "href": "agents/how-to/virtual-networks",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/virtual-networks"
+      },
+      {
+        "title": "Use an AI Gateway",
+        "href": "agents/how-to/ai-gateway",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/ai-gateway"
+      },
+      {
+        "title": "Manage Grounding with Bing",
+        "href": "agents/how-to/manage-grounding-with-bing",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/manage-grounding-with-bing"
+      }
+    ],
+    "Azure OpenAI": [
+      {
+        "title": "System message design",
+        "href": "openai/concepts/advanced-prompt-engineering",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/advanced-prompt-engineering"
+      },
+      {
+        "title": "Safety system messages",
+        "href": "openai/concepts/system-message",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/system-message"
+      },
+      {
+        "title": "Safety system message templates",
+        "href": "openai/concepts/safety-system-message-templates",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/safety-system-message-templates"
+      },
+      {
+        "title": "Automatic model updates",
+        "href": "openai/how-to/working-with-models",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/working-with-models"
+      },
+      {
+        "title": "Legacy models",
+        "href": "openai/concepts/legacy-models",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/legacy-models"
+      },
+      {
+        "title": "Overview",
+        "href": "openai/concepts/model-router",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-router"
+      },
+      {
+        "title": "Get started with model router",
+        "href": "openai/how-to/model-router",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/model-router"
+      },
+      {
+        "title": "Use blocklists",
+        "href": "openai/how-to/use-blocklists",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/use-blocklists"
+      },
+      {
+        "title": "Image generation",
+        "href": "openai/how-to/dall-e",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/dall-e"
+      },
+      {
+        "title": "Video generation",
+        "href": "openai/concepts/video-generation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/video-generation"
+      },
+      {
+        "title": "Vision-enabled chats",
+        "href": "openai/how-to/gpt-with-vision",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/gpt-with-vision"
+      },
+      {
+        "title": "Image prompt engineering techniques",
+        "href": "openai/concepts/gpt-4-v-prompt-engineering",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/gpt-4-v-prompt-engineering"
+      },
+      {
+        "title": "Realtime API for speech and audio",
+        "href": "openai/how-to/realtime-audio",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio"
+      },
+      {
+        "title": "Realtime API for speech and audio quickstart",
+        "href": "openai/how-to/realtime-audio#quickstart",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio#quickstart"
+      },
+      {
+        "title": "Realtime API via WebRTC",
+        "href": "openai/how-to/realtime-audio-webrtc",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio-webrtc"
+      },
+      {
+        "title": "Realtime API via WebSockets",
+        "href": "openai/how-to/realtime-audio-websockets",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio-websockets"
+      },
+      {
+        "title": "Realtime API via SIP",
+        "href": "openai/how-to/realtime-audio-sip",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio-sip"
+      },
+      {
+        "title": "Realtime API migration from Preview to GA",
+        "href": "openai/how-to/realtime-audio-preview-api-migration-guide",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/realtime-audio-preview-api-migration-guide"
+      },
+      {
+        "title": "Speech to text with Whisper",
+        "href": "openai/whisper-quickstart",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/whisper-quickstart"
+      },
+      {
+        "title": "Azure OpenAI in Foundry Models",
+        "href": "openai/supported-languages",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/supported-languages"
+      },
+      {
+        "title": "Priority processing",
+        "href": "openai/concepts/priority-processing",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/priority-processing"
+      },
+      {
+        "title": "Provisioned Throughput offering (PTU)",
+        "href": "openai/concepts/provisioned-throughput",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/provisioned-throughput"
+      },
+      {
+        "title": "Understanding and calculating PTU costs",
+        "href": "openai/how-to/provisioned-throughput-onboarding",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-onboarding"
+      },
+      {
+        "title": "Get started with Provisioned Deployments",
+        "href": "openai/how-to/provisioned-get-started",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-get-started"
+      },
+      {
+        "title": "Provisioned spillover",
+        "href": "openai/how-to/spillover-traffic-management",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/spillover-traffic-management"
+      },
+      {
+        "title": "Chat completions API",
+        "href": "openai/how-to/chatgpt",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/chatgpt"
+      },
+      {
+        "title": "Responses API",
+        "href": "openai/how-to/responses",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/responses"
+      },
+      {
+        "title": "Reasoning models",
+        "href": "openai/how-to/reasoning",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/reasoning"
+      },
+      {
+        "title": "Batch processing",
+        "href": "openai/how-to/batch",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/batch"
+      },
+      {
+        "title": "Deep research",
+        "href": "openai/how-to/deep-research",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/deep-research"
+      },
+      {
+        "title": "Function calling",
+        "href": "openai/how-to/function-calling",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/function-calling"
+      },
+      {
+        "title": "Structured outputs",
+        "href": "openai/how-to/structured-outputs",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs"
+      },
+      {
+        "title": "JSON mode",
+        "href": "openai/how-to/json-mode",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/json-mode"
+      },
+      {
+        "title": "Web search",
+        "href": "openai/how-to/web-search",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/web-search"
+      },
+      {
+        "title": "Predicted outputs",
+        "href": "openai/how-to/predicted-outputs",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/predicted-outputs"
+      },
+      {
+        "title": "Prompt caching",
+        "href": "openai/how-to/prompt-caching",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/prompt-caching"
+      },
+      {
+        "title": "Embeddings",
+        "href": "openai/how-to/embeddings",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/embeddings"
+      },
+      {
+        "title": "Embeddings tutorial",
+        "href": "openai/tutorials/embeddings",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/tutorials/embeddings"
+      },
+      {
+        "title": "Audio generation",
+        "href": "openai/audio-completions-quickstart",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/audio-completions-quickstart"
+      },
+      {
+        "title": "Vision-enabled chats",
+        "href": "openai/how-to/gpt-with-vision",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/gpt-with-vision"
+      },
+      {
+        "title": "Image prompt engineering techniques",
+        "href": "openai/concepts/gpt-4-v-prompt-engineering",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/gpt-4-v-prompt-engineering"
+      },
+      {
+        "title": "Image prompt transformation",
+        "href": "openai/concepts/prompt-transformation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/prompt-transformation"
+      },
+      {
+        "title": "Video generation (preview)",
+        "href": "openai/concepts/video-generation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/video-generation"
+      },
+      {
+        "title": "Codex",
+        "href": "openai/how-to/codex",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/codex"
+      },
+      {
+        "title": "Webhooks",
+        "href": "openai/how-to/webhooks",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/webhooks"
+      },
+      {
+        "title": "When to use fine-tuning",
+        "href": "openai/concepts/fine-tuning-considerations",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/fine-tuning-considerations"
+      },
+      {
+        "title": "Fine-tune models",
+        "href": "openai/how-to/fine-tuning",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/fine-tuning"
+      },
+      {
+        "title": "Deploy your fine-tuned model",
+        "href": "openai/how-to/fine-tuning-deploy",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/fine-tuning-deploy"
+      },
+      {
+        "title": "Vision fine-tuning",
+        "href": "openai/how-to/fine-tuning-vision",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/fine-tuning-vision"
+      },
+      {
+        "title": "Preference fine-tuning",
+        "href": "openai/how-to/fine-tuning-direct-preference-optimization",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/fine-tuning-direct-preference-optimization"
+      },
+      {
+        "title": "Reinforcement fine-tuning",
+        "href": "openai/how-to/reinforcement-fine-tuning",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/reinforcement-fine-tuning"
+      },
+      {
+        "title": "Tool calling",
+        "href": "openai/how-to/fine-tuning-functions",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/fine-tuning-functions"
+      },
+      {
+        "title": "Safety evaluation",
+        "href": "openai/how-to/fine-tuning-safety-evaluation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/fine-tuning-safety-evaluation"
+      },
+      {
+        "title": "Fine-tuning cost management",
+        "href": "openai/how-to/fine-tuning-cost-management",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/fine-tuning-cost-management"
+      },
+      {
+        "title": "API lifecycle",
+        "href": "openai/api-version-lifecycle",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/api-version-lifecycle"
+      },
+      {
+        "title": "Dataplane SDK language support",
+        "href": "openai/supported-languages",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/supported-languages"
+      },
+      {
+        "title": "v1 API",
+        "href": "openai/latest",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest"
+      },
+      {
+        "title": "Chat",
+        "href": "openai/latest#create-chat-completion",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#create-chat-completion"
+      },
+      {
+        "title": "Embeddings",
+        "href": "openai/latest#create-embedding",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#create-embedding"
+      },
+      {
+        "title": "Evals (preview)",
+        "href": "openai/latest#list-evals",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#list-evals"
+      },
+      {
+        "title": "Files",
+        "href": "openai/latest#create-file",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#create-file"
+      },
+      {
+        "title": "Fine-tuning",
+        "href": "openai/latest#create-fine-tuning-job",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#create-fine-tuning-job"
+      },
+      {
+        "title": "Models",
+        "href": "openai/latest#list-models",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#list-models"
+      },
+      {
+        "title": "Responses",
+        "href": "openai/latest#create-response",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#create-response"
+      },
+      {
+        "title": "Vector stores",
+        "href": "openai/latest#list-vector-stores",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/latest#list-vector-stores"
+      },
+      {
+        "title": "2024-10-21 API reference",
+        "href": "openai/reference",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/reference"
+      },
+      {
+        "title": "v1 Preview API",
+        "href": "openai/reference-preview-latest",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/reference-preview-latest"
+      },
+      {
+        "title": "2025-04-01-preview - Authoring",
+        "href": "openai/authoring-reference-preview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/authoring-reference-preview"
+      },
+      {
+        "title": "2025-04-01-preview - Inference",
+        "href": "openai/reference-preview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/reference-preview"
+      },
+      {
+        "title": "Azure OpenAI monitoring data reference",
+        "href": "openai/monitor-openai-reference",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/monitor-openai-reference"
+      },
+      {
+        "title": "Audio events reference",
+        "href": "openai/realtime-audio-reference",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/realtime-audio-reference"
+      },
+      {
+        "title": "Harm categories and severity levels",
+        "href": "openai/concepts/content-filter-severity-levels",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/content-filter-severity-levels"
+      },
+      {
+        "title": "Prompt shields",
+        "href": "openai/concepts/content-filter-prompt-shields",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/content-filter-prompt-shields"
+      },
+      {
+        "title": "Sensitive data leakage",
+        "href": "openai/concepts/content-filter-personal-information",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/content-filter-personal-information"
+      },
+      {
+        "title": "Groundedness detection",
+        "href": "openai/concepts/content-filter-groundedness",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/content-filter-groundedness"
+      },
+      {
+        "title": "Protected material for text",
+        "href": "openai/concepts/content-filter-protected-material",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/content-filter-protected-material"
+      },
+      {
+        "title": "Default safety policies",
+        "href": "openai/concepts/default-safety-policies",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/default-safety-policies"
+      },
+      {
+        "title": "Safety system messages",
+        "href": "openai/concepts/safety-system-message-templates",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/safety-system-message-templates"
+      },
+      {
+        "title": "Content streaming",
+        "href": "openai/concepts/content-streaming",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/content-streaming"
+      },
+      {
+        "title": "Abuse monitoring",
+        "href": "openai/concepts/abuse-monitoring",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/abuse-monitoring"
+      },
+      {
+        "title": "Prompt engineering techniques",
+        "href": "openai/concepts/prompt-engineering",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/prompt-engineering"
+      },
+      {
+        "title": "Performance & latency",
+        "href": "openai/how-to/latency",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/latency"
+      },
+      {
+        "title": "Red teaming large language models (LLMs)",
+        "href": "openai/concepts/red-teaming",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/red-teaming"
+      },
+      {
+        "title": "Azure OpenAI quotas and limits",
+        "href": "openai/quotas-limits",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits"
+      },
+      {
+        "title": "Azure OpenAI model retirement",
+        "href": "openai/concepts/model-retirements",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirements"
+      }
+    ],
+    "Observability & Evaluation": [
+      {
+        "title": "Monitor agents in the dashboard",
+        "href": "observability/how-to/how-to-monitor-agents-dashboard",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/how-to-monitor-agents-dashboard"
+      },
+      {
+        "title": "Trace agent overview",
+        "href": "observability/concepts/trace-agent-concept",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/concepts/trace-agent-concept"
+      },
+      {
+        "title": "Set up tracing",
+        "href": "observability/how-to/trace-agent-setup",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/trace-agent-setup"
+      },
+      {
+        "title": "Tracing integrations",
+        "href": "observability/how-to/trace-agent-framework",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/trace-agent-framework"
       },
       {
         "title": "Upgrade/Switch Models with Ask AI",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/optimization-model-upgrade?view=foundry"
+        "href": "observability/how-to/optimization-model-upgrade",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/optimization-model-upgrade"
+      },
+      {
+        "title": "Evaluate your AI agents",
+        "href": "observability/how-to/evaluate-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/evaluate-agent"
+      },
+      {
+        "title": "Evaluation Cluster Analysis",
+        "href": "observability/how-to/cluster-analysis",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/cluster-analysis"
+      },
+      {
+        "title": "Human evaluation for agents",
+        "href": "observability/how-to/human-evaluation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/human-evaluation"
+      },
+      {
+        "title": "Monitor agents in the dashboard",
+        "href": "observability/how-to/how-to-monitor-agents-dashboard",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/how-to-monitor-agents-dashboard"
+      },
+      {
+        "title": "Monitoring dashboard insights with Foundry agent",
+        "href": "observability/how-to/optimization-dashboard",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/optimization-dashboard"
+      },
+      {
+        "title": "Agent tracing overview",
+        "href": "observability/concepts/trace-agent-concept",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/concepts/trace-agent-concept"
+      },
+      {
+        "title": "Set up tracing",
+        "href": "observability/how-to/trace-agent-setup",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/trace-agent-setup"
+      },
+      {
+        "title": "Tracing integrations",
+        "href": "observability/how-to/trace-agent-framework",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/how-to/trace-agent-framework"
+      }
+    ],
+    "Model Context Protocol": [
+      {
+        "title": "Build your own MCP server",
+        "href": "mcp/build-your-own-mcp-server",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/mcp/build-your-own-mcp-server"
+      },
+      {
+        "title": "Get started with Foundry MCP Server",
+        "href": "mcp/get-started",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/mcp/get-started"
+      },
+      {
+        "title": "Best practices and security guidance",
+        "href": "mcp/security-best-practices",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/mcp/security-best-practices"
+      },
+      {
+        "title": "Available tools and sample prompts",
+        "href": "mcp/available-tools",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/mcp/available-tools"
+      }
+    ],
+    "Foundry Models": [
+      {
+        "title": "Foundry Models sold directly by Azure",
+        "href": "foundry-models/concepts/models-sold-directly-by-azure",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure"
+      },
+      {
+        "title": "Foundry Models from partners and community",
+        "href": "foundry-models/concepts/models-from-partners",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-from-partners"
+      },
+      {
+        "title": "Model versions",
+        "href": "foundry-models/concepts/model-versions",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/model-versions"
+      },
+      {
+        "title": "Marketplace configuration for partner models",
+        "href": "foundry-models/how-to/configure-marketplace",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/configure-marketplace"
+      },
+      {
+        "title": "GPT-5 vs GPT-4.1",
+        "href": "foundry-models/how-to/model-choice-guide",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/model-choice-guide"
+      },
+      {
+        "title": "What's new",
+        "href": "foundry-models/whats-new-model-router",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/whats-new-model-router"
+      },
+      {
+        "title": "Responses API with Foundry Models",
+        "href": "foundry-models/how-to/generate-responses",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/generate-responses"
+      },
+      {
+        "title": "Deploy Foundry Models in the portal",
+        "href": "foundry-models/how-to/deploy-foundry-models",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/deploy-foundry-models"
+      },
+      {
+        "title": "Deploy Foundry Models using code",
+        "href": "foundry-models/how-to/create-model-deployments",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/create-model-deployments"
+      },
+      {
+        "title": "Deployment types",
+        "href": "foundry-models/concepts/deployment-types",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/deployment-types"
+      },
+      {
+        "title": "Upgrade GitHub Models to Foundry Models",
+        "href": "foundry-models/how-to/quickstart-github-models",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/quickstart-github-models"
+      },
+      {
+        "title": "Claude in Foundry Models",
+        "href": "foundry-models/how-to/use-foundry-models-claude",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/use-foundry-models-claude"
+      },
+      {
+        "title": "Monitor model deployments",
+        "href": "foundry-models/how-to/monitor-models",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/monitor-models"
+      },
+      {
+        "title": "Configure Claude Code with Microsoft Foundry",
+        "href": "foundry-models/how-to/configure-claude-code",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/configure-claude-code"
+      },
+      {
+        "title": "Endpoints for Foundry Models",
+        "href": "foundry-models/concepts/endpoints",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/endpoints"
+      },
+      {
+        "title": "Get started with DeepSeek-R1 reasoning model",
+        "href": "foundry-models/tutorials/get-started-deepseek-r1",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/tutorials/get-started-deepseek-r1"
+      },
+      {
+        "title": "Foundry Models quotas and limits",
+        "href": "foundry-models/quotas-limits",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/quotas-limits"
+      },
+      {
+        "title": "Configure keyless authentication",
+        "href": "foundry-models/how-to/configure-entra-id",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/configure-entra-id"
+      }
+    ],
+    "How-To Guides": [
+      {
+        "title": "Compare models",
+        "href": "how-to/benchmark-model-in-catalog",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/benchmark-model-in-catalog"
+      },
+      {
+        "title": "Run evaluations from the SDK",
+        "href": "how-to/develop/cloud-evaluation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/cloud-evaluation"
+      },
+      {
+        "title": "Run evaluations from the portal",
+        "href": "how-to/evaluate-generative-ai-app",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/evaluate-generative-ai-app"
+      },
+      {
+        "title": "View evaluation results in the portal",
+        "href": "how-to/evaluate-results",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/evaluate-results"
+      },
+      {
+        "title": "Run red teaming scans in the cloud",
+        "href": "how-to/develop/run-ai-red-teaming-cloud",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/run-ai-red-teaming-cloud"
+      },
+      {
+        "title": "Run red teaming scans locally",
+        "href": "how-to/develop/run-scans-ai-red-teaming-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/run-scans-ai-red-teaming-agent"
+      },
+      {
+        "title": "Evaluation in GitHub Actions",
+        "href": "how-to/evaluation-github-action",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/evaluation-github-action"
+      },
+      {
+        "title": "Evaluation in Azure DevOps",
+        "href": "how-to/evaluation-azure-devops",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/evaluation-azure-devops"
+      },
+      {
+        "title": "Set up your developer environment",
+        "href": "how-to/develop/install-cli-sdk",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/install-cli-sdk"
+      },
+      {
+        "title": "Work in VS Code",
+        "href": "how-to/develop/get-started-projects-vs-code",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/get-started-projects-vs-code"
+      },
+      {
+        "title": "Start with an AI template",
+        "href": "how-to/develop/ai-template-get-started",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/ai-template-get-started"
+      },
+      {
+        "title": "Microsoft Foundry SDKs",
+        "href": "how-to/develop/sdk-overview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/sdk-overview"
+      },
+      {
+        "title": "Integrate with your applications",
+        "href": "how-to/integrate-with-other-apps",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/integrate-with-other-apps"
+      },
+      {
+        "title": "Create resources using Bicep template",
+        "href": "how-to/create-resource-template",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/create-resource-template"
+      },
+      {
+        "title": "Manage resources using Terraform",
+        "href": "how-to/create-resource-terraform",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/create-resource-terraform"
+      },
+      {
+        "title": "Upgrade from Azure OpenAI Service",
+        "href": "how-to/upgrade-azure-openai",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/upgrade-azure-openai"
+      },
+      {
+        "title": "Migrate from Azure AI Inference SDK to OpenAI SDK",
+        "href": "how-to/model-inference-to-openai-migration",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/model-inference-to-openai-migration"
+      },
+      {
+        "title": "Create and manage projects",
+        "href": "how-to/create-projects",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/create-projects"
+      },
+      {
+        "title": "Create a connection",
+        "href": "how-to/connections-add",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/connections-add"
+      },
+      {
+        "title": "Connect to your own storage in Foundry",
+        "href": "how-to/bring-your-own-azure-storage-foundry",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/bring-your-own-azure-storage-foundry"
+      },
+      {
+        "title": "Connect to your own storage for Speech/Language",
+        "href": "how-to/bring-your-own-azure-storage-speech-language-services",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/bring-your-own-azure-storage-speech-language-services"
+      },
+      {
+        "title": "Manage quotas for Foundry resources",
+        "href": "how-to/quota",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/quota"
+      },
+      {
+        "title": "Hide preview features with Azure tags",
+        "href": "how-to/disable-preview-features",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/disable-preview-features"
+      },
+      {
+        "title": "Configure private link",
+        "href": "how-to/configure-private-link",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/configure-private-link"
+      },
+      {
+        "title": "Managed virtual network",
+        "href": "how-to/managed-virtual-network",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/managed-virtual-network"
+      },
+      {
+        "title": "Network security perimeter",
+        "href": "how-to/add-foundry-to-network-security-perimeter",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/add-foundry-to-network-security-perimeter"
+      },
+      {
+        "title": "Store secrets in your Azure Key Vault",
+        "href": "how-to/set-up-key-vault-connection",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/set-up-key-vault-connection"
+      },
+      {
+        "title": "Built-in policy for model deployment",
+        "href": "how-to/model-deployment-policy",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/model-deployment-policy"
+      },
+      {
+        "title": "Create custom policy definitions",
+        "href": "how-to/custom-policy-definition",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/custom-policy-definition"
+      },
+      {
+        "title": "High availability and resiliency",
+        "href": "how-to/high-availability-resiliency",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/high-availability-resiliency"
+      },
+      {
+        "title": "Disaster recovery for agent services",
+        "href": "how-to/agent-service-disaster-recovery",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/agent-service-disaster-recovery"
+      },
+      {
+        "title": "Disaster recovery from a platform outage",
+        "href": "how-to/agent-service-platform-disaster-recovery",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/agent-service-platform-disaster-recovery"
+      },
+      {
+        "title": "Disaster recovery from resource and data loss",
+        "href": "how-to/agent-service-operator-disaster-recovery",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/agent-service-operator-disaster-recovery"
       }
     ],
     "Fine-tuning": [
       {
-        "title": "When to use fine-tuning",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/fine-tuning-considerations?view=foundry"
-      },
-      {
-        "title": "Fine-tune models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/fine-tuning?view=foundry"
-      },
-      {
-        "title": "Deploy your fine-tuned model",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/fine-tuning-deploy?view=foundry"
-      },
-      {
         "title": "Synthetic Data Generation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/fine-tuning/data-generation?view=foundry"
-      },
-      {
-        "title": "Vision fine-tuning",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/fine-tuning-vision?view=foundry"
-      },
-      {
-        "title": "Preference fine-tuning",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/fine-tuning-direct-preference-optimization?view=foundry"
-      },
-      {
-        "title": "Reinforcement fine-tuning",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/reinforcement-fine-tuning?view=foundry"
-      },
-      {
-        "title": "Tool calling",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/fine-tuning-functions?view=foundry"
-      },
-      {
-        "title": "Safety evaluation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/fine-tuning-safety-evaluation?view=foundry"
-      },
-      {
-        "title": "Fine-tuning cost management",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/fine-tuning-cost-management?view=foundry"
+        "href": "fine-tuning/data-generation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/fine-tuning/data-generation"
       }
     ],
-    "Manage agents, models, & tools": [
+    "Control Plane": [
       {
         "title": "What is the Foundry control plane?",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/overview?view=foundry"
-      },
-      {
-        "title": "Govern MCP tools by using an AI gateway",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/governance?view=foundry"
+        "href": "control-plane/overview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/overview"
       },
       {
         "title": "Monitor fleet health and performance",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/monitoring-across-fleet?view=foundry"
+        "href": "control-plane/monitoring-across-fleet",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/monitoring-across-fleet"
       },
       {
         "title": "Manage agents at scale",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/how-to-manage-agents?view=foundry"
+        "href": "control-plane/how-to-manage-agents",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/how-to-manage-agents"
       },
       {
         "title": "Register and manage custom agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/register-custom-agent?view=foundry"
+        "href": "control-plane/register-custom-agent",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/register-custom-agent"
       },
       {
         "title": "Enforce token limits",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/how-to-enforce-limits-models?view=foundry"
+        "href": "control-plane/how-to-enforce-limits-models",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/how-to-enforce-limits-models"
       },
       {
         "title": "Apply a guardrail policy for models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/quickstart-create-guardrail-policy?view=foundry"
+        "href": "control-plane/quickstart-create-guardrail-policy",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/quickstart-create-guardrail-policy"
       },
       {
         "title": "Optimize cost and performance",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/how-to-optimize-cost-performance?view=foundry"
+        "href": "control-plane/how-to-optimize-cost-performance",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/how-to-optimize-cost-performance"
       },
       {
         "title": "Manage compliance and security",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/how-to-manage-compliance-security?view=foundry"
-      },
+        "href": "control-plane/how-to-manage-compliance-security",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/control-plane/how-to-manage-compliance-security"
+      }
+    ],
+    "Configuration": [
       {
         "title": "Configure an AI gateway",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/configuration/enable-ai-api-management-gateway-portal?view=foundry"
+        "href": "configuration/enable-ai-api-management-gateway-portal",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/configuration/enable-ai-api-management-gateway-portal"
       }
     ],
-    "Observability, evaluation, & tracing": [
-      {
-        "title": "Observability overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/observability?view=foundry"
-      },
-      {
-        "title": "Rate limits, region support, and enterprise features",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-regions-limits-virtual-network?view=foundry"
-      },
-      {
-        "title": "Transparency Note for safety evaluations",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/safety-evaluations-transparency-note?view=foundry"
-      },
-      {
-        "title": "Built-in evaluators reference",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/built-in-evaluators?view=foundry"
-      },
-      {
-        "title": "General purpose evaluators",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/general-purpose-evaluators?view=foundry"
-      },
-      {
-        "title": "Textual similarity evaluators",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/textual-similarity-evaluators?view=foundry"
-      },
-      {
-        "title": "Retrieval Augmented Generation (RAG) evaluators",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/rag-evaluators?view=foundry"
-      },
-      {
-        "title": "Risk and safety evaluators",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/risk-safety-evaluators?view=foundry"
-      },
-      {
-        "title": "Agent evaluators",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/agent-evaluators?view=foundry"
-      },
-      {
-        "title": "Azure OpenAI evaluators",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/azure-openai-graders?view=foundry"
-      },
-      {
-        "title": "Custom evaluators",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/custom-evaluators?view=foundry"
-      },
-      {
-        "title": "Evaluate your AI agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/evaluate-agent?view=foundry"
-      },
-      {
-        "title": "Run evaluations from the SDK",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/cloud-evaluation?view=foundry"
-      },
-      {
-        "title": "Run evaluations from the portal",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/evaluate-generative-ai-app?view=foundry"
-      },
-      {
-        "title": "View evaluation results in the portal",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/evaluate-results?view=foundry"
-      },
-      {
-        "title": "Evaluation Cluster Analysis",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/cluster-analysis?view=foundry"
-      },
-      {
-        "title": "Human evaluation for agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/human-evaluation?view=foundry"
-      },
-      {
-        "title": "AI red teaming agent overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/ai-red-teaming-agent?view=foundry"
-      },
-      {
-        "title": "Run red teaming scans in the cloud",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/run-ai-red-teaming-cloud?view=foundry"
-      },
-      {
-        "title": "Run red teaming scans locally",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/run-scans-ai-red-teaming-agent?view=foundry"
-      },
-      {
-        "title": "Evaluation in GitHub Actions",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/evaluation-github-action?view=foundry"
-      },
-      {
-        "title": "Evaluation in Azure DevOps",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/evaluation-azure-devops?view=foundry"
-      },
-      {
-        "title": "Monitor agents in the dashboard",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/how-to-monitor-agents-dashboard?view=foundry"
-      },
-      {
-        "title": "Monitoring dashboard insights with Foundry agent",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/optimization-dashboard?view=foundry"
-      },
-      {
-        "title": "Monitor model deployments",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/monitor-models?view=foundry"
-      },
-      {
-        "title": "Agent tracing overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/concepts/trace-agent-concept?view=foundry"
-      },
-      {
-        "title": "Set up tracing",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/trace-agent-setup?view=foundry"
-      },
-      {
-        "title": "Tracing integrations",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/trace-agent-framework?view=foundry"
-      }
-    ],
-    "Developer experience": [
-      {
-        "title": "Set up your developer environment",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/install-cli-sdk?view=foundry"
-      },
-      {
-        "title": "Work in VS Code",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/get-started-projects-vs-code?view=foundry"
-      },
-      {
-        "title": "Configure Claude Code with Microsoft Foundry",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/configure-claude-code?view=foundry"
-      },
-      {
-        "title": "Start with an AI template",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/ai-template-get-started?view=foundry"
-      },
-      {
-        "title": "Playgrounds and quick evaluation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/concept-playgrounds?view=foundry"
-      },
-      {
-        "title": "Use declarative agent workflows in the Visual Studio Code extension",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/vs-code-agents-workflow-low-code?view=foundry"
-      },
-      {
-        "title": "Use hosted agent workflows in the Visual Studio Code extension",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/vs-code-agents-workflow-pro-code?view=foundry"
-      },
-      {
-        "title": "Get started with Foundry MCP Server",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/get-started?view=foundry"
-      },
-      {
-        "title": "Best practices and security guidance",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/security-best-practices?view=foundry"
-      },
-      {
-        "title": "Available tools and sample prompts",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/available-tools?view=foundry"
-      }
-    ],
-    "API & SDK": [
-      {
-        "title": "Microsoft Foundry SDKs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/sdk-overview?view=foundry"
-      },
-      {
-        "title": "Endpoints for Foundry Models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/endpoints?view=foundry"
-      },
+    "General": [
       {
         "title": "C#",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/dotnet/api/overview/azure/ai.projects-readme?view=foundry"
+        "href": "/dotnet/api/overview/azure/ai.projects-readme",
+        "url": "https://learn.microsoft.com/dotnet/api/overview/azure/ai.projects-readme"
       },
       {
         "title": "JavaScript",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/javascript/api/overview/azure/ai-projects-readme?view=azure-node-preview?view=foundry"
+        "href": "/javascript/api/overview/azure/ai-projects-readme?view=azure-node-preview",
+        "url": "https://learn.microsoft.com/javascript/api/overview/azure/ai-projects-readme?view=azure-node-preview"
       },
       {
         "title": "Python",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/python/api/overview/azure/ai-projects-readme?view=azure-python-preview?view=foundry"
-      },
-      {
-        "title": "REST API",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/reference/foundry-project?view=foundry"
-      },
-      {
-        "title": "REST API (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/reference/foundry-project-rest-preview?view=foundry"
-      },
-      {
-        "title": "API lifecycle",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/api-version-lifecycle?view=foundry"
-      },
-      {
-        "title": "Dataplane SDK language support",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/supported-languages?view=foundry"
-      },
-      {
-        "title": "v1 API",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest?view=foundry"
-      },
-      {
-        "title": "Chat",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-chat-completion?view=foundry"
-      },
-      {
-        "title": "Embeddings",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-embedding?view=foundry"
-      },
-      {
-        "title": "Evals (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-evals?view=foundry"
-      },
-      {
-        "title": "Files",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-file?view=foundry"
-      },
-      {
-        "title": "Fine-tuning",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-fine-tuning-job?view=foundry"
-      },
-      {
-        "title": "Models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-models?view=foundry"
-      },
-      {
-        "title": "Responses",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-response?view=foundry"
-      },
-      {
-        "title": "Vector stores",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-vector-stores?view=foundry"
-      },
-      {
-        "title": "2024-10-21 API reference",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference?view=foundry"
-      },
-      {
-        "title": "v1 Preview API",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference-preview-latest?view=foundry"
-      },
-      {
-        "title": "2025-04-01-preview - Authoring",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/authoring-reference-preview?view=foundry"
-      },
-      {
-        "title": "2025-04-01-preview - Inference",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference-preview?view=foundry"
+        "href": "/python/api/overview/azure/ai-projects-readme?view=azure-python-preview",
+        "url": "https://learn.microsoft.com/python/api/overview/azure/ai-projects-readme?view=azure-python-preview"
       },
       {
         "title": "REST API (resource creation & deployment)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/rest/api/aiservices/accountmanagement/deployments/create-or-update?tabs=HTTP?view=foundry"
-      },
-      {
-        "title": "Azure OpenAI monitoring data reference",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/monitor-openai-reference?view=foundry"
-      },
-      {
-        "title": "Audio events reference",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/realtime-audio-reference?view=foundry"
-      },
-      {
-        "title": "Foundry Tools SDKs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/reference/sdk-package-resources.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Foundry Tools REST APIs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/reference/rest-api-resources.md?context=/azure/foundry/context/context?view=foundry"
+        "href": "/rest/api/aiservices/accountmanagement/deployments/create-or-update?tabs=HTTP",
+        "url": "https://learn.microsoft.com/rest/api/aiservices/accountmanagement/deployments/create-or-update?tabs=HTTP"
       },
       {
         "title": "Azure Resource Manager/Bicep/Terraform",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/templates/microsoft.cognitiveservices/accounts?pivots=deployment-language-bicep?view=foundry"
+        "href": "/azure/templates/microsoft.cognitiveservices/accounts?pivots=deployment-language-bicep",
+        "url": "https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts?pivots=deployment-language-bicep"
       },
       {
         "title": "Azure CLI",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/cli/azure/cognitiveservices?view=azure-cli-latest?view=foundry"
+        "href": "/cli/azure/cognitiveservices?view=azure-cli-latest",
+        "url": "https://learn.microsoft.com/cli/azure/cognitiveservices?view=azure-cli-latest"
+      },
+      {
+        "title": "Responsible AI overview",
+        "href": "responsible-use-of-ai-overview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-use-of-ai-overview"
+      },
+      {
+        "title": "Code of conduct",
+        "href": "/legal/ai-code-of-conduct",
+        "url": "https://learn.microsoft.com/legal/ai-code-of-conduct"
+      },
+      {
+        "title": "Security baseline",
+        "href": "/security/benchmark/azure/baselines/azure-ai-foundry-security-baseline",
+        "url": "https://learn.microsoft.com/security/benchmark/azure/baselines/azure-ai-foundry-security-baseline"
+      },
+      {
+        "title": "What's new in Microsoft Foundry",
+        "href": "whats-new-foundry",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/whats-new-foundry"
+      },
+      {
+        "title": "Status dashboard",
+        "href": "foundry-status-dashboard-documentation",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-status-dashboard-documentation"
+      },
+      {
+        "title": "Code of conduct",
+        "href": "/legal/ai-code-of-conduct",
+        "url": "https://learn.microsoft.com/legal/ai-code-of-conduct"
       }
     ],
-    "Guardrails and controls": [
+    "Reference": [
+      {
+        "title": "REST API",
+        "href": "reference/foundry-project",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/reference/foundry-project"
+      },
+      {
+        "title": "REST API (preview)",
+        "href": "reference/foundry-project-rest-preview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/reference/foundry-project-rest-preview"
+      },
+      {
+        "title": "Known issues",
+        "href": "reference/foundry-known-issues",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/reference/foundry-known-issues"
+      },
+      {
+        "title": "Feature availability by region",
+        "href": "reference/region-support",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/reference/region-support"
+      }
+    ],
+    "Guardrails & Safety": [
       {
         "title": "Overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/guardrails/guardrails-overview?view=foundry"
+        "href": "guardrails/guardrails-overview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/guardrails/guardrails-overview"
       },
       {
         "title": "How to configure Guardrails and controls",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/guardrails/how-to-create-guardrails?view=foundry"
+        "href": "guardrails/how-to-create-guardrails",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/guardrails/how-to-create-guardrails"
       },
       {
         "title": "Third party Guardrail integrations",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/guardrails/third-party-integrations?view=foundry"
-      },
-      {
-        "title": "Harm categories and severity levels",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/content-filter-severity-levels?view=foundry"
-      },
-      {
-        "title": "Prompt shields",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/content-filter-prompt-shields?view=foundry"
-      },
-      {
-        "title": "Sensitive data leakage",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/content-filter-personal-information?view=foundry"
-      },
-      {
-        "title": "Groundedness detection",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/content-filter-groundedness?view=foundry"
-      },
-      {
-        "title": "Protected material for code",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/quickstart-protected-material-code?view=foundry"
-      },
-      {
-        "title": "Protected material for text",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/content-filter-protected-material?view=foundry"
-      },
-      {
-        "title": "Block lists",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/quickstart-blocklist?view=foundry"
-      },
-      {
-        "title": "Custom categories",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/concepts/custom-categories.md?context=/azure/foundry/context/context?view=foundry"
+        "href": "guardrails/third-party-integrations",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/guardrails/third-party-integrations"
       },
       {
         "title": "Intervention points",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/guardrails/intervention-points?view=foundry"
-      },
-      {
-        "title": "Default safety policies",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/default-safety-policies?view=foundry"
-      },
-      {
-        "title": "Safety system messages",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/safety-system-message-templates?view=foundry"
-      },
-      {
-        "title": "Content streaming",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/content-streaming?view=foundry"
-      },
-      {
-        "title": "Abuse monitoring",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/abuse-monitoring?view=foundry"
+        "href": "guardrails/intervention-points",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/guardrails/intervention-points"
       }
     ],
     "Responsible AI": [
       {
-        "title": "Responsible AI overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-use-of-ai-overview?view=foundry"
-      },
-      {
-        "title": "Limited access",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/cognitive-services-limited-access?view=foundry"
-      },
-      {
         "title": "Overview",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/overview?view=foundry"
-      },
-      {
-        "title": "Limited access",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/limited-access?view=foundry"
-      },
-      {
-        "title": "Code of conduct",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/legal/ai-code-of-conduct?view=foundry"
-      },
-      {
-        "title": "Data, privacy, and security",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/data-privacy?view=foundry"
-      },
-      {
-        "title": "Customer Copyright Commitment",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/customer-copyright-commitment?view=foundry"
+        "href": "responsible-ai/openai/overview",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/overview"
       },
       {
         "title": "Transparency note",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/agents/transparency-note?view=foundry"
+        "href": "responsible-ai/openai/transparency-note",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/transparency-note"
+      },
+      {
+        "title": "Limited access",
+        "href": "responsible-ai/openai/limited-access",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/limited-access"
+      },
+      {
+        "title": "Data, privacy, and security",
+        "href": "responsible-ai/openai/data-privacy",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/data-privacy"
+      },
+      {
+        "title": "Customer Copyright Commitment",
+        "href": "responsible-ai/openai/customer-copyright-commitment",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/customer-copyright-commitment"
+      },
+      {
+        "title": "Transparency note",
+        "href": "responsible-ai/agents/transparency-note",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/agents/transparency-note"
       },
       {
         "title": "Data, privacy, and security for agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/agents/data-privacy-security?view=foundry"
-      }
-    ],
-    "Best practices": [
-      {
-        "title": "Get started with DeepSeek-R1 reasoning model",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/tutorials/get-started-deepseek-r1?view=foundry"
-      },
-      {
-        "title": "Prompt engineering techniques",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/prompt-engineering?view=foundry"
-      },
-      {
-        "title": "Performance & latency",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/latency?view=foundry"
-      },
-      {
-        "title": "Integrate with your applications",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/integrate-with-other-apps?view=foundry"
-      },
-      {
-        "title": "Red teaming large language models (LLMs)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/red-teaming?view=foundry"
-      }
-    ],
-    "Setup & configure": [
-      {
-        "title": "Plan rollout",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/planning?view=foundry"
-      },
-      {
-        "title": "Create your first resource",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/multi-service-resource.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Create resources using Bicep template",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-resource-template?view=foundry"
-      },
-      {
-        "title": "Manage resources using Terraform",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-resource-terraform?view=foundry"
-      },
-      {
-        "title": "Recover or purge deleted resources",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/recover-purge-resources.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Upgrade from Azure OpenAI Service",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/upgrade-azure-openai?view=foundry"
-      },
-      {
-        "title": "Migrate from Azure AI Inference SDK to OpenAI SDK",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/model-inference-to-openai-migration?view=foundry"
-      },
-      {
-        "title": "Create and manage projects",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-projects?view=foundry"
-      },
-      {
-        "title": "Set up your agent resources",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/environment-setup?view=foundry"
-      },
-      {
-        "title": "Standard agent setup",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/standard-agent-setup?view=foundry"
-      },
-      {
-        "title": "Use your own Azure resources",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/use-your-own-resources?view=foundry"
-      },
-      {
-        "title": "Migrate agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/migrate?view=foundry"
-      },
-      {
-        "title": "Virtual networks",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/virtual-networks?view=foundry"
-      },
-      {
-        "title": "Use an AI Gateway",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/ai-gateway?view=foundry"
-      },
-      {
-        "title": "Create a connection",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/connections-add?view=foundry"
-      },
-      {
-        "title": "Connect to your own storage in Foundry",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/bring-your-own-azure-storage-foundry?view=foundry"
-      },
-      {
-        "title": "Connect to your own storage for Speech/Language",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/bring-your-own-azure-storage-speech-language-services?view=foundry"
-      },
-      {
-        "title": "Manage Grounding with Bing",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/manage-grounding-with-bing?view=foundry"
-      },
-      {
-        "title": "Manage quotas for Foundry resources",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/quota?view=foundry"
-      },
-      {
-        "title": "Foundry Models quotas and limits",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/quotas-limits?view=foundry"
-      },
-      {
-        "title": "Azure OpenAI quotas and limits",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/quotas-limits?view=foundry"
-      }
-    ],
-    "Security & governance": [
-      {
-        "title": "Authentication and authorization",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/authentication-authorization-foundry?view=foundry"
-      },
-      {
-        "title": "Hide preview features with Azure tags",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/disable-preview-features?view=foundry"
-      },
-      {
-        "title": "Disable preview features with role-based access control",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/disable-preview-features-with-rbac?view=foundry"
-      },
-      {
-        "title": "Role-based access control",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/rbac-foundry?view=foundry"
-      },
-      {
-        "title": "Configure keyless authentication",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/configure-entra-id?view=foundry"
-      },
-      {
-        "title": "Configure private link",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/configure-private-link?view=foundry"
-      },
-      {
-        "title": "Managed virtual network",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/managed-virtual-network?view=foundry"
-      },
-      {
-        "title": "Network security perimeter",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/add-foundry-to-network-security-perimeter?view=foundry"
-      },
-      {
-        "title": "Configure customer-managed keys",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/encryption-keys-portal?view=foundry"
-      },
-      {
-        "title": "Store secrets in your Azure Key Vault",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/set-up-key-vault-connection?view=foundry"
-      },
-      {
-        "title": "Rotate API access keys",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/rotate-keys?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Built-in policy definitions",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/policy-reference.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Built-in policy for model deployment",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/model-deployment-policy?view=foundry"
-      },
-      {
-        "title": "Create custom policy definitions",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/custom-policy-definition?view=foundry"
-      },
-      {
-        "title": "High availability and resiliency",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/high-availability-resiliency?view=foundry"
-      },
-      {
-        "title": "Disaster recovery for agent services",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/agent-service-disaster-recovery?view=foundry"
-      },
-      {
-        "title": "Disaster recovery from a platform outage",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/agent-service-platform-disaster-recovery?view=foundry"
-      },
-      {
-        "title": "Disaster recovery from resource and data loss",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/agent-service-operator-disaster-recovery?view=foundry"
-      },
-      {
-        "title": "Plan and manage costs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/manage-costs?view=foundry"
-      },
-      {
-        "title": "Security baseline",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/security/benchmark/azure/baselines/azure-ai-foundry-security-baseline?view=foundry"
-      },
-      {
-        "title": "Service architecture",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/architecture?view=foundry"
+        "href": "responsible-ai/agents/data-privacy-security",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/agents/data-privacy-security"
       },
       {
         "title": "Data, privacy, and security for Foundry Models sold directly by Azure",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/data-privacy?view=foundry"
+        "href": "responsible-ai/openai/data-privacy",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/data-privacy"
       },
       {
         "title": "Data, privacy, and security for Claude models in Microsoft Foundry",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/claude-models/data-privacy?view=foundry"
-      }
-    ],
-    "Operate & support": [
-      {
-        "title": "What's new in Microsoft Foundry",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/whats-new-foundry?view=foundry"
-      },
-      {
-        "title": "Status dashboard",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-status-dashboard-documentation?view=foundry"
-      },
-      {
-        "title": "Use Microsoft Foundry with a screen reader",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/screen-reader?view=foundry"
-      },
-      {
-        "title": "Known issues",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/reference/foundry-known-issues?view=foundry"
-      },
-      {
-        "title": "Feature availability by region",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/reference/region-support?view=foundry"
-      },
-      {
-        "title": "Region support",
-        "url": "https://azure.microsoft.com/explore/global-infrastructure/products-by-region/"
-      },
-      {
-        "title": "Model lifecycle and retirement",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/model-lifecycle-retirement?view=foundry"
-      },
-      {
-        "title": "Azure OpenAI model retirement",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/model-retirements?view=foundry"
-      },
-      {
-        "title": "Code of conduct",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/legal/ai-code-of-conduct?view=foundry"
-      },
-      {
-        "title": "Compliance",
-        "url": "https://aka.ms/AzureCompliance"
-      },
-      {
-        "title": "Service Level Agreement (SLA)",
-        "url": "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"
-      },
-      {
-        "title": "Azure updates",
-        "url": "https://azure.microsoft.com/updates/?filters=%5B%22Azure+AI+Foundry%22%5D#"
-      },
-      {
-        "title": "Microsoft Foundry pricing",
-        "url": "https://azure.microsoft.com/pricing/details/ai-foundry/"
+        "href": "responsible-ai/claude-models/data-privacy",
+        "url": "https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/claude-models/data-privacy"
       }
     ]
   },
-  "total_pages": 305,
-  "generated_at": "2026-03-02T03:56:57Z"
+  "total_pages": 278,
+  "generated_at": "2026-03-05T03:58:45Z"
 }
