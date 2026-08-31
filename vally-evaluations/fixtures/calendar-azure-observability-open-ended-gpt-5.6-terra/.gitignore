@@ -13,6 +13,7 @@ dist-server
 dist-ssr
 *.local
 data/*.json
+test-results
 
 # Editor directories and files
 .vscode/*

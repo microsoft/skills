@@ -5,19 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently --kill-others \"npm:dev:api\" \"npm:dev:web\"",
-    "dev:api": "tsx watch --import ./server/telemetryBootstrap.ts ./server/index.ts --api-only",
+    "dev:api": "node --watch --import @azure/monitor-opentelemetry/loader --import tsx ./server/telemetryBootstrap.ts --api-only",
     "dev:web": "vite",
     "build": "tsc -p tsconfig.app.json && tsc -p tsconfig.server.json && tsc -p tsconfig.node.json && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "start": "node --import ./dist-server/server/telemetryBootstrap.js dist-server/server/index.js",
+    "start": "node --import @azure/monitor-opentelemetry/loader ./dist-server/server/telemetryBootstrap.js",
     "test": "vitest run"
   },
   "dependencies": {
     "@azure/monitor-opentelemetry": "^1.19.0",
     "@azure/storage-blob": "^12.33.0",
     "@opentelemetry/api": "^1.9.1",
-    "@opentelemetry/api-logs": "^0.221.0",
+    "@opentelemetry/api-logs": "0.220.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

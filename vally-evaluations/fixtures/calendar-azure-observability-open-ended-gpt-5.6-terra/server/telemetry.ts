@@ -1,6 +1,6 @@
-import { SpanStatusCode, trace, type Attributes } from '@opentelemetry/api'
-import { logs, SeverityNumber } from '@opentelemetry/api-logs'
-import { useAzureMonitor } from '@azure/monitor-opentelemetry'
+import { SpanStatusCode, trace, type Attributes, type Tracer } from '@opentelemetry/api'
+import { logs, SeverityNumber, type Logger } from '@opentelemetry/api-logs'
+import type { AzureMonitorOpenTelemetryOptions } from '@azure/monitor-opentelemetry'
 
 type TelemetryAttributes = Record<string, string | number | boolean>
 
@@ -10,8 +10,16 @@ export interface Telemetry {
 }
 
 class OpenTelemetry implements Telemetry {
-  private readonly tracer = trace.getTracer('daymark')
-  private readonly logger = logs.getLogger('daymark')
+  private readonly tracer: Tracer
+  private readonly logger: Logger
+
+  constructor(
+    tracer: Tracer,
+    logger: Logger,
+  ) {
+    this.tracer = tracer
+    this.logger = logger
+  }
 
   async runOperation<T>(name: string, attributes: TelemetryAttributes, operation: () => Promise<T>): Promise<T> {
     return this.tracer.startActiveSpan(name, async (span) => {
@@ -38,19 +46,32 @@ class OpenTelemetry implements Telemetry {
   }
 }
 
-const telemetry = new OpenTelemetry()
+let telemetry: Telemetry | undefined
 let azureMonitorStarted = false
 
 export function getTelemetry(): Telemetry {
+  telemetry ??= new OpenTelemetry(trace.getTracer('daymark'), logs.getLogger('daymark'))
   return telemetry
 }
 
-export function initializeAzureMonitor(connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING, configure = useAzureMonitor): boolean {
+export function initializeAzureMonitor(
+  connectionString: string | undefined,
+  configure: (options: AzureMonitorOpenTelemetryOptions) => void,
+): boolean {
   if (!connectionString || azureMonitorStarted) return false
   configure({
     azureMonitorExporterOptions: { connectionString },
     instrumentationOptions: { azureSdk: { enabled: true }, http: { enabled: true }, console: { enabled: false } },
   })
   azureMonitorStarted = true
+  telemetry = new OpenTelemetry(trace.getTracer('daymark'), logs.getLogger('daymark'))
   return true
+}
+
+export async function shutdownTelemetry(): Promise<void> {
+  if (!azureMonitorStarted) return
+  const { shutdownAzureMonitor } = await import('@azure/monitor-opentelemetry')
+  await shutdownAzureMonitor()
+  azureMonitorStarted = false
+  telemetry = undefined
 }

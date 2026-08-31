@@ -35,4 +35,12 @@ The React client reads and writes `/api/appointments`. The API depends on the `A
 
 ## Observability
 
-The server exports logs and distributed traces to **Azure Monitor Application Insights** with the Azure Monitor OpenTelemetry distribution. Set `APPLICATIONINSIGHTS_CONNECTION_STRING` only in the server runtime environment; it is never exposed to the browser or Vite variables. The startup scripts preload telemetry so HTTP and Azure SDK calls (including Blob Storage) are automatically correlated. Daymark also records server-side calendar and Blob read/write operations with only safe operational metadata (HTTP method/status, storage type, and error type), not appointment content or credentials. When the connection string is absent, telemetry remains disabled for local development.
+The server exports logs and distributed traces to **Azure Monitor Application Insights** with the Azure Monitor OpenTelemetry distribution. Set `APPLICATIONINSIGHTS_CONNECTION_STRING` only in the server runtime environment; it is never exposed to the browser or Vite variables. The startup scripts preload `@azure/monitor-opentelemetry/loader`, configure Azure Monitor, and only then import the application. Tracer and logger handles are acquired after configuration so custom Daymark operations use the active providers, while HTTP and Azure SDK calls (including Blob Storage) are automatically correlated. Daymark records only safe operational metadata (HTTP method/status, storage type, and error type), not appointment content or credentials. Graceful `SIGINT` and `SIGTERM` handling flushes telemetry before exit. When the connection string is absent, telemetry remains disabled for local development.
+
+For bounded exporter troubleshooting, set
+`APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL=VERBOSE`,
+`APPLICATIONINSIGHTS_LOG_DESTINATION=file`, and
+`APPLICATIONINSIGHTS_LOGDIR` to an ignored directory such as
+`test-results/applicationinsights`. Diagnostic output can contain operational
+details, so do not publish it or include credentials and environment dumps in
+test evidence.

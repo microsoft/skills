@@ -80,13 +80,24 @@ stimuli:
            delay. Verify that Daymark request telemetry and Blob read/write telemetry
            were exported and can be correlated to the tested operation.
         6. Initialize Azure Monitor before application libraries that produce
-           telemetry, keep OpenTelemetry API package versions compatible, and
+           telemetry. For every ESM development, start, and live-test Node process,
+           preload `@azure/monitor-opentelemetry/loader` before the application entry
+           point. Do not acquire or cache a tracer or logger until `useAzureMonitor`
+           has completed. Keep OpenTelemetry API package versions compatible, and
            explicitly flush or shut down telemetry before beginning the final
            ingestion query.
         7. If a correlation query returns no matching rows, enable Azure Monitor
-           exporter self-diagnostics and run a bounded, time-filtered discovery query
-           for recent telemetry before applying the correlation filter. Use projected
-           columns and a row limit. Distinguish exporter failure, ingestion delay,
+           exporter self-diagnostics with
+           `APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL=VERBOSE`,
+           `APPLICATIONINSIGHTS_LOG_DESTINATION=file`, and
+           `APPLICATIONINSIGHTS_LOGDIR` under the ignored `test-results` directory.
+           Run a bounded, time-filtered discovery query for recent telemetry before
+           applying the correlation filter. Use projected columns and a row limit.
+           Record concise non-secret projected rows including timestamp, item type,
+           operation ID, name or message, and safe custom-dimension keys or values
+           needed to distinguish automatic telemetry from missing custom Daymark
+           operations; a row count alone is insufficient. Do not print or retain
+           credentials in diagnostics. Distinguish exporter failure, ingestion delay,
            schema or attribute mapping, and correlation failure before changing the
            test or reporting a blocker.
         8. Live tests must fail clearly when Azure authentication, resource
@@ -117,6 +128,12 @@ stimuli:
             troubleshooting, evidence artifact, and cleanup.
         13. Run the existing unit tests, complete TypeScript build, and lint in
             addition to the live-Azure integration tests.
+        14. Add a deterministic provider-lifecycle regression test. It must exercise
+            the production telemetry initialization path, prove configuration
+            completes before `trace.getTracer` and `logs.getLogger` are acquired, and
+            prove a custom operation uses the post-configuration providers. Preserve
+            the existing injected `RecordingTelemetry` behavior tests, but do not
+            treat them as provider lifecycle coverage.
 
         If an external Azure precondition prevents progress, preserve the diagnostic
         evidence and report the exact observed condition without fabricating success.
@@ -146,6 +163,8 @@ stimuli:
       - Daymark runs locally with Azure configuration supplied only at runtime, uses the provisioned Blob rather than local JSON fallback, and exposes no credentials or privileged configuration to the browser, repository, or test logs.
       - A distinct automated live test exercises the local Daymark API, round-trips a uniquely identifiable appointment, and independently verifies the stored Azure Blob JSON and content type.
       - The live test generates a unique correlation marker and queries Application Insights with bounded ingestion retries to verify queryable Daymark request and Blob-operation telemetry from that operation.
+      - Azure Monitor is configured before tracer and logger acquisition, every ESM server invocation preloads the Azure Monitor loader, and deterministic regression coverage proves custom operations use the post-configuration providers.
+      - On correlation failure, documented self-diagnostics and bounded projected discovery rows provide non-secret evidence that distinguishes automatic telemetry from missing custom Daymark telemetry.
       - The live test uses real Azure services rather than mocks or local substitutes, fails instead of skipping when prerequisites or assertions are missing, and uses bounded process and polling timeouts.
       - The live-Azure command exits successfully and its recorded result metrics demonstrate that all Azure-backed assertions actually passed; an honestly reported external blocker remains an incomplete result.
       - Test processes and data are isolated, the local server is stopped, disposable Azure resources are deleted after success or failure, and no secrets are persisted or printed.

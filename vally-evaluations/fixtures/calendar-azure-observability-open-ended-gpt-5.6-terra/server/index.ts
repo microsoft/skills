@@ -5,6 +5,7 @@ import path from 'node:path'
 import { createCalendarApiHandler } from './calendarApi.js'
 import { JsonFileAppointmentStore } from './appointmentStore.js'
 import { AzureBlobAppointmentStore } from './azureBlobAppointmentStore.js'
+import { shutdownTelemetry } from './telemetry.js'
 
 const projectRoot = process.cwd()
 const distDirectory = path.join(projectRoot, 'dist')
@@ -78,3 +79,26 @@ const server = createServer((request, response) => {
 server.listen(port, () => {
   console.log(`Daymark server listening on http://localhost:${port}`)
 })
+
+let shutdownStarted = false
+
+async function shutdownServer(): Promise<void> {
+  if (shutdownStarted) return
+  shutdownStarted = true
+  await new Promise<void>((resolve, reject) => {
+    server.close((error) => error ? reject(error) : resolve())
+  })
+  await shutdownTelemetry()
+}
+
+for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+  process.once(signal, () => {
+    void shutdownServer().then(
+      () => process.exit(0),
+      (error: unknown) => {
+        console.error('Daymark server shutdown failed.', error)
+        process.exit(1)
+      },
+    )
+  })
+}
