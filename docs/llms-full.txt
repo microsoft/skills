@@ -29,21 +29,20 @@ AZURE_AI_PROJECT_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/
 AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 ```
 
-## General
+## What is Microsoft Foundry (new)?
 
 - [What is Microsoft Foundry (new)?](https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-foundry?view=foundry)
 
 ## Get started
 
-- ["Quickstart: Create resources"](https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/quickstart-create-foundry-resources?view=foundry)
-- ["Quickstart: Chat with an agent"](https://learn.microsoft.com/en-us/azure/ai-foundry/quickstarts/get-started-code?view=foundry)
-- ["Tutorial: Idea to prototype"](https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/developer-journey-idea-to-prototype?view=foundry)
+- [Quickstart: Create resources](https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/quickstart-create-foundry-resources?view=foundry)
+- [Quickstart: Chat with an agent](https://learn.microsoft.com/en-us/azure/ai-foundry/quickstarts/get-started-code?view=foundry)
+- [Tutorial: Idea to prototype](https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/developer-journey-idea-to-prototype?view=foundry)
 - [Ask AI](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/ask-ai?view=foundry)
 
 ## Agent development
 
 - [Agent development overview](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview?view=foundry)
-- [FAQ](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/faq?view=foundry)
 - [Quotas, limits, models and region support](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/limits-quotas-regions?view=foundry)
 - [Development lifecycle](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/development-lifecycle?view=foundry)
 - [Agent runtime components](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/runtime-components?view=foundry)
@@ -57,6 +56,7 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [System message design](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/advanced-prompt-engineering?view=foundry)
 - [Safety system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/system-message?view=foundry)
 - [Safety system message templates](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/safety-system-message-templates?view=foundry)
+- [Optimize agent prompts](https://learn.microsoft.com/en-us/azure/ai-foundry/observability/how-to/prompt-optimizer?view=foundry)
 - [Publish and share agents](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/publish-agent?view=foundry)
 - [Publish to Microsoft 365 Copilot and Teams](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/publish-copilot?view=foundry)
 - [Agent 365](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/agent-365?view=foundry)
@@ -79,7 +79,7 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Custom code interpreter (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/custom-code-interpreter?view=foundry)
 - [Browser automation (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/browser-automation?view=foundry)
 - [Computer Use (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/computer-use?view=foundry)
-- [Image generation (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/image-generation?view=foundry)
+- [Image generation](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/image-generation?view=foundry)
 - [What is memory?](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/what-is-memory?view=foundry)
 - [Create and use memory](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/memory-usage?view=foundry)
 - [Retrieval Augmented Generation (RAG) overview](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/retrieval-augmented-generation?view=foundry)
@@ -92,15 +92,8 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Grounding with Bing tools](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/bing-tools?view=foundry)
 - [Fabric data agent (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/fabric?view=foundry)
 - [What is Foundry IQ?](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/what-is-foundry-iq?view=foundry)
-- [FAQ](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/foundry-iq-faq?view=foundry)
 - [Connect knowledge base to agents](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/foundry-iq-connect?view=foundry)
 - [Azure Speech in Foundry Tools](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/azure-ai-speech?view=foundry)
-- [Azure Language tools and agents](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/concepts/foundry-tools-agents?context=/azure/foundry/context/context?view=foundry)
-- [Try CLU multi-turn conversations](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/conversational-language-understanding/how-to/quickstart-multi-turn-conversations?context=/azure/foundry/context/context?view=foundry)
-- [Detect Personally Identifiable Information (PII)](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/personally-identifiable-information/quickstart?context=/azure/foundry/context/context?view=foundry)
-- [Try Azure Language detection](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/language-detection/quickstart?context=/azure/foundry/context/context?view=foundry)
-- [Azure text translation](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/translator/text-translation/overview?context=/azure/foundry/context/context?view=foundry)
-- [Azure document translation](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/translator/document-translation/overview?context=/azure/foundry/context/context?view=foundry)
 - [Connect to MCP server](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/model-context-protocol?view=foundry)
 - [MCP authentication](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/mcp-authentication?view=foundry)
 - [Build your own MCP server](https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/build-your-own-mcp-server?view=foundry)
@@ -111,6 +104,7 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 
 ## Model catalog
 
+- [Foundry Models Overview](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/foundry-models-overview?view=foundry)
 - [Foundry Models sold directly by Azure](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/models-sold-directly-by-azure?view=foundry)
 - [Foundry Models from partners and community](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/models-from-partners?view=foundry)
 - [Model versions](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/model-versions?view=foundry)
@@ -128,7 +122,6 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Vision-enabled chats](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/gpt-with-vision?view=foundry)
 - [Image prompt engineering techniques](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/gpt-4-v-prompt-engineering?view=foundry)
 - [Realtime API for speech and audio](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio?view=foundry)
-- [Realtime API for speech and audio quickstart](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio.md#quickstart?view=foundry)
 - [Realtime API via WebRTC](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-webrtc?view=foundry)
 - [Realtime API via WebSockets](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-websockets?view=foundry)
 - [Realtime API via SIP](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-sip?view=foundry)
@@ -162,15 +155,10 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Embeddings](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/embeddings?view=foundry)
 - [Embeddings tutorial](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/tutorials/embeddings?view=foundry)
 - [Audio generation](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/audio-completions-quickstart?view=foundry)
-- [Speech to text](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/get-started-speech-to-text.md?context=/azure/foundry/context/context?view=foundry)
-- [Text to speech](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/get-started-text-to-speech.md?context=/azure/foundry/context/context?view=foundry)
-- [Text to speech avatar](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/text-to-speech-avatar/batch-synthesis-avatar.md?context=/azure/foundry/context/context?view=foundry)
-- [Voice Live](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/voice-live-quickstart.md?context=/azure/foundry/context/context?view=foundry)
 - [Vision-enabled chats](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/gpt-with-vision?view=foundry)
 - [Image prompt engineering techniques](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/gpt-4-v-prompt-engineering?view=foundry)
 - [Image prompt transformation](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/prompt-transformation?view=foundry)
 - [Video generation (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/video-generation?view=foundry)
-- [Video translation (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/video-translation-get-started.md?context=/azure/foundry/context/context?view=foundry)
 - [Codex](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/codex?view=foundry)
 - [Webhooks](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/webhooks?view=foundry)
 - [Playgrounds and quick evaluation](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/concept-playgrounds?view=foundry)
@@ -198,6 +186,7 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Monitor fleet health and performance](https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/monitoring-across-fleet?view=foundry)
 - [Manage agents at scale](https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/how-to-manage-agents?view=foundry)
 - [Register and manage custom agents](https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/register-custom-agent?view=foundry)
+- [Govern agents as a global administrator](https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/govern-agent-infrastructure-entra-admin?view=foundry)
 - [Enforce token limits](https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/how-to-enforce-limits-models?view=foundry)
 - [Apply a guardrail policy for models](https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/quickstart-create-guardrail-policy?view=foundry)
 - [Optimize cost and performance](https://learn.microsoft.com/en-us/azure/ai-foundry/control-plane/how-to-optimize-cost-performance?view=foundry)
@@ -242,43 +231,34 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Configure Claude Code with Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/configure-claude-code?view=foundry)
 - [Start with an AI template](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/ai-template-get-started?view=foundry)
 - [Playgrounds and quick evaluation](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/concept-playgrounds?view=foundry)
+- [Get started with LangChain and LangGraph in Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/langchain?view=foundry)
+- [Use Foundry Models](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/langchain-models?view=foundry)
+- [Use Foundry Agent Service](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/langchain-agents?view=foundry)
+- [Use Foundry Memory](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/langchain-memory?view=foundry)
+- [Trace with Foundry Observability](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/langchain-traces?view=foundry)
 - [Use declarative agent workflows in the Visual Studio Code extension](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/vs-code-agents-workflow-low-code?view=foundry)
 - [Use hosted agent workflows in the Visual Studio Code extension](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/vs-code-agents-workflow-pro-code?view=foundry)
 - [Get started with Foundry MCP Server](https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/get-started?view=foundry)
 - [Best practices and security guidance](https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/security-best-practices?view=foundry)
 - [Available tools and sample prompts](https://learn.microsoft.com/en-us/azure/ai-foundry/mcp/available-tools?view=foundry)
+- [Use Fireworks models](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/fireworks/enable-fireworks-models?view=foundry)
+- [Import custom models with Fireworks](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/fireworks/import-custom-models?view=foundry)
 
 ## API & SDK
 
 - [Microsoft Foundry SDKs](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/sdk-overview?view=foundry)
 - [Endpoints for Foundry Models](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/endpoints?view=foundry)
-- [C#](https://learn.microsoft.com/en-us/azure/ai-foundry/dotnet/api/overview/azure/ai.projects-readme?view=foundry)
-- [JavaScript](https://learn.microsoft.com/en-us/azure/ai-foundry/javascript/api/overview/azure/ai-projects-readme?view=azure-node-preview?view=foundry)
-- [Python](https://learn.microsoft.com/en-us/azure/ai-foundry/python/api/overview/azure/ai-projects-readme?view=azure-python-preview?view=foundry)
 - [REST API](https://learn.microsoft.com/en-us/azure/ai-foundry/reference/foundry-project?view=foundry)
 - [REST API (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/reference/foundry-project-rest-preview?view=foundry)
 - [API lifecycle](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/api-version-lifecycle?view=foundry)
 - [Dataplane SDK language support](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/supported-languages?view=foundry)
 - [v1 API](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest?view=foundry)
-- [Chat](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-chat-completion?view=foundry)
-- [Embeddings](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-embedding?view=foundry)
-- [Evals (preview)](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-evals?view=foundry)
-- [Files](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-file?view=foundry)
-- [Fine-tuning](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-fine-tuning-job?view=foundry)
-- [Models](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-models?view=foundry)
-- [Responses](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-response?view=foundry)
-- [Vector stores](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-vector-stores?view=foundry)
 - [2024-10-21 API reference](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference?view=foundry)
 - [v1 Preview API](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference-preview-latest?view=foundry)
 - [2025-04-01-preview - Authoring](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/authoring-reference-preview?view=foundry)
 - [2025-04-01-preview - Inference](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference-preview?view=foundry)
-- [REST API (resource creation & deployment)](https://learn.microsoft.com/en-us/azure/ai-foundry/rest/api/aiservices/accountmanagement/deployments/create-or-update?tabs=HTTP?view=foundry)
 - [Azure OpenAI monitoring data reference](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/monitor-openai-reference?view=foundry)
 - [Audio events reference](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/realtime-audio-reference?view=foundry)
-- [Foundry Tools SDKs](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/reference/sdk-package-resources.md?context=/azure/foundry/context/context?view=foundry)
-- [Foundry Tools REST APIs](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/reference/rest-api-resources.md?context=/azure/foundry/context/context?view=foundry)
-- [Azure Resource Manager/Bicep/Terraform](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/templates/microsoft.cognitiveservices/accounts?pivots=deployment-language-bicep?view=foundry)
-- [Azure CLI](https://learn.microsoft.com/en-us/azure/ai-foundry/cli/azure/cognitiveservices?view=azure-cli-latest?view=foundry)
 
 ## Guardrails and controls
 
@@ -292,7 +272,6 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Protected material for code](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/quickstart-protected-material-code?view=foundry)
 - [Protected material for text](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/content-filter-protected-material?view=foundry)
 - [Block lists](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/quickstart-blocklist?view=foundry)
-- [Custom categories](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/concepts/custom-categories.md?context=/azure/foundry/context/context?view=foundry)
 - [Intervention points](https://learn.microsoft.com/en-us/azure/ai-foundry/guardrails/intervention-points?view=foundry)
 - [Default safety policies](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/default-safety-policies?view=foundry)
 - [Safety system messages](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/safety-system-message-templates?view=foundry)
@@ -305,7 +284,6 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Limited access](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/cognitive-services-limited-access?view=foundry)
 - [Overview](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/overview?view=foundry)
 - [Limited access](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/limited-access?view=foundry)
-- [Code of conduct](https://learn.microsoft.com/en-us/azure/ai-foundry/legal/ai-code-of-conduct?view=foundry)
 - [Data, privacy, and security](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/data-privacy?view=foundry)
 - [Customer Copyright Commitment](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/customer-copyright-commitment?view=foundry)
 - [Transparency note](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/agents/transparency-note?view=foundry)
@@ -322,10 +300,8 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 ## Setup & configure
 
 - [Plan rollout](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/planning?view=foundry)
-- [Create your first resource](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/multi-service-resource.md?context=/azure/foundry/context/context?view=foundry)
 - [Create resources using Bicep template](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-resource-template?view=foundry)
 - [Manage resources using Terraform](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-resource-terraform?view=foundry)
-- [Recover or purge deleted resources](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/recover-purge-resources.md?context=/azure/foundry/context/context?view=foundry)
 - [Upgrade from Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/upgrade-azure-openai?view=foundry)
 - [Migrate from Azure AI Inference SDK to OpenAI SDK](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/model-inference-to-openai-migration?view=foundry)
 - [Create and manage projects](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-projects?view=foundry)
@@ -355,8 +331,6 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Network security perimeter](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/add-foundry-to-network-security-perimeter?view=foundry)
 - [Configure customer-managed keys](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/encryption-keys-portal?view=foundry)
 - [Store secrets in your Azure Key Vault](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/set-up-key-vault-connection?view=foundry)
-- [Rotate API access keys](https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/rotate-keys?context=/azure/foundry/context/context?view=foundry)
-- [Built-in policy definitions](https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/policy-reference.md?context=/azure/foundry/context/context?view=foundry)
 - [Built-in policy for model deployment](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/model-deployment-policy?view=foundry)
 - [Create custom policy definitions](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/custom-policy-definition?view=foundry)
 - [High availability and resiliency](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/high-availability-resiliency?view=foundry)
@@ -364,7 +338,6 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Disaster recovery from a platform outage](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/agent-service-platform-disaster-recovery?view=foundry)
 - [Disaster recovery from resource and data loss](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/agent-service-operator-disaster-recovery?view=foundry)
 - [Plan and manage costs](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/manage-costs?view=foundry)
-- [Security baseline](https://learn.microsoft.com/en-us/azure/ai-foundry/security/benchmark/azure/baselines/azure-ai-foundry-security-baseline?view=foundry)
 - [Service architecture](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/architecture?view=foundry)
 - [Data, privacy, and security for Foundry Models sold directly by Azure](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/data-privacy?view=foundry)
 - [Data, privacy, and security for Claude models in Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/claude-models/data-privacy?view=foundry)
@@ -376,14 +349,8 @@ AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 - [Use Microsoft Foundry with a screen reader](https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/screen-reader?view=foundry)
 - [Known issues](https://learn.microsoft.com/en-us/azure/ai-foundry/reference/foundry-known-issues?view=foundry)
 - [Feature availability by region](https://learn.microsoft.com/en-us/azure/ai-foundry/reference/region-support?view=foundry)
-- [Region support](https://azure.microsoft.com/explore/global-infrastructure/products-by-region/)
 - [Model lifecycle and retirement](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/model-lifecycle-retirement?view=foundry)
 - [Azure OpenAI model retirement](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/model-retirements?view=foundry)
-- [Code of conduct](https://learn.microsoft.com/en-us/azure/ai-foundry/legal/ai-code-of-conduct?view=foundry)
-- [Compliance](https://aka.ms/AzureCompliance)
-- [Service Level Agreement (SLA)](https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services)
-- [Azure updates](https://azure.microsoft.com/updates/?filters=%5B%22Azure+AI+Foundry%22%5D#)
-- [Microsoft Foundry pricing](https://azure.microsoft.com/pricing/details/ai-foundry/)
 
 ## Optional
 
