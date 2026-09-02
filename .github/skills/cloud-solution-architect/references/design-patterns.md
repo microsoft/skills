@@ -370,7 +370,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 - You want to limit the attack surface by isolating security checks from the trusted host
 - Compliance requires an explicit security boundary between public and private tiers
 
-**WAF Pillars:** Security
+**WAF Pillars:** Security, Performance Efficiency
 
 **Related patterns:** Valet Key, Gateway Routing, Gateway Offloading, Federated Identity
 
