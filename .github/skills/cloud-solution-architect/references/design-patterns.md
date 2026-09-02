@@ -8,7 +8,7 @@ A comprehensive reference of all 44 cloud design patterns from the Azure Archite
 
 ### Availability / Reliability
 
-Circuit Breaker · Compensating Transaction · Health Endpoint Monitoring · Leader Election · Queue-Based Load Leveling · Retry · Saga · Scheduler Agent Supervisor · Sequential Convoy · Bulkhead · Rate Limiting
+Circuit Breaker · Compensating Transaction · Health Endpoint Monitoring · Leader Election · Queue-Based Load Leveling · Retry · Saga · Scheduler Agent Supervisor · Sequential Convoy · Bulkhead · Rate Limiting · Idempotent Consumer
 
 ### Data Management
 
@@ -20,11 +20,11 @@ Ambassador · Anti-Corruption Layer · Backends for Frontends · Compute Resourc
 
 ### Messaging
 
-Asynchronous Request-Reply · Choreography · Claim Check · Competing Consumers · Messaging Bridge · Pipes and Filters · Priority Queue · Publisher/Subscriber · Queue-Based Load Leveling · Sequential Convoy
+Asynchronous Request-Reply · Choreography · Claim Check · Competing Consumers · Idempotent Consumer · Messaging Bridge · Pipes and Filters · Priority Queue · Publisher/Subscriber · Queue-Based Load Leveling · Sequential Convoy
 
 ### Performance / Scalability
 
-Cache-Aside · Geode · Throttling · Deployment Stamps · CQRS
+Cache-Aside · Geode · Throttling · Deployment Stamps · CQRS · Static Content Hosting
 
 ### Security
 
@@ -300,26 +300,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 15. Edge Workload Configuration
-
-**Centrally configure workloads that run at the edge, managing configuration drift and deployment consistency across heterogeneous edge devices.**
-
-**Problem:** Edge devices are numerous, heterogeneous, and often intermittently connected. Deploying and configuring workloads individually is error-prone. Configuration drift between devices causes inconsistent behavior and difficult debugging.
-
-**When to use:**
-
-- You manage a fleet of edge devices running the same workload with differing local parameters
-- Edge devices have intermittent connectivity and must operate independently
-- You need a central source of truth for configuration with local overrides
-- Audit and compliance require tracking which configuration each device is running
-
-**WAF Pillars:** Operational Excellence
-
-**Related patterns:** External Configuration Store, Sidecar, Ambassador
-
----
-
-### 16. Event Sourcing
+### 15. Event Sourcing
 
 **Use an append-only store to record the full series of events that describe actions taken on data in a domain.**
 
@@ -338,7 +319,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 17. External Configuration Store
+### 16. External Configuration Store
 
 **Move configuration information out of the application deployment package to a centralized location.**
 
@@ -353,11 +334,11 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 **WAF Pillars:** Operational Excellence
 
-**Related patterns:** Edge Workload Configuration, Sidecar
+**Related patterns:** Sidecar, Cache-Aside
 
 ---
 
-### 18. Federated Identity
+### 17. Federated Identity
 
 **Delegate authentication to an external identity provider.**
 
@@ -376,7 +357,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 19. Gatekeeper
+### 18. Gatekeeper
 
 **Protect applications and services by using a dedicated host instance that acts as a broker between clients and the application or service.**
 
@@ -395,7 +376,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 20. Gateway Aggregation
+### 19. Gateway Aggregation
 
 **Use a gateway to aggregate multiple individual requests into a single request.**
 
@@ -414,7 +395,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 21. Gateway Offloading
+### 20. Gateway Offloading
 
 **Offload shared or specialized service functionality to a gateway proxy.**
 
@@ -433,7 +414,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 22. Gateway Routing
+### 21. Gateway Routing
 
 **Route requests to multiple services using a single endpoint.**
 
@@ -452,7 +433,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 23. Geode
+### 22. Geode
 
 **Deploy backend services into a set of geographical nodes, each of which can service any client request in any region.**
 
@@ -471,7 +452,7 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 
 ---
 
-### 24. Health Endpoint Monitoring
+### 23. Health Endpoint Monitoring
 
 **Implement functional checks in an application that external tools can access through exposed endpoints at regular intervals.**
 
@@ -487,6 +468,32 @@ Gatekeeper · Quarantine · Valet Key · Federated Identity · Throttling
 **WAF Pillars:** Reliability, Operational Excellence, Performance Efficiency
 
 **Related patterns:** Circuit Breaker, Retry, Ambassador
+
+---
+
+### 24. Idempotent Consumer
+
+**Design message consumers so that processing the same message more than once has the same effect as processing it once.**
+
+**Problem:** Most message brokers guarantee at-least-once delivery. Duplicates arise from producer retries, redelivery after a missing acknowledgment, or consumer failures mid-processing. Exactly-once delivery is impractical to guarantee across a distributed system, so without duplicate resilience, reprocessing a message can create duplicate records, double-charge a customer, or have other unwanted effects.
+
+**When to use:**
+
+- You consume messages from a broker with at-least-once delivery (the default for most brokers)
+- Reprocessing a message produces incorrect results, such as duplicate financial transactions, duplicate resource creation, or repeated notifications
+- Multiple competing consumers process the same channel, making concurrent duplicate delivery likely
+- The same unit of work can run more than once outside messaging too — scheduled jobs that overlap, webhook endpoints, ETL and stream replays resumed from a checkpoint
+
+**Implementation notes:**
+
+- Prefer naturally idempotent operations first (upserts keyed on a business identifier, absolute-value writes); add a deduplication store only for operations that can't be made naturally idempotent
+- Key deduplication on a stable identifier that survives redelivery (Service Bus `MessageId`, CloudEvents `source` + `id`), not transport-level identifiers that change between duplicates
+- Commit the deduplication marker and the business side effects in the same transaction (the *inbox pattern*), and guard concurrent duplicates with a unique constraint at the data store
+- Retain deduplication records at least as long as the broker can redeliver the message, and propagate idempotency keys to downstream calls
+
+**WAF Pillars:** Reliability
+
+**Related patterns:** Competing Consumers, Retry, Queue-Based Load Leveling, Saga
 
 ---
 
