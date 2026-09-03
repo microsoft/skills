@@ -6,6 +6,12 @@
         "type": "command",
         "command": "bash ${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh"
       }
+    ],
+    "afterMCPExecution": [
+      {
+        "type": "command",
+        "command": "bash ${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh"
+      }
     ]
   }
 }

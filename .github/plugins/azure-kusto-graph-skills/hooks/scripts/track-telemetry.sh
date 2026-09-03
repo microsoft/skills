@@ -19,6 +19,13 @@
 #   - Skill prefix:   azure:<skill-name>  (e.g., azure:azure-prepare)
 #   - Detection:      has "hook_event_name", tool_use_id does NOT contain "__vscode"
 #
+# Cursor:
+#   - Field names:    snake_case (tool_name, session_id, tool_input, hook_event_name)
+#   - Tool names:     PascalCase for file reads (Read); raw MCP tool name from afterMCPExecution
+#   - Skill paths:    .cursor/plugins/cache/<catalog>/azure/<revision>/skills/<name>/SKILL.md
+#   - Detection:      has "hook_event_name" and "cursor_version"
+#   - MCP detection:  afterMCPExecution event with mcp_server_name "azure"
+#
 # VS Code:
 #   - Field names:    snake_case (tool_name, session_id, tool_input, hook_event_name)
 #   - Tool names:     snake_case (read_file, replace_string_in_file)
@@ -44,7 +51,8 @@
 #
 # 2. tool_invocation
 #    - Triggered when: a tool matching an Azure MCP prefix is called
-#      (azure-*, mcp__plugin_azure_azure__*, mcp_azure_mcp_*)
+#      (azure-*, mcp__plugin_azure_azure__*, mcp_azure_mcp_*), or when Cursor
+#      sends afterMCPExecution with mcp_server_name "azure"
 #    - Tracked field: --tool-name <toolName>
 #
 # 3. reference_file_read
@@ -68,8 +76,8 @@
 #
 # === Reference File Detection ===
 #
-# When a file read tool is invoked (Copilot CLI: "view", Claude Code: "Read",
-# VS Code: "read_file"), the script extracts the file path from the tool input
+# When a file read tool is invoked (Copilot CLI: "view", Claude Code/Cursor:
+# "Read", VS Code: "read_file"), the script extracts the file path from the tool input
 # and checks if it falls within a recognized azure-skills folder:
 #
 #   Path field lookup order:
@@ -84,10 +92,12 @@
 #       match the plugin's own name, "azure")
 #     - .claude/plugins/cache/azure-skills/azure/<version>/skills/...
 #     - .claude/plugins/cache/claude-plugins-official/azure/<version>/skills/...
+#     - .cursor/plugins/cache/<catalog-name>/azure/<revision>/skills/...
 #     - .vscode/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-skills/skills/...
 #     azure-kusto-graph-skills:
 #     - .copilot/installed-plugins/<catalog-name>/azure-kusto-graph-skills/skills/...
 #     - .claude/plugins/cache/azure-skills/azure-kusto-graph-skills/<version>/skills/...
+#     - .cursor/plugins/cache/<catalog-name>/azure-kusto-graph-skills/<revision>/skills/...
 #     - .vscode/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-kusto-graph-skills/skills/...
 #     shared:
 #     - .agents/skills/...
@@ -260,6 +270,8 @@ write_raw_input_to_file "$rawInput"
 # Support Copilot CLI (camelCase), Claude Code (snake_case), and VS Code (snake_case) formats
 toolName=$(extract_json_field "$rawInput" "toolName")
 sessionId=$(extract_json_field "$rawInput" "sessionId")
+hookEventName=$(extract_json_field "$rawInput" "hook_event_name")
+mcpServerName=$(extract_json_field "$rawInput" "mcp_server_name")
 
 # Fall back to Claude Code / VS Code snake_case field names
 if [ -z "$toolName" ]; then
@@ -329,11 +341,13 @@ is_azure_skills_path() {
     [[ "$p" == *".copilot/installed-plugins/"*"/azure/skills/"* ]] && return 0
     [[ "$p" == *".claude/plugins/cache/azure-skills/azure/"*"/skills/"* ]] && return 0
     [[ "$p" == *".claude/plugins/cache/claude-plugins-official/azure/"*"/skills/"* ]] && return 0
+    [[ "$p" == *".cursor/plugins/cache/"*"/azure/"*"/skills/"* ]] && return 0
     [[ "$p" == *"agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-skills/skills/"* ]] && return 0
 
     # --- azure-kusto-graph-skills plugin ---
     [[ "$p" == *".copilot/installed-plugins/"*"/azure-kusto-graph-skills/skills/"* ]] && return 0
     [[ "$p" == *".claude/plugins/cache/azure-skills/azure-kusto-graph-skills/"*"/skills/"* ]] && return 0
+    [[ "$p" == *".cursor/plugins/cache/"*"/azure-kusto-graph-skills/"*"/skills/"* ]] && return 0
     [[ "$p" == *"agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-kusto-graph-skills/skills/"* ]] && return 0
 
     # --- shared across all plugins ---
@@ -394,9 +408,16 @@ fi
 # Check for Azure MCP tool invocation
 # Copilot CLI:  "azure-*" prefix (e.g., azure-documentation)
 # Claude Code:  "mcp__plugin_azure_azure__*" prefix (e.g., mcp__plugin_azure_azure__documentation)
+# Cursor:       afterMCPExecution with mcp_server_name "azure"; normalize the
+#               raw tool name to the postToolUse form (e.g., MCP:get_azure_bestpractices)
 # VS Code:      "mcp_azure_mcp_*" prefix (e.g., mcp_azure_mcp_documentation)
 if [ -n "$toolName" ]; then
-    if [[ "$toolName" == azure-* ]] || [[ "$toolName" == mcp__plugin_azure_azure__* ]] || [[ "$toolName" == mcp_azure_mcp_* ]]; then
+    if [ "$clientName" = "cursor" ] && [ "$hookEventName" = "afterMCPExecution" ] && [ "$mcpServerName" = "azure" ]; then
+        azureToolName="$toolName"
+        [[ "$azureToolName" == MCP:* ]] || azureToolName="MCP:$azureToolName"
+        eventType="tool_invocation"
+        shouldTrack=true
+    elif [[ "$toolName" == azure-* ]] || [[ "$toolName" == mcp__plugin_azure_azure__* ]] || [[ "$toolName" == mcp_azure_mcp_* ]]; then
         azureToolName="$toolName"
         eventType="tool_invocation"
         shouldTrack=true
@@ -466,4 +487,3 @@ fi
 
 # Output success to stdout (required by hooks)
 return_success
-
