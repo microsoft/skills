@@ -54,6 +54,30 @@ For Azure Cosmos DB work, load the `azure-cosmos-db-py` skill.
 For FastAPI endpoints, load the `fastapi-router-py` skill.
 ```
 
+## Autohand Code Discovery
+
+Autohand Code discovers skills from user-level and project-level skill directories:
+
+```text
+~/.autohand/skills/<skill>/
+<project>/.autohand/skills/<skill>/
+```
+
+Use the cataloged overview skill when you want high-level Microsoft SDK grounding:
+
+```bash
+autohand --skill-install microsoft-skills
+autohand --skill-install microsoft-skills --project
+```
+
+For a specific repository skill, copy or symlink only the skill directories relevant to the current project:
+
+```bash
+git clone https://github.com/microsoft/skills.git microsoft-skills
+mkdir -p your-project/.autohand/skills
+cp -r microsoft-skills/.github/skills/azure-cosmos-db-py your-project/.autohand/skills/
+```
+
 ## Progressive Disclosure
 
 Skills use a three-tier loading strategy to manage context efficiently:
@@ -131,8 +155,13 @@ npx skills add microsoft/agent-skills
 # Copy specific skills
 cp -r agent-skills/.github/skills/azure-cosmos-db-py your-project/.github/skills/
 
+# Copy specific skills for Autohand Code
+mkdir -p your-project/.autohand/skills
+cp -r agent-skills/.github/skills/azure-cosmos-db-py your-project/.autohand/skills/
+
 # Or symlink for multi-project setups
 ln -s /path/to/agent-skills/.github/skills/mcp-builder /path/to/your-project/.github/skills/mcp-builder
+ln -s /path/to/agent-skills/.github/skills/mcp-builder /path/to/your-project/.autohand/skills/mcp-builder
 ```
 
 ## Skill Naming Convention
