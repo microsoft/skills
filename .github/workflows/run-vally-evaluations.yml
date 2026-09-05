@@ -35,11 +35,11 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_COPILOT_API_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
 
@@ -50,13 +50,13 @@ jobs:
         run: npm install -g @microsoft/vally-cli@0.10.0
 
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           toolchain: stable
           override: true
 
       - name: Cache Rust dependencies and build outputs
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: |
             tests/scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure -> target
@@ -191,7 +191,7 @@ jobs:
 
       - name: Upload Vally artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: vally-results
           path: |
