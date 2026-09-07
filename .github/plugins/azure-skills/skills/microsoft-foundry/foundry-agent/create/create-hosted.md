@@ -52,6 +52,8 @@ Capture the selected sample's `manifestUrl`.
 
 You should pick only one sample for `azd ai agent init`, but you can browse multiple samples relevant to the user's task as code references.
 
+> **Important:** When users want to create or continue working on LangChain/LangGraph agents, you MUST read and follow [LangChain and LangGraph hosting](references/langchain-langgraph-hosting.md) before selecting a sample or changing agent code.
+
 ## Workflow
 
 ### Step 1 -- Verify the environment

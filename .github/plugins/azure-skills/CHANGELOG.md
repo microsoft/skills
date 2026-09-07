@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.41
+
+- fix: improve langchain-azure-ai migration ([#3160](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3160))
+
 ## 1.2.40
 
 - chore: clean duplicate trigger words in Foundry Skill description ([#3145](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3145))
