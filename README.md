@@ -59,7 +59,7 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 | Resource | Description |
 |----------|-------------|
-| **[174 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
+| **[175 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
 | **[Plugins](#plugins)** | Installable plugin packages (deep-wiki, azure-skills and more) |
 | **[Custom Agents](#agents)** | Role-specific agents (backend, frontend, infrastructure, planner) |
 | **[AGENTS.md](AGENTS.md)** | Template for configuring agent behavior in your projects |
@@ -90,6 +90,7 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 | Skill | Description |
 |-------|-------------|
+| [aident-skill](.github/skills/aident-skill/) | Use Aident Loadout to connect your AI agents to 1,000+ real-world apps and tools like Gmail, Slack, Linear, Notion, Firecrawl, and Fal, unlock 27,000+ executable actions, and track full audit history so your agents can get real work done reliably. |
 | [cloud-solution-architect](.github/skills/cloud-solution-architect/) | Design well-architected Azure cloud systems. Architecture styles, 44 design patterns, technology choices, mission-critical design, WAF pillars. |
 | [copilot-sdk](.github/skills/copilot-sdk/) | Build applications powered by GitHub Copilot using the Copilot SDK. Session management, custom tools, streaming, hooks, MCP servers, BYOK, deployment patterns. |
 | [debugview](.github/skills/debugview/) | Sysinternals DebugView CLI — capture and analyze usermode/kernel-mode Windows debug output. Bounded execution, filtering, boot logging, remote monitoring. |

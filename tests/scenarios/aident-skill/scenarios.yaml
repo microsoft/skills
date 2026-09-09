@@ -1,0 +1,79 @@
+# Test scenarios for aident-skill evaluation
+# Each scenario tests the agent workflow for operating Aident-managed integrations.
+
+config:
+  model: gpt-4
+  max_tokens: 2000
+  temperature: 0.3
+
+scenarios:
+  - name: operate_connected_integration
+    prompt: |
+      I want to post "Deploy is complete" to Slack through Aident.
+      Explain the exact agent workflow you would follow before executing it.
+    expected_patterns:
+      - "aident capabilities search"
+      - "aident capabilities get"
+      - "aident vault status"
+      - "aident capabilities execute"
+      - "aident audit recent"
+      - "Vault connected state"
+    forbidden_patterns:
+      - "raw Slack"
+      - "process.env.SLACK"
+      - "aident-loadout"
+    tags:
+      - cli
+      - integrations
+      - vault
+    mock_response: |
+      I would use `aident-skill` with the Aident CLI because this host can run shell commands.
+
+      1. Discover the right Slack capability:
+         `aident capabilities search --query "post Slack message" --json`
+      2. Inspect the live schema before creating input:
+         `aident capabilities get --name slack_tools.slack_post_message --json`
+      3. Confirm Slack is connected in Aident Vault:
+         `aident vault status --integrationIds slack_tools --json`
+      4. If Vault shows Slack is disconnected, ask the user to connect it through Aident:
+         `aident vault connect --integrationId slack_tools --json`
+      5. Execute only after the schema and Vault connected state are verified:
+         `aident capabilities execute --name slack_tools.slack_post_message --input '{"channel":"#team","text":"Deploy is complete"}' --json`
+      6. If the user wants proof, check audit history:
+         `aident audit recent --limit 20 --json`
+
+      I would not ask for a Slack API token because Aident Vault manages the connection.
+
+  - name: vscode_copilot_mcp_setup
+    prompt: |
+      Configure Aident MCP for GitHub Copilot in VS Code.
+      Show the MCP config snippet and the setup caveats.
+    expected_patterns:
+      - ".vscode/mcp.json"
+      - "https://loadout.aident.ai/mcp"
+      - "\"type\": \"http\""
+      - "\"url\": \"https://loadout.aident.ai/mcp\""
+      - "browser OAuth"
+      - "https://aident.ai/SETUP.md"
+    forbidden_patterns:
+      - "aident-loadout"
+      - "AIDENT_TOKEN"
+    tags:
+      - mcp
+      - vscode
+      - copilot
+    mock_response: |
+      For GitHub Copilot in VS Code, add Aident to `.vscode/mcp.json`:
+
+      ```json
+      {
+        "servers": {
+          "aident": {
+            "type": "http",
+            "url": "https://loadout.aident.ai/mcp"
+          }
+        }
+      }
+      ```
+
+      On first use, the MCP client should open a browser OAuth flow. If Aident has not been set up for this agent environment yet, fetch and follow `https://aident.ai/SETUP.md` first. After connection, use Aident Vault integrations rather than asking for a provider API key.
