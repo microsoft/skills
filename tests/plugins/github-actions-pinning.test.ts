@@ -40,11 +40,15 @@ function findMutableActionReferences(source: string, content: string): string[] 
   let inYamlFence = !isMarkdown;
 
   for (const [index, line] of content.split(/\r?\n/u).entries()) {
-    if (isMarkdown && /^```ya?ml\s*$/iu.test(line.trim())) {
+    const normalizedLine = isMarkdown
+      ? line.replace(/^\s*(?:>\s*)+/u, "")
+      : line;
+
+    if (isMarkdown && /^```ya?ml\s*$/iu.test(normalizedLine.trim())) {
       inYamlFence = true;
       continue;
     }
-    if (isMarkdown && inYamlFence && /^```\s*$/u.test(line.trim())) {
+    if (isMarkdown && inYamlFence && /^```\s*$/u.test(normalizedLine.trim())) {
       inYamlFence = false;
       continue;
     }
@@ -52,7 +56,9 @@ function findMutableActionReferences(source: string, content: string): string[] 
       continue;
     }
 
-    const match = line.match(/^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?(?:\s+#.*)?$/u);
+    const match = normalizedLine.match(
+      /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?(?:\s+#.*)?$/u,
+    );
     const reference = match?.[1];
     if (
       !reference ||
@@ -97,6 +103,18 @@ describe("GitHub Actions supply-chain pinning", () => {
       [],
       "fixture.md",
     ],
+    [
+      "rejects mutable references in blockquoted Markdown YAML fences",
+      ["> ```yaml", "> steps:", ">   - uses: actions/checkout@v4", "> ```"].join("\n"),
+      ["prompt.md:3: actions/checkout@v4"],
+      "prompt.md",
+    ],
+    [
+      "ignores blockquoted YAML without GitHub actions",
+      ["> ```yaml", "> - uses: aadApp/create", "> ```"].join("\n"),
+      [],
+      "prompt.md",
+    ],
   ])("%s", (_name, content, expected, source = "fixture.yml") => {
     expect(findMutableActionReferences(source, content)).toEqual(expected);
   });
@@ -112,6 +130,11 @@ describe("GitHub Actions supply-chain pinning", () => {
         join(repoRoot, ".github", "plugins"),
         distributedExtensions,
         (path) => extname(path) === ".md" || isDistributedPluginYaml(path),
+      ),
+      ...collectFiles(
+        join(repoRoot, ".github", "prompts"),
+        new Set([".md"]),
+        () => true,
       ),
       ...collectFiles(
         join(repoRoot, "tests", "scenarios"),
