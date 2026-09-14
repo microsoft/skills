@@ -34,6 +34,68 @@ function isDistributedPluginYaml(path: string): boolean {
     .some((segment) => distributedDirectoryNames.has(segment));
 }
 
+function isYamlCodePosition(line: string, index: number): boolean {
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+  let escaped = false;
+
+  for (let position = 0; position < index; position += 1) {
+    const character = line[position];
+
+    if (inDoubleQuote) {
+      if (escaped) {
+        escaped = false;
+      } else if (character === "\\") {
+        escaped = true;
+      } else if (character === '"') {
+        inDoubleQuote = false;
+      }
+      continue;
+    }
+
+    if (inSingleQuote) {
+      if (character === "'" && line[position + 1] === "'") {
+        position += 1;
+      } else if (character === "'") {
+        inSingleQuote = false;
+      }
+      continue;
+    }
+
+    if (character === "#") {
+      return false;
+    }
+    if (character === "'") {
+      inSingleQuote = true;
+    } else if (character === '"') {
+      inDoubleQuote = true;
+    }
+  }
+
+  return !inSingleQuote && !inDoubleQuote;
+}
+
+function findActionReferences(line: string): string[] {
+  const references = new Set<string>();
+  const blockReference = line.match(
+    /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?\s*(?:#.*)?$/u,
+  )?.[1];
+  if (blockReference) {
+    references.add(blockReference);
+  }
+
+  const flowReferencePattern =
+    /(?:^|[,{]\s*)["']?uses["']?\s*:\s*["']?([^"'#,\]}\s]+)["']?/gu;
+  for (const match of line.matchAll(flowReferencePattern)) {
+    const usesIndex = (match.index ?? 0) + match[0].indexOf("uses");
+    if (match[1] && isYamlCodePosition(line, usesIndex)) {
+      references.add(match[1]);
+    }
+  }
+
+  return [...references];
+}
+
 function findMutableActionReferences(source: string, content: string): string[] {
   const findings: string[] = [];
   const isMarkdown = extname(source) === ".md";
@@ -56,21 +118,18 @@ function findMutableActionReferences(source: string, content: string): string[] 
       continue;
     }
 
-    const match = normalizedLine.match(
-      /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?\s*(?:#.*)?$/u,
-    );
-    const reference = match?.[1];
-    if (
-      !reference ||
-      !reference.includes("@") ||
-      reference.startsWith("./") ||
-      reference.startsWith("docker://") ||
-      fullShaReference.test(reference)
-    ) {
-      continue;
-    }
+    for (const reference of findActionReferences(normalizedLine)) {
+      if (
+        !reference.includes("@") ||
+        reference.startsWith("./") ||
+        reference.startsWith("docker://") ||
+        fullShaReference.test(reference)
+      ) {
+        continue;
+      }
 
-    findings.push(`${source}:${index + 1}: ${reference}`);
+      findings.push(`${source}:${index + 1}: ${reference}`);
+    }
   }
 
   return findings;
@@ -87,6 +146,16 @@ describe("GitHub Actions supply-chain pinning", () => {
       "rejects mutable external references with trailing whitespace",
       "uses: actions/checkout@v4 ",
       ["fixture.yml:1: actions/checkout@v4"],
+    ],
+    [
+      "rejects mutable references in flow-style mappings",
+      "steps: [{ uses: actions/checkout@v4 }]",
+      ["fixture.yml:1: actions/checkout@v4"],
+    ],
+    [
+      "ignores flow-style syntax inside quoted prose",
+      'message: "steps: [{ uses: actions/checkout@v4 }]"',
+      [],
     ],
     [
       "accepts full commit SHAs",
