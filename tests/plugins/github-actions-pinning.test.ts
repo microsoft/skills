@@ -57,7 +57,7 @@ function findMutableActionReferences(source: string, content: string): string[] 
     }
 
     const match = normalizedLine.match(
-      /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?(?:\s+#.*)?$/u,
+      /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?\s*(?:#.*)?$/u,
     );
     const reference = match?.[1];
     if (
@@ -81,6 +81,11 @@ describe("GitHub Actions supply-chain pinning", () => {
     [
       "rejects mutable external references",
       "uses: actions/checkout@v4",
+      ["fixture.yml:1: actions/checkout@v4"],
+    ],
+    [
+      "rejects mutable external references with trailing whitespace",
+      "uses: actions/checkout@v4 ",
       ["fixture.yml:1: actions/checkout@v4"],
     ],
     [
