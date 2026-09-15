@@ -536,6 +536,11 @@ provider: { type: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: pro
 provider: { type: "openai", baseUrl: "http://localhost:11434/v1" }
 ```
 
+**OrcaRouter (OpenAI-compatible gateway):**
+```typescript
+provider: { type: "openai", baseUrl: "https://api.orcarouter.ai/v1", apiKey: process.env.ORCAROUTER_API_KEY }
+```
+
 ### Provider Config Reference
 
 | Field | Type | Description |
