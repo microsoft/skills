@@ -29,6 +29,12 @@ Examples: -SkillPattern '*-rust', -SkillPattern 'azure-ai-*'
 .PARAMETER Workers
 Number of parallel experiment runs. Defaults to 1 (sequential).
 
+.PARAMETER Model
+Generator model used for every experiment variant. Defaults to gpt-5.6-terra.
+
+.PARAMETER GraderModel
+Model used by prompt graders. Defaults to claude-sonnet-4.6.
+
 .PARAMETER DryRun
 If set, shows what experiments would be run without actually running them.
 
@@ -81,6 +87,14 @@ param(
     [Parameter(Mandatory = $false)]
     [ValidateRange(1, 128)]
     [int]$Workers = 1,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]$Model = "gpt-5.6-terra",
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]$GraderModel = "claude-sonnet-4.6",
     
     [Parameter(Mandatory = $false)]
     [switch]$DryRun,
@@ -1003,13 +1017,15 @@ if ($skillDirs.Count -eq 0) {
 if ($DryRun) {
     Write-Information ""
     Write-Information "DRY RUN - Would execute the following experiments:"
+    Write-Information "  Generator Model: $Model"
+    Write-Information "  Grader Model: $GraderModel"
     foreach ($skillDir in $skillDirs) {
         Write-Information "  - $($skillDir.Name): $(Join-Path $skillDir.FullName 'vally' 'skill_effectiveness_experiment.yaml')"
     }
     exit 0
 }
 
-# Validate vally is available via pnpm after dry-run check
+# Validate the package-local Vally executable after the dry-run check.
 $vallyExeUnix = Join-Path $PSScriptRoot "node_modules/.bin/vally"
 $vallyExeWindows = Join-Path $PSScriptRoot "node_modules/.bin/vally.cmd"
 if (Test-Path -LiteralPath $vallyExeWindows) {
@@ -1020,89 +1036,11 @@ if (Test-Path -LiteralPath $vallyExeWindows) {
     $vallyExe = $null
 }
 if (-not $vallyExe) {
-    Write-Error "vally command not found. Please install @microsoft/vally via pnpm."
+    Write-Error "Vally CLI not found. Install test dependencies with npm or pnpm."
     exit 1
 }
 
-# Use package-local binary via pnpm
-$vallyCmd = "pnpm", "--dir", $PSScriptRoot, "exec", "vally"
-
 Write-Information "Vally: $vallyExe"
-
-# Detect and build the shared rust-cargo-build-failure grader plugin if any experiment uses it
-$customGraderPluginDir = Join-Path $PSScriptRoot "scenarios/_shared/vally/grader-plugins/rust-cargo-build-failure"
-$customGraderSource = Join-Path $customGraderPluginDir "index.ts"
-$customGraderPackage = Join-Path $customGraderPluginDir "package.json"
-$customGraderTsConfig = Join-Path $customGraderPluginDir "tsconfig.json"
-$customGraderDistEntry = Join-Path $customGraderPluginDir "dist/index.js"
-
-$requiresRustCustomGrader = $false
-foreach ($skillDir in $skillDirs) {
-    $vallyFiles = Get-ChildItem -Path (Join-Path $skillDir.FullName "vally") -Filter "*.yaml" -ErrorAction SilentlyContinue
-    foreach ($vallyFile in $vallyFiles) {
-        $match = Select-String -Path $vallyFile.FullName -Pattern 'type:\s*rust-cargo-build-failure-check' -CaseSensitive:$false -ErrorAction SilentlyContinue
-        if ($match) {
-            $requiresRustCustomGrader = $true
-            break
-        }
-    }
-    if ($requiresRustCustomGrader) { break }
-}
-
-if ($requiresRustCustomGrader) {
-    if (-not (Test-Path $customGraderPluginDir)) {
-        Write-Error "Custom grader plugin directory not found: $customGraderPluginDir"
-        exit 1
-    }
-
-    $customGraderRebuildReasons = @()
-    if (-not (Test-Path $customGraderDistEntry)) {
-        $customGraderRebuildReasons += "dist/index.js is missing"
-    }
-    else {
-        $distTime = (Get-Item $customGraderDistEntry).LastWriteTimeUtc
-        foreach ($sourcePath in @($customGraderSource, $customGraderTsConfig, $customGraderPackage)) {
-            if (Test-Path $sourcePath) {
-                $sourceTime = (Get-Item $sourcePath).LastWriteTimeUtc
-                if ($sourceTime -gt $distTime) {
-                    $customGraderRebuildReasons += "$(Split-Path -Leaf $sourcePath) is newer than dist/index.js"
-                }
-            }
-        }
-    }
-
-    if ($customGraderRebuildReasons.Count -gt 0) {
-        Write-Host "Custom grader plugin rebuild required: $($customGraderRebuildReasons -join '; ')"
-
-        $buildOutput = $null
-        $buildExitCode = 1
-
-        $pnpmCmd = Get-Command pnpm -ErrorAction SilentlyContinue
-        if ($pnpmCmd) {
-            Write-Host "Rebuilding custom grader plugin via pnpm exec tsc..."
-            $buildOutput = & pnpm --dir $PSScriptRoot exec tsc --project $customGraderTsConfig 2>&1
-            $buildExitCode = $LASTEXITCODE
-        }
-        else {
-            Write-Host "pnpm not found; rebuilding custom grader plugin via npx tsc..."
-            $buildOutput = & npx tsc --project $customGraderTsConfig 2>&1
-            $buildExitCode = $LASTEXITCODE
-        }
-
-        if ($buildExitCode -ne 0 -or -not (Test-Path $customGraderDistEntry)) {
-            if ($buildOutput) {
-                $buildOutput | ForEach-Object { Write-Error $_ }
-            }
-            Write-Error "Failed to build custom grader plugin at $customGraderPluginDir"
-            exit 1
-        }
-
-        Write-Host "Custom grader plugin rebuilt successfully."
-    }
-    else {
-        Write-Host "Custom grader plugin is up to date."
-    }
-}
 
 # Create results directory with timestamp
 $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH-mm-ss-fff") + "Z"
@@ -1112,6 +1050,8 @@ New-Item -ItemType Directory -Path $experimentResultsDir -Force | Out-Null
 Write-Information ""
 Write-Information "Results Directory: $experimentResultsDir"
 Write-Information "Parallel Workers: $Workers"
+Write-Information "Generator Model: $Model"
+Write-Information "Grader Model: $GraderModel"
 Write-Information ""
 
 # Track results and timing
@@ -1124,7 +1064,7 @@ $skillTimings = @()  # Track timings for ETA calculation
 
 # Execute experiments
 $scriptBlock = {
-    param($SkillDir, $ExperimentResultsDir, $ResultsRoot, $SkillIndex, $TotalSkills, $TestsRoot, $RequiresRustCustomGrader, $CustomGraderPluginDir)
+    param($SkillDir, $ExperimentResultsDir, $ResultsRoot, $SkillIndex, $TotalSkills, $VallyExe, $Model, $GraderModel)
     
     $skillName = $SkillDir.Name
     $vallyDir = Join-Path $SkillDir.FullName "vally"
@@ -1138,9 +1078,13 @@ $scriptBlock = {
         # Note: vally experiment run expects to be run from the scenario directory
         Push-Location $vallyDir
         try {
-            $vallyArgs = @("experiment", "run", "skill_effectiveness_experiment.yaml", "--output-dir", $skillOutputRoot)
-            if ($RequiresRustCustomGrader) { $vallyArgs += @("--grader-plugin", $CustomGraderPluginDir) }
-            $output = & pnpm --dir $TestsRoot exec vally @vallyArgs 2>&1
+            $vallyArgs = @(
+                "experiment", "run", "skill_effectiveness_experiment.yaml",
+                "--output-dir", $skillOutputRoot,
+                "--param", "MODEL=$Model",
+                "--param", "GRADER_MODEL=$GraderModel"
+            )
+            $output = & $VallyExe @vallyArgs 2>&1
             $exitCode = $LASTEXITCODE
         }
         finally {
@@ -1322,15 +1266,26 @@ $scriptBlock = {
         }
 
         if (($null -ne $baselineScore) -and ($null -ne $skillScore)) {
-            $delta = [double]$skillScore - [double]$baselineScore
+            $delta = [math]::Round(([double]$skillScore - [double]$baselineScore), 1)
         }
         
         if ($succeeded) {
             # Format impact indicator with efficiency metrics
             $impactStr = ""
             if ($delta -ne $null) {
-                $impactDirection = if ($delta -ge 0) { "↑" } else { "↓" }
-                $impactStr = " [baseline: $($baselineScore.ToString('F1'))% → skill: $($skillScore.ToString('F1'))% $impactDirection $($delta.ToString('+0.0;-0.0'))%]"
+                if ($delta -gt 0) {
+                    $impactDirection = "↑"
+                    $deltaText = "+$($delta.ToString('F1'))"
+                }
+                elseif ($delta -lt 0) {
+                    $impactDirection = "↓"
+                    $deltaText = $delta.ToString('F1')
+                }
+                else {
+                    $impactDirection = "="
+                    $deltaText = "0.0"
+                }
+                $impactStr = " [baseline: $($baselineScore.ToString('F1'))% → skill: $($skillScore.ToString('F1'))% $impactDirection $deltaText%]"
             }
             elseif ($skillScore) {
                 $impactStr = " [skill: $($skillScore.ToString('F1'))%]"
@@ -1417,7 +1372,7 @@ if ($Workers -eq 1) {
     foreach ($skillDir in $skillDirs) {
         $skillIndex++
 
-        $result = & $scriptBlock $skillDir $experimentResultsDir $ResultsRoot $skillIndex $totalSkills $PSScriptRoot $requiresRustCustomGrader $customGraderPluginDir
+        $result = & $scriptBlock $skillDir $experimentResultsDir $ResultsRoot $skillIndex $totalSkills $vallyExe $Model $GraderModel
         $results += $result
         $skillTimings += $result.Duration
 
@@ -1468,13 +1423,13 @@ else {
             [scriptblock]$RunnerScript,
 
             [Parameter(Mandatory = $true)]
-            [string]$TestsRoot,
+            [string]$VallyExe,
 
-            [Parameter(Mandatory = $false)]
-            [bool]$RequiresRustCustomGrader = $false,
+            [Parameter(Mandatory = $true)]
+            [string]$Model,
 
-            [Parameter(Mandatory = $false)]
-            [string]$CustomGraderPluginDir = ""
+            [Parameter(Mandatory = $true)]
+            [string]$GraderModel
         )
 
         if ($Queue.Count -eq 0) {
@@ -1482,7 +1437,7 @@ else {
         }
 
         $nextSkillDir = $Queue.Dequeue()
-        $newJob = Start-Job -ScriptBlock $RunnerScript -ArgumentList $nextSkillDir, $ExpResultsDir, $ResRoot, $NextIndex, $TotalCount, $TestsRoot, $RequiresRustCustomGrader, $CustomGraderPluginDir
+        $newJob = Start-Job -ScriptBlock $RunnerScript -ArgumentList $nextSkillDir, $ExpResultsDir, $ResRoot, $NextIndex, $TotalCount, $VallyExe, $Model, $GraderModel
 
         return @{
             Job        = $newJob
@@ -1494,7 +1449,7 @@ else {
     # Seed up to worker limit.
     while ($activeJobs.Count -lt $Workers -and $pendingSkills.Count -gt 0) {
         $skillIndex++
-        $jobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot -RequiresRustCustomGrader $requiresRustCustomGrader -CustomGraderPluginDir $customGraderPluginDir
+        $jobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -VallyExe $vallyExe -Model $Model -GraderModel $GraderModel
         if ($jobInfo) {
             $activeJobs += $jobInfo
             Write-Host "  queued [$($jobInfo.SkillIndex)/$totalSkills] $($jobInfo.Skill) (active: $($activeJobs.Count)/$Workers)" -ForegroundColor DarkCyan
@@ -1530,7 +1485,7 @@ else {
 
         if ($pendingSkills.Count -gt 0) {
             $skillIndex++
-            $nextJobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -TestsRoot $PSScriptRoot -RequiresRustCustomGrader $requiresRustCustomGrader -CustomGraderPluginDir $customGraderPluginDir
+            $nextJobInfo = Start-NextExperimentJob -Queue $pendingSkills -NextIndex $skillIndex -ExpResultsDir $experimentResultsDir -ResRoot $ResultsRoot -TotalCount $totalSkills -RunnerScript $scriptBlock -VallyExe $vallyExe -Model $Model -GraderModel $GraderModel
             if ($nextJobInfo) {
                 $activeJobs += $nextJobInfo
                 Write-Host "  queued [$($nextJobInfo.SkillIndex)/$totalSkills] $($nextJobInfo.Skill) (active: $($activeJobs.Count)/$Workers)" -ForegroundColor DarkCyan
