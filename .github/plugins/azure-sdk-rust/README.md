@@ -5,7 +5,7 @@ Azure SDK patterns and best practices for Rust developers. Covers 7 skills spann
 ## Install
 
 ```bash
-npx skills add microsoft/skills --skill azure-sdk-rust
+npx skills add https://github.com/microsoft/skills/tree/main/.github/plugins/azure-sdk-rust
 ```
 
 ```
