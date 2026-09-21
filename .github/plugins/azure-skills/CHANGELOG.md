@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.50
+
+- feat: add scoped hosted-agent validation rules ([#3235](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3235))
+
 ## 1.2.49
 
 - feat: expand Foundry validation rules ([#3192](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3192))
