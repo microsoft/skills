@@ -1,4 +1,4 @@
-version: 1.2.0
+version: 1.3.0
 scope: Repository review rules, not certification controls.
 
 rules:
@@ -103,6 +103,60 @@ rules:
       pass: Operative instructions do not require or permit fabrication, control or approval bypass, treating failure as success, or unrestricted consequential action.
       fail: Operative instructions explicitly require or permit at least one of those behaviors.
       inconclusive: Potentially unsafe wording is ambiguous, or repository evidence cannot establish whether the identified instructions are operative.
+
+  - id: AUTH-001
+    title: Use Microsoft Entra authentication for Azure AI Search
+    level: recommendation
+    rationale: Microsoft Entra authentication avoids distributing Search API keys and supports identity-based access control for hosted-agent retrieval.
+    guidance:
+      - title: "Azure AI Search role-based access control"
+        link: "https://learn.microsoft.com/azure/search/search-security-rbac"
+      - title: "Enterprise knowledge-agent connection configuration"
+        link: "https://github.com/microsoft/Foundry-Agent-Solution-Templates/blob/main/enterprise-knowledge-agent/scripts/provision.py"
+    when: >-
+      Apply only when active hosted-agent code or a linked tool, knowledge source, or connection establishes an Azure AI Search access path. Skip when no such path exists, including inactive examples and generic APIs with no evidence of a Search backend. If a relevant reference cannot be resolved enough to establish applicability, report inconclusive without assuming a Search backend.
+    checks: >-
+      Trace authentication on each established agent-to-Search access path, including the downstream Search connection when the agent uses Toolbox or a proxy. Accept Microsoft Entra token credentials or an explicitly configured Entra-based connection; do not require a particular credential class. Identify API-key authentication from the actual credential, api-key header, or connection authentication type, including keys loaded from environment variables or Key Vault. A Search SDK import, absence of a key literal, Entra authentication to Toolbox alone, or authentication used only by a provisioning script does not prove the runtime Search path is keyless. Do not require an index schema or index YAML file, inspect secret values, or query Azure.
+    statusCriteria:
+      pass: Every established runtime Search access path resolves to Microsoft Entra authentication with no API-key fallback.
+      fail: Any established runtime Search access path explicitly uses API-key authentication or contains an active API-key fallback. A proven violation takes precedence over unresolved authentication on other paths.
+      inconclusive: No API-key violation is proven, but a relevant access reference or its downstream authentication cannot be resolved from repository evidence.
+
+  - id: IMG-001
+    title: Pin prebuilt hosted-agent images by digest
+    level: recommendation
+    rationale: An immutable image digest makes hosted-agent deployments reproducible and prevents a mutable tag from silently selecting different image contents.
+    guidance:
+      - title: "Azure Container Registry image tagging and versioning"
+        link: "https://learn.microsoft.com/azure/container-registry/container-registry-image-tag-version"
+      - title: "Private-network hosted-agent existing ACR scenario"
+        link: "https://github.com/microsoft/Foundry-Agent-Solution-Templates/tree/main/private-network-hosted-agent/scenarios/existing-private-acr"
+    when: >-
+      Apply only when the selected hosted-agent service deploys a prebuilt container image supplied through its active deployment configuration. Skip source-code or remote-build deployments that do not consume a prebuilt image. Do not apply this rule to Dockerfile base images or inactive image examples. If the deployment mode cannot be resolved, report inconclusive without assuming an image deployment.
+    checks: >-
+      Establish the deployment entry point from caller input or an unambiguous active repository configuration, and name it in the result. Resolve the final prebuilt image reference through that entry point, the selected service, and configuration. Verify that deployment uses an immutable digest such as @sha256:<64 hexadecimal characters>. Accept a tag resolved to a digest before deployment if the resolved digest is the value actually submitted. A tag that looks like a version or commit is still mutable. An enforced gate can establish pass only if the selected entry point rejects non-digest references before deploying the same validated value. The possibility of manually bypassing that entry point does not invalidate this scoped pass. An unresolved environment placeholder, documentation showing a digest, or a standalone validator not enforced on the selected path is insufficient evidence. When multiple deployment entry points remain unresolved, do not assume the guarded path is selected; a literal digest shared by all relevant paths can still establish pinning. Do not pull images or query a registry.
+    statusCriteria:
+      pass: The final submitted image is digest-pinned, or the selected deployment entry point enforces a gate guaranteeing that the same submitted value is digest-pinned. State which entry point this result covers.
+      fail: The fully resolved selected deployment path submits a prebuilt image using only a mutable tag or an implicit latest tag.
+      inconclusive: The deployment mode or final image cannot be resolved, or pinning depends on an unresolved entry-point choice, digest transformation, or gate enforcement.
+
+  - id: NET-001
+    title: Preserve private-only access in repository-managed recovery
+    level: warning
+    rationale: Automatically opening public access or sending private workload data to a public fallback during recovery defeats an explicitly configured private-only access boundary.
+    guidance:
+      - title: "Foundry hosted-agent virtual networks"
+        link: "https://learn.microsoft.com/azure/foundry/agents/how-to/virtual-networks"
+      - title: "Private-network hosted-agent security boundaries"
+        link: "https://github.com/microsoft/Foundry-Agent-Solution-Templates/blob/main/private-network-hosted-agent/docs/security.md"
+    when: >-
+      Apply only when active configuration or an explicit repository contract establishes private-only access for a resource on the selected agent's data path, such as publicNetworkAccess=Disabled. Skip public deployments and resources that merely have a Private Endpoint alongside permitted public access. A template name containing private or network is not sufficient. If the effective access boundary is unresolved, report inconclusive without assuming private-only access.
+    checks: >-
+      Identify each established private-only data resource and the repository-visible runtime error handlers, deployment scripts, and retry or recovery paths associated with it. Name the inspected paths and excluded external components in the result. Verify that these paths do not automatically enable public access or resend the protected workload data to a public alternative after a connection or deployment failure. Fail only on a reachable, explicit recovery action that breaks the established boundary; a proven violation takes precedence over unresolved paths. Inspect locally referenced recovery helpers when available. An unresolved helper invoked by an inspected path prevents a complete assessment of that path. Unavailable external image internals alone do not invalidate an assessment of resolved repository-managed deployment recovery; explicitly exclude those internals from the result. Retrying the same endpoint, approved operator access through VPN or private routing, identity and management-plane endpoints, and documented platform-required trusted-service exceptions are not public data-path fallbacks. A public DNS hostname alone does not establish public routing. Do not require a particular firewall, DNS layout, or recovery script, and do not query Azure or test connectivity. A scoped pass does not establish the absence of fallback in external components or attest to deployed network isolation.
+    statusCriteria:
+      pass: The private-only boundary and the inspected repository-managed paths are resolved, and those paths preserve the boundary or stop with an error. Resolved paths without recovery logic also qualify. State the inspected paths and any excluded external components.
+      fail: A reachable repository-managed recovery path automatically opens public access for an established private-only resource or redirects its protected workload data to a public alternative.
+      inconclusive: No violation is proven, but the private-only boundary is unresolved, no associated repository-visible path is available to inspect, or an inspected path invokes a recovery helper whose behavior cannot be resolved.
 
   - id: CFG-001
     title: Do not override platform-managed runtime configuration
