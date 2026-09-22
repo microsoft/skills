@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.51
+
+- refactor: clarify evidence checks in hosted-agent validation rules ([#3236](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3236))
+
 ## 1.2.50
 
 - feat: add scoped hosted-agent validation rules ([#3235](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3235))
