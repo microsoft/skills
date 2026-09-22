@@ -37,7 +37,8 @@ rules:
   - id: OBS-001
     title: Enable supported tracing for hosted agents
     level: recommendation
-    rationale: Foundry tracing provides end-to-end visibility into agent invocations, model operations, and tool calls. Hosted-agent protocol libraries can emit OpenTelemetry automatically when project monitoring or an OTLP exporter is configured, so explicit application instrumentation is not always required.
+    rationale: >-
+      Tracing connects agent, model and tool operations to an inspectable telemetry destination.
     guidance:
       - title: "Configure hosted-agent telemetry"
         link: "https://learn.microsoft.com/azure/foundry/agents/how-to/configure-hosted-agent-telemetry"
@@ -45,16 +46,17 @@ rules:
         link: "https://learn.microsoft.com/azure/foundry/observability/how-to/trace-agent-setup"
     when: Apply to every hosted agent configured with host azure.ai.agent.
     checks: >-
-      Inspect azure.yaml, agent configuration, infrastructure, dependencies, and observability documentation. Accept any supported tracing path with an export destination: Foundry project monitoring connected to Application Insights, automatic instrumentation supplied by the hosted-agent library or a framework supported by the Microsoft OpenTelemetry distribution and configured for Application Insights or OTLP export, or explicit OpenTelemetry instrumentation with a configured exporter. Do not require application OpenTelemetry code when the hosted-agent protocol library or Foundry server-side tracing supplies it. Do not treat use of a hosting or instrumentation library alone as proof that telemetry is exported. Treat project-level monitoring that cannot be inspected from the repository as missing evidence, not as proof that tracing is disabled.
+      Read selected service telemetry settings and linked project monitoring. Look for APPLICATIONINSIGHTS_CONNECTION_STRING, OTEL_EXPORTER_OTLP_ENDPOINT or signal-specific OTLP endpoints and their hosting/instrumentation consumer. Inspect matching blocks and directly referenced initialization only. Accept supported automatic hosting or project tracing; do not require explicit instrumentation. An unused setting or library alone is insufficient. If export configuration is external or absent here, stop with inconclusive.
     statusCriteria:
-      pass: Repository evidence identifies both a supported tracing path and an Application Insights or OTLP export destination, and the configuration does not contradict or disable that path.
-      fail: Repository evidence explicitly disables all applicable tracing or telemetry export without documenting an alternative, or claims tracing is enabled while its repository-managed configuration is contradictory.
-      inconclusive: Tracing may be supplied by remotely managed Foundry project monitoring or another external configuration that cannot be established from repository evidence.
+      pass: A supported tracing path and its export destination are established without contradictory settings.
+      fail: Active configuration explicitly disables all applicable tracing/export or contradicts its claimed tracing setup.
+      inconclusive: The supported tracing path or export destination cannot be established locally.
 
   - id: SDK-001
     title: Use consistent Microsoft Agent Framework dependencies
     level: recommendation
-    rationale: Microsoft Agent Framework is the recommended orchestration framework for applicable Foundry hosted-agent scenarios, but other supported frameworks and custom implementations remain valid choices. This rule checks repository-level dependency consistency rather than requiring the latest package or proving complete runtime compatibility.
+    rationale: >-
+      Consistent Agent Framework declarations and imports prevent avoidable dependency mismatches; other supported frameworks remain valid.
     guidance:
       - title: "Microsoft Agent Framework SDK overview"
         link: "https://learn.microsoft.com/azure/foundry/how-to/develop/sdk-overview#agent-framework"
@@ -62,11 +64,11 @@ rules:
         link: "https://learn.microsoft.com/azure/foundry/agents/quickstarts/quickstart-deploy-own-code#choose-your-framework"
     when: Apply only when the hosted agent declares or imports Microsoft Agent Framework; otherwise skip this rule.
     checks: >-
-      Inspect dependency manifests, lock files, central package-management files, and Microsoft Agent Framework imports under the agent root. Verify that the project declares the official Agent Framework package family and that package declarations, effective versions when determinable, and source imports are internally consistent. An exact declaration or fully resolvable central version declaration can establish the effective direct dependency version. Do not execute tests, inspect dependency caches or generated results, infer API availability from an uninstalled package, or require the latest package version.
+      Read Agent Framework entries in the selected service's dependency manifests, matching lock/central version declarations and entry-point imports. Exact direct pins establish versions without a lock file. Compare the same package across files, not version numbers of different packages. Record literal package/version evidence. Follow direct local version references only; stop on unresolved ranges or generated declarations. Do not inspect installed packages, whole lock files or SDK internals, require latest versions, or infer API compatibility.
     statusCriteria:
-      pass: The official Agent Framework package family is declared, the effective direct dependency version can be determined from repository configuration, and source imports are consistent with that package family.
-      fail: Repository evidence explicitly shows an unrelated package presented as Agent Framework, conflicting effective dependency versions for the deployed agent, or imports inconsistent with the declared package family.
-      inconclusive: The effective package or version is affected by unresolved ranges, unresolved central version management, environment-specific resolution, or other indirection, or imports cannot be mapped reliably to the declared package family.
+      pass: Official package-family declarations have determinable direct versions and consistent imports.
+      fail: An unrelated package is presented as Agent Framework, the same dependency has conflicting effective versions, or source imports contradict the declared family.
+      inconclusive: Version resolution or import-to-package mapping remains unresolved.
 
   - id: SDK-002
     title: Use recommended Foundry hosted-agent SDKs
@@ -98,7 +100,7 @@ rules:
         link: "https://learn.microsoft.com/azure/foundry/responsible-ai/agents/transparency-note"
     when: Apply when the repository stores or references instructions that govern the hosted agent at runtime; otherwise skip this rule.
     checks: >-
-      Identify instructions that are actually loaded or referenced by the hosted agent, distinguishing them from documentation, comments, tests, examples, and security counterexamples. Inspect the operative instructions for language that requires or permits the agent to fabricate results, represent failed operations as successful, bypass authorization or approval controls, or perform unrestricted consequential actions. Do not treat ordinary error recovery, retries, fallback behavior, or clearly bounded automation as a violation.
+      Read instructions/system-prompt arguments from the selected entry point or configuration and directly referenced local prompt definitions. Locate named symbols rather than reading all Markdown. Flag explicit fabrication, representing failure as success, bypassing controls/approvals, or unrestricted consequential action. Exclude bounded automation, retries, documentation, tests and quoted counterexamples. Stop with inconclusive for unresolved remote/dynamic operative prompts; missing recommended wording alone is not a failure.
     statusCriteria:
       pass: Operative instructions do not require or permit fabrication, control or approval bypass, treating failure as success, or unrestricted consequential action.
       fail: Operative instructions explicitly require or permit at least one of those behaviors.
@@ -114,13 +116,13 @@ rules:
       - title: "Enterprise knowledge-agent connection configuration"
         link: "https://github.com/microsoft/Foundry-Agent-Solution-Templates/blob/main/enterprise-knowledge-agent/scripts/provision.py"
     when: >-
-      Apply only when active hosted-agent code or a linked tool, knowledge source, or connection establishes an Azure AI Search access path. Skip when no such path exists, including inactive examples and generic APIs with no evidence of a Search backend. If a relevant reference cannot be resolved enough to establish applicability, report inconclusive without assuming a Search backend.
+      Apply to an established runtime Azure AI Search client or linked Search tool/connection. Skip inactive examples and generic APIs without Search evidence; unresolved relevant references are inconclusive.
     checks: >-
-      Trace authentication on each established agent-to-Search access path, including the downstream Search connection when the agent uses Toolbox or a proxy. Accept Microsoft Entra token credentials or an explicitly configured Entra-based connection; do not require a particular credential class. Identify API-key authentication from the actual credential, api-key header, or connection authentication type, including keys loaded from environment variables or Key Vault. A Search SDK import, absence of a key literal, Entra authentication to Toolbox alone, or authentication used only by a provisioning script does not prove the runtime Search path is keyless. Do not require an index schema or index YAML file, inspect secret values, or query Azure.
+      Inspect actual Search client credential arguments, directly referenced credential factories, or linked Search connection auth types. A manifest hook creating the runtime connection is valid evidence: locate the referenced connection name or variable and its auth-type/authenticationType declaration, including agentic-identity or managed identity. Entra token credentials and Entra-based connections qualify; AzureKeyCredential, api-key headers or API-key connections fail even when keys come from Key Vault. Search environment names are locators only. Toolbox authentication alone and credentials used solely to run provisioning do not prove runtime Search auth. Stop at unavailable downstream auth configuration; do not inspect indexes, secrets or proxy internals.
     statusCriteria:
-      pass: Every established runtime Search access path resolves to Microsoft Entra authentication with no API-key fallback.
-      fail: Any established runtime Search access path explicitly uses API-key authentication or contains an active API-key fallback. A proven violation takes precedence over unresolved authentication on other paths.
-      inconclusive: No API-key violation is proven, but a relevant access reference or its downstream authentication cannot be resolved from repository evidence.
+      pass: Every established Search runtime path uses Entra with no key fallback.
+      fail: Any established Search runtime path uses a key or active key fallback, even if other paths are unresolved.
+      inconclusive: No key violation is proven, but relevant runtime Search authentication remains unresolved.
 
   - id: IMG-001
     title: Pin prebuilt hosted-agent images by digest
@@ -132,13 +134,13 @@ rules:
       - title: "Private-network hosted-agent existing ACR scenario"
         link: "https://github.com/microsoft/Foundry-Agent-Solution-Templates/tree/main/private-network-hosted-agent/scenarios/existing-private-acr"
     when: >-
-      Apply only when the selected hosted-agent service deploys a prebuilt container image supplied through its active deployment configuration. Skip source-code or remote-build deployments that do not consume a prebuilt image. Do not apply this rule to Dockerfile base images or inactive image examples. If the deployment mode cannot be resolved, report inconclusive without assuming an image deployment.
+      Apply when the selected service consumes a prebuilt image. Skip source/remote-build services without an image and Dockerfile base images; unresolved deployment mode is inconclusive.
     checks: >-
-      Establish the deployment entry point from caller input or an unambiguous active repository configuration, and name it in the result. Resolve the final prebuilt image reference through that entry point, the selected service, and configuration. Verify that deployment uses an immutable digest such as @sha256:<64 hexadecimal characters>. Accept a tag resolved to a digest before deployment if the resolved digest is the value actually submitted. A tag that looks like a version or commit is still mutable. An enforced gate can establish pass only if the selected entry point rejects non-digest references before deploying the same validated value. The possibility of manually bypassing that entry point does not invalidate this scoped pass. An unresolved environment placeholder, documentation showing a digest, or a standalone validator not enforced on the selected path is insufficient evidence. When multiple deployment entry points remain unresolved, do not assume the guarded path is selected; a literal digest shared by all relevant paths can still establish pinning. Do not pull images or query a registry.
+      Start with the selected service image field. A final @sha256:<64 hexadecimal characters> reference passes; a final tag-only reference fails. Resolve directly referenced local variables. Follow a pipeline only if selected by the caller or explicitly linked by active configuration. Accept digest resolution or a gate that validates and deploys the same value; possible manual bypass is outside that scoped result. State the entry point. Unresolved values/transformations are inconclusive; do not search unrelated CI or treat standalone validators as enforced gates.
     statusCriteria:
-      pass: The final submitted image is digest-pinned, or the selected deployment entry point enforces a gate guaranteeing that the same submitted value is digest-pinned. State which entry point this result covers.
-      fail: The fully resolved selected deployment path submits a prebuilt image using only a mutable tag or an implicit latest tag.
-      inconclusive: The deployment mode or final image cannot be resolved, or pinning depends on an unresolved entry-point choice, digest transformation, or gate enforcement.
+      pass: The submitted image is digest-pinned or the selected entry point enforces pinning of that same value.
+      fail: The selected resolved deployment submits a tag-only or implicit-latest image.
+      inconclusive: Deployment mode, final image or selected pipeline pinning cannot be resolved.
 
   - id: NET-001
     title: Preserve private-only access in repository-managed recovery
@@ -150,33 +152,35 @@ rules:
       - title: "Private-network hosted-agent security boundaries"
         link: "https://github.com/microsoft/Foundry-Agent-Solution-Templates/blob/main/private-network-hosted-agent/docs/security.md"
     when: >-
-      Apply only when active configuration or an explicit repository contract establishes private-only access for a resource on the selected agent's data path, such as publicNetworkAccess=Disabled. Skip public deployments and resources that merely have a Private Endpoint alongside permitted public access. A template name containing private or network is not sufficient. If the effective access boundary is unresolved, report inconclusive without assuming private-only access.
+      Apply when linked active resource configuration or an explicit resource contract establishes private-only access. Skip permitted public access, including deployments with optional Private Endpoints. Names alone are insufficient; unresolved boundaries are inconclusive.
     checks: >-
-      Identify each established private-only data resource and the repository-visible runtime error handlers, deployment scripts, and retry or recovery paths associated with it. Name the inspected paths and excluded external components in the result. Verify that these paths do not automatically enable public access or resend the protected workload data to a public alternative after a connection or deployment failure. Fail only on a reachable, explicit recovery action that breaks the established boundary; a proven violation takes precedence over unresolved paths. Inspect locally referenced recovery helpers when available. An unresolved helper invoked by an inspected path prevents a complete assessment of that path. Unavailable external image internals alone do not invalidate an assessment of resolved repository-managed deployment recovery; explicitly exclude those internals from the result. Retrying the same endpoint, approved operator access through VPN or private routing, identity and management-plane endpoints, and documented platform-required trusted-service exceptions are not public data-path fallbacks. A public DNS hostname alone does not establish public routing. Do not require a particular firewall, DNS layout, or recovery script, and do not query Azure or test connectivity. A scoped pass does not establish the absence of fallback in external components or attest to deployed network isolation.
+      Locate publicNetworkAccess=Disabled, public_network_access_enabled=false or the explicit private-only contract. Inspect selected deployment hooks and resource-call error handlers plus directly called local recovery helpers; locate matching blocks, not whole libraries. Fail only for reachable recovery that opens the same resource publicly or sends its protected data to a public alternative. Same-endpoint retries, VPN, identity/control-plane access and documented platform exceptions are allowed. Hostnames alone do not prove routing. Stop on unresolved helpers. State inspected executable paths and excluded external image internals; this is not live network assurance.
     statusCriteria:
-      pass: The private-only boundary and the inspected repository-managed paths are resolved, and those paths preserve the boundary or stop with an error. Resolved paths without recovery logic also qualify. State the inspected paths and any excluded external components.
-      fail: A reachable repository-managed recovery path automatically opens public access for an established private-only resource or redirects its protected workload data to a public alternative.
-      inconclusive: No violation is proven, but the private-only boundary is unresolved, no associated repository-visible path is available to inspect, or an inspected path invokes a recovery helper whose behavior cannot be resolved.
+      pass: At least one associated executable local runtime/deployment path is resolved and all inspected paths preserve the boundary or stop. IaC/manifest settings alone cannot establish pass; state coverage and exclusions.
+      fail: A reachable recovery action opens the private resource publicly or redirects its protected data to a public alternative; proven violations take precedence.
+      inconclusive: No violation is proven, but the boundary or an invoked recovery helper is unresolved, or no associated executable local path is inspectable.
 
   - id: CFG-001
     title: Do not override platform-managed runtime configuration
     level: warning
-    rationale: Foundry injects platform-managed runtime values into hosted agents. Redefining reserved FOUNDRY_* or AGENT_* variables can shadow those values and break authentication, routing, telemetry, or agent lifecycle behavior.
+    rationale: >-
+      Overriding platform-injected FOUNDRY_* or AGENT_* runtime variables can break hosted-agent behavior.
     guidance:
       - title: "Review platform environment variables"
         link: "https://learn.microsoft.com/azure/foundry/agents/how-to/configure-hosted-agent-env-variables#review-platform-environment-variables"
     when: Apply when hosted-agent runtime or deployment configuration is present.
     checks: >-
-      Inspect azure.yaml, agent configuration, container configuration, deployment scripts, and source code that writes environment variables for the deployed process. Verify that FOUNDRY_* and AGENT_* values supplied by the platform are consumed but are not declared, assigned, or overwritten by repository-managed deployed runtime configuration. Include deprecated user-defined variables such as FOUNDRY_TOOLBOX_ENDPOINT. Reading a platform-managed variable is valid. Do not fail a local-only development environment file unless repository evidence shows that it is committed as deployed configuration or consumed by the deployed runtime. Do not use this rule for general required-setting validation, credentials, endpoint literals, or other configuration without a reserved prefix.
+      Check selected service environmentVariables, linked container ENV, and entry-point/startup environment assignments for FOUNDRY_* or AGENT_*, including deprecated FOUNDRY_TOOLBOX_ENDPOINT. Follow direct assignment sources only. Reads, platform outputs and deployment-tool values do not violate this rule unless assigned into the hosted process. Exclude local-only development settings. Unresolved injection or precedence is inconclusive; do not search unrelated scripts.
     statusCriteria:
-      pass: Repository-managed deployed runtime configuration does not declare, assign, or overwrite FOUNDRY_* or AGENT_* variables; any local-only development values are not consumed by the deployed runtime.
-      fail: Repository evidence explicitly declares, assigns, or overwrites a reserved FOUNDRY_* or AGENT_* variable in deployed hosted-agent runtime configuration.
-      inconclusive: Repository evidence cannot establish whether a local or externally generated configuration is consumed by the deployed runtime or could shadow a platform-managed value.
+      pass: Inspected deployed runtime configuration does not assign reserved variables.
+      fail: Repository configuration assigns a reserved FOUNDRY_* or AGENT_* variable into the hosted runtime.
+      inconclusive: Runtime injection or configuration precedence cannot be resolved.
 
   - id: PROTO-001
     title: Keep declared protocols consistent with runtime handlers
     level: warning
-    rationale: A Foundry hosted agent must implement each protocol endpoint declared by its deployment configuration. A mismatch prevents the platform from invoking the agent through that protocol.
+    rationale: >-
+      Declared hosted-agent protocols must match the deployed handlers.
     guidance:
       - title: "Hosted-agent protocol endpoints"
         link: "https://learn.microsoft.com/azure/foundry/agents/concepts/hosted-agent-contract#protocol-endpoints"
@@ -184,8 +188,8 @@ rules:
         link: "https://learn.microsoft.com/azure/foundry/agents/how-to/add-protocol-adapter"
     when: Apply when the hosted-agent service declares the Responses or Invocations protocol in azure.yaml; otherwise skip this rule.
     checks: >-
-      Inspect the target azure.ai.agent service, its locally resolvable configuration references, dependency declarations, and deployed entry point. For each Responses or Invocations value in that service's azure.yaml protocols[].protocol, verify that the deployed entry point provides the matching endpoint and handler through an official protocol adapter or a valid custom implementation. When the project declares a specific hosted-agent protocol SDK, verify that the entry point uses that SDK's corresponding adapter or host, while accepting other documented registration patterns. Consistent examples include responses with ResponsesHostServer, ResponsesAgentServerHost, or a custom POST /responses handler, and invocations with InvocationsHostServer, InvocationAgentServerHost, or a custom POST /invocations handler; these examples are not an exhaustive class-name allowlist. Inspect only these two protocols and runtime paths that can be fully resolved from files under the agent root. Do not execute the server or infer dynamically registered routes. Failure to locate or resolve an adapter, route, or handler is inconclusive, not fail.
+      Compare selected service protocols[].protocol with its entry point and directly referenced registrations. Examples: responses uses ResponsesHostServer, ResponsesAgentServerHost or POST /responses; invocations uses InvocationsHostServer, InvocationAgentServerHost or POST /invocations. Accept equivalent official wiring and valid custom handlers, not just these names. An official host wired to an agent/handler suffices without inspecting SDK internals. Fully resolved mismatches fail; unresolved or dynamic registration is inconclusive. Do not run the server.
     statusCriteria:
-      pass: Every declared Responses or Invocations protocol has either a statically identifiable official adapter and handler or a statically identifiable custom endpoint and handler, with no explicit protocol mismatch.
-      fail: Repository evidence fully resolves the deployed entry point and explicitly shows that a declared Responses or Invocations protocol is mapped to a different endpoint or handler, or that the complete static route registration omits the declared protocol endpoint.
-      inconclusive: An adapter, route, handler, deployed entry point, local configuration reference, framework registration, or dynamically constructed route cannot be resolved sufficiently to map every declared Responses or Invocations protocol to a valid implementation path.
+      pass: Every declared Responses/Invocations protocol maps to a statically identifiable host and handler.
+      fail: A resolved entry point maps a declared protocol incorrectly or its complete static registrations omit the endpoint.
+      inconclusive: Entry point, adapter or handler registration cannot be resolved.
