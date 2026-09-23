@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "azure-resource-manager-mcp": {
+      "type": "http",
+      "url": "https://mcp.management.azure.com",
+      "headers": {
+        "x-mcp-toolset": "CostManagement"
+      }
+    }
+  }
+}

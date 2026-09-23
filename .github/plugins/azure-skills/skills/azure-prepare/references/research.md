@@ -83,7 +83,7 @@ Invoke related skills for specialized scenarios:
 | Need detailed security hardening | Handle directly with service-specific security guidance and platform best practices |
 | Setting up App Insights instrumentation | `appinsights-instrumentation` |
 | Building AI applications | `microsoft-foundry` |
-| Cost-sensitive deployment | `azure-cost` |
+| Estimate a planned deployment's cost | `cost-estimation` from the separately installed `azure-cost` plugin |
 
 **Skill/Reference Invocation Pattern:**
 

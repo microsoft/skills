@@ -1,92 +1,168 @@
 # Changelog
 
-## 1.2.51
+## 1.2.70
+
+- fix: use session_start telemetry event ([#3245](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3245))
+
+## 1.2.69
+
+- Document npx usage in plugin README and their security implication ([#3240](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3240))
+
+## 1.2.68
+
+- feature: add standalone Azure Cost plugin ([#3151](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3151))
+
+## 1.2.67
+
+- fix: bump plugin versions for hook changes ([#3227](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3227))
+
+## 1.2.66
 
 - refactor: clarify evidence checks in hosted-agent validation rules ([#3236](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3236))
 
-## 1.2.50
+## 1.2.65
 
 - feat: add scoped hosted-agent validation rules ([#3235](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3235))
 
-## 1.2.49
+## 1.2.64
+
+- feat: report session start telemetry ([#3216](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3216))
+
+## 1.2.63
+
+- feat: add Foundry IQ skills plugin ([#3209](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3209))
+
+## 1.2.62
+
+- feature: new onboard-plugin skill ([#3191](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3191))
+
+## 1.2.61
+
+- fix: decode Cursor telemetry input as UTF-8 ([#3214](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3214))
+
+## 1.2.60
 
 - feat: expand Foundry validation rules ([#3192](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3192))
 
-## 1.2.48
+## 1.2.59
 
 - feat(microsoft-foundry): add MCP-backed agent insights workflow ([#3207](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3207))
 
-## 1.2.47
+## 1.2.58
+
+- feature: add azure-local-skills plugin (standard + multi-rack) ([#2163](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2163))
+
+## 1.2.57
 
 - feat: improve Foundry validation reports ([#3170](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3170))
 
-## 1.2.46
+## 1.2.56
 
 - chore: foundry skill improvements on sample selection, model query, trigger words, and evals ([#3177](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3177))
 
-## 1.2.45
+## 1.2.55
 
 - fix: use TCP checks for local agent readiness in Foundry Skill ([#3169](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3169))
 
-## 1.2.44
+## 1.2.54
 
 - fix: refine Foundry agent setup and deployment guidance ([#3165](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3165))
 
-## 1.2.43
+## 1.2.53
 
 - fix: remove unnecessary trigger phrase in azure-compliance skill body ([#3118](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3118))
 
-## 1.2.42
+## 1.2.52
+
+- fix: normalize Cursor telemetry input ([#3158](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3158))
+
+## 1.2.51
 
 - feat: add Azure Functions hosting and cold-start guidance ([#3122](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3122))
 
-## 1.2.41
+## 1.2.50
 
 - fix: improve langchain-azure-ai migration ([#3160](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3160))
 
-## 1.2.40
+## 1.2.49
+
+- fix: add cross-platform Cursor telemetry runner ([#3146](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3146))
+
+## 1.2.48
+
+- fix: restore Cursor telemetry reporting ([#3141](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3141))
+
+## 1.2.47
 
 - chore: clean duplicate trigger words in Foundry Skill description ([#3145](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3145))
 
-## 1.2.39
+## 1.2.46
+
+- fix: deduplicate events from track-telemetry script ([#3142](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3142))
+
+## 1.2.45
+
+- chore: bring back additional filter for multiple plugins ([#3131](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3131))
+
+## 1.2.44
 
 - feat: Add more validate rules ([#3130](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3130))
 
-## 1.2.38
+## 1.2.43
 
 - feat: route explicit Foundry agent validation ([#3128](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3128))
 
-## 1.2.37
+## 1.2.42
 
 - Add agent validation rules ([#3127](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3127))
 
-## 1.2.36
+## 1.2.41
 
 - feat: add Foundry agent validation skill entry point ([#3115](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3115))
 
-## 1.2.35
+## 1.2.40
 
 - fix: role ([#3114](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3114))
 
-## 1.2.34
+## 1.2.39
+
+- misc: revert additional path pattern for kusto graph plugin ([#3108](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3108))
+
+## 1.2.38
 
 - feat: Added Referenced Workloads Updates to Azure Enterprise Infra Planner Skills (feature: Referenced Workloads) ([#3094](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3094))
 
-## 1.2.33
+## 1.2.37
+
+- chore: log plugin version ([#3102](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3102))
+
+## 1.2.36
 
 - refactor: remove duplicate content from Foundry skill description ([#3104](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3104))
 
-## 1.2.32
+## 1.2.35
+
+- fix: detect Cursor client in telemetry hook via cursor_version field ([#3100](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3100))
+
+## 1.2.34
+
+- fix: track reference file reads regardless of plugin catalog name ([#3096](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3096))
+
+## 1.2.33
 
 - Update outdated runtime references in plugin skills to latest LTS versions ([#3011](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3011))
 
-## 1.2.31
+## 1.2.32
 
 - feat: replace azure-diagnostics AKS pod-failure evidence bundle with a script ([#2933](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2933))
 
-## 1.2.30
+## 1.2.31
 
 - fix: mark Azure diagnostics shell script executable ([#3029](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3029))
+
+## 1.2.30
+
+- feature: extend telemetry for new plugins ([#3059](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3059))
 
 ## 1.2.29
 

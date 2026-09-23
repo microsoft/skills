@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+
+        "windows": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1",
+        "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
+        "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
+
+        "bash": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
+        "powershell": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1",
+
+        "env": {
+          "AZURE_SKILLS_HOOK_CLIENT_FAMILY": "copilot-vscode"
+        }
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+
+        "windows": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1",
+        "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
+        "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
+
+        "bash": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
+        "powershell": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1"
+      }
+    ]
+  }
+}

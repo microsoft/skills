@@ -23,7 +23,11 @@ Invoked by the `azure-app-onboard` orchestrator at Phase 4 when `scaffold-manife
 | Generate IaC files from a plan | `azure-app-onboard` Step 7 (scaffold) |
 | Run `azd up` or execute existing deployment templates | `azure-deploy` |
 | Debug a running app after deployment | `azure-diagnostics` |
-| Optimize existing Azure spending | `azure-cost` |
+| Optimize existing Azure spending | `cost-optimization` from the optional `azure-cost` plugin |
+
+If `cost-optimization` is unavailable, explain that it is provided by the
+optional `azure-cost` plugin and direct the user to their client's supported
+plugin installation flow; do not imply the handoff completed.
 
 ## Workflow
 

@@ -2,6 +2,11 @@
 
 Azure Local planning, deployment, operations, and workload management skills, covering both standard and rack-scale deployments.
 
+## Security
+
+> [!WARNING]
+> The `azure-local-skills` plugin uses `npx` to download and run the Azure MCP Server, inheriting the local environment's `.npmrc` configuration. Install this plugin only on trusted devices. A compromised `.npmrc` configuration could cause `npx` to download and execute malicious code, potentially resulting in remote code execution.
+
 ## Skills
 
 - **azure-local** — Standard Azure Local (formerly Azure Stack HCI): 1-16 node hyperconverged, up to 64 disaggregated, and rack-aware clusters. Covers planning and deployment, day-2 operations and lifecycle updates, workloads (Azure Local VMs, AKS on Azure Local, images, disks, logical networks), SDN and network security, and troubleshooting.
