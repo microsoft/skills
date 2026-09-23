@@ -1,10 +1,10 @@
 ---
 name: azure-app-onboard
-description: "End-to-end orchestrator: from a business idea, app idea, or existing app to running Azure deployment with cost estimates and pre-deploy approval. Analyzes your app, auto-detects the right Azure services, scaffolds infrastructure code, and deploys — tailored to your app, not a template. Handles moving existing apps to Azure without rewriting or with minimal changes. WHEN: bring your app to Azure, plan my app, cost to run, is my code ready to deploy, deploy my app to the cloud, deploy all my services, what Azure services do I need, plan my Azure deployment, deploy my new app to Azure, one-click deploy, I have an app and want it on Azure, migrate my app to Azure, help me get started, build an app, no code yet, starter project. DO NOT USE FOR: use azd for deployment(use azure-deploy), optimizing existing costs (use azure-cost), code readiness checks only (use azure-app-onboard-prereq)."
+description: "End-to-end orchestrator: from a business idea, app idea, or existing app to running Azure deployment with cost estimates and pre-deploy approval. Analyzes your app, auto-detects the right Azure services, scaffolds infrastructure code, and deploys — tailored to your app, not a template. Handles moving existing apps to Azure without rewriting or with minimal changes. WHEN: bring your app to Azure, plan my app, cost to run, is my code ready to deploy, deploy my app to the cloud, deploy all my services, what Azure services do I need, plan my Azure deployment, deploy my new app to Azure, one-click deploy, I have an app and want it on Azure, migrate my app to Azure, help me get started, build an app, no code yet, starter project. DO NOT USE FOR: use azd for deployment(use azure-deploy), optimizing existing costs (use cost-optimization), code readiness checks only (use azure-app-onboard-prereq)."
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.3"
+  version: "1.2.4"
 ---
 
 # Azure App Onboard
@@ -35,12 +35,16 @@ metadata:
 | Scenario | Use Instead |
 |----------|-------------|
 | Run `azd up` or execute an existing deployment | `azure-deploy` |
-| Optimize existing Azure spend | `azure-cost` |
+| Optimize existing Azure spend | `cost-optimization` from the optional `azure-cost` plugin |
 | Generate Bicep/Terraform for a known architecture | `azure-prepare` |
 | Validate infrastructure or run preflight checks | `azure-validate` |
 | Troubleshoot a running Azure deployment | `azure-diagnostics` |
 | Deploy to or manage AKS/Kubernetes directly | `azure-kubernetes` |
 | Look up or list existing Azure resources | `azure-resource-lookup` |
+
+If `cost-optimization` is unavailable, explain that it is provided by the
+optional `azure-cost` plugin and direct the user to their client's supported
+plugin installation flow; do not imply the handoff completed.
 
 ## Pipeline Rules
 

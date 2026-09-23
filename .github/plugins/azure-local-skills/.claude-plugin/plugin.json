@@ -1,7 +1,7 @@
 {
   "name": "azure-local-skills",
   "description": "Azure Local skills covering standard deployments (Azure Stack HCI, 1-16 node hyperconverged, rack-aware clusters) and multi-rack (rack scale) deployments built on Network Fabric Controller, Cluster Manager, and managed network fabric.",
-  "version": "1.0.0",
+  "version": "1.0.7",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"

@@ -22,9 +22,13 @@ Invoked by the `azure-app-onboard` orchestrator at Phase 2 when `prereq-output.j
 | Code readiness or prereq scanning | `azure-app-onboard` Step 3 (prereq) |
 | IaC generation from a completed plan | `azure-app-onboard` Step 7 (scaffold) |
 | Deploying resources to Azure | `azure-app-onboard` Step 9 (deploy) |
-| Optimizing existing Azure spend | `azure-cost` |
+| Optimizing existing Azure spend | `cost-optimization` from the optional `azure-cost` plugin |
 | Estimating VM-specific costs | `azure-compute` |
 | Enterprise landing zone architecture | `azure-enterprise-infra-planner` |
+
+If `cost-optimization` is unavailable, explain that it is provided by the
+optional `azure-cost` plugin and direct the user to their client's supported
+plugin installation flow; do not imply the handoff completed.
 
 ## MCP Tools
 

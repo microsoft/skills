@@ -63,7 +63,7 @@
 #    - Tracked fields: --file-reference <relative-path-after-skills/>,
 #      --skill-version <version>
 #
-# 4. session-start
+# 4. session_start
 #    - Triggered when: a client starts or resumes an agent session
 #    - Tracked fields: --plugin-name <name>, --plugin-version <version>,
 #      --client-name <client>, and --session-id <id>
@@ -390,9 +390,9 @@ skillVersion=""
 azureToolName=""
 filePath=""
 
-# Report every session-start invocation, including resumed sessions.
+# Report every session_start invocation, including resumed sessions.
 if [ "$isSessionStart" = true ]; then
-    eventType="session-start"
+    eventType="session_start"
     shouldTrack=true
 fi
 
@@ -484,8 +484,8 @@ fi
 # === STEP 3: Publish event via azmcp ===
 
 if [ "$shouldTrack" = true ]; then
-    # The plugin-telemetry command requires a session ID for session-start events.
-    if [ "$eventType" = "session-start" ] && [ -z "$sessionId" ]; then
+    # The plugin-telemetry command requires a session ID for session_start events.
+    if [ "$eventType" = "session_start" ] && [ -z "$sessionId" ]; then
         return_success
     fi
 
@@ -493,7 +493,7 @@ if [ "$shouldTrack" = true ]; then
     pluginVersion=$(get_plugin_field "$clientName" "version")
 
     # Session telemetry must identify the plugin.
-    if [ "$eventType" = "session-start" ] && { [ -z "$pluginName" ] || [ -z "$pluginVersion" ]; }; then
+    if [ "$eventType" = "session_start" ] && { [ -z "$pluginName" ] || [ -z "$pluginVersion" ]; }; then
         return_success
     fi
 

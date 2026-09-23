@@ -2,6 +2,11 @@
 
 [Microsoft Azure](https://azure.microsoft.com) is Microsoft's cloud computing platform. This plugin connects [GitHub Copilot CLI](https://github.com/github/copilot-cli) or Claude Code to your Azure account, letting you manage resources, deploy applications, and monitor services directly from your development environment.
 
+## Security
+
+> [!WARNING]
+> The `azure` plugin uses `npx` to download and run the Azure MCP Server, inheriting the local environment's `.npmrc` configuration. Install this plugin only on trusted devices. A compromised `.npmrc` configuration could cause `npx` to download and execute malicious code, potentially resulting in remote code execution.
+
 ## Setup
 
 ### 1. Create an Azure Account

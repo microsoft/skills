@@ -85,12 +85,15 @@ Include this in the chat handoff AND in `deployment-summary.md`.
 | Always | **`azure-compliance`** — "Run a compliance scan on your deployed resources" |
 | Always | **`azure-resource-visualizer`** — "Generate an architecture diagram of your resource group" |
 | Reliability/HA gaps (single-zone, no failover, prod workload) or user asks to "harden" / "make production-ready" | **`azure-reliability`** — "Assess & improve reliability: zone redundancy, multi-region failover, health probes" |
-| Cost-sensitive workload or user asks about spend | **`azure-cost`** — "Review and optimize your Azure spend" |
+| Cost-sensitive workload or user asks about spend | **`cost-analysis`** from the optional `azure-cost` plugin — "Review your Azure spend and identify its drivers" |
 | Health check failed / `healthStatus: "degraded"/"unreachable"` | **`azure-diagnostics`** — "Troubleshoot your deployment" |
 | Auth/OAuth/MSAL detected in intent or prereq | **`entra-app-registration`** — "Set up app registration for your auth flow" |
 | `postDeployRecommendations[]` has upgrade suggestions | **`azure-upgrade`** — "Upgrade your runtime or framework" |
 | Storage-heavy patterns | **`azure-storage`** — "Optimize your storage configuration" |
 | `postDeployRecommendations[]` mentions RBAC/role | **`azure-rbac`** — "Configure least-privilege role assignments" |
+
+If unavailable, direct the user to their client's supported plugin installation
+flow and leave the handoff pending.
 
 ## Completion
 

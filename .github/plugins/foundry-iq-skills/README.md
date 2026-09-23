@@ -4,6 +4,11 @@ Build grounded knowledge experiences with [Azure AI Search (Foundry IQ)](https:/
 
 This plugin helps GitHub Copilot CLI create and use Foundry IQ knowledge bases, using your existing Azure resources when possible.
 
+## Security
+
+> [!WARNING]
+> The `foundry-iq-skills` plugin uses `npx` to download and run the Azure MCP Server, inheriting the local environment's `.npmrc` configuration. Install this plugin only on trusted devices. A compromised `.npmrc` configuration could cause `npx` to download and execute malicious code, potentially resulting in remote code execution.
+
 ## Skill
 
 - **foundry-iq**: Build, connect, query, and troubleshoot Foundry IQ knowledge experiences using supported Azure resources.

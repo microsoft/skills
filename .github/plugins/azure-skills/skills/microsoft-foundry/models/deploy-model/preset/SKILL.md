@@ -99,5 +99,5 @@ az cognitiveservices account deployment delete --name <acct> --resource-group <r
 - **microsoft-foundry** - Parent skill for Microsoft Foundry operations
 - **[quota](../../../quota/quota.md)** — For quota viewing, increase requests, and troubleshooting quota errors, defer to this skill
 - **azure-quick-review** - Review Azure resources for compliance
-- **azure-cost-estimation** - Estimate costs for Azure deployments
+- **cost-estimation** - Estimate costs through the separately installed `azure-cost` plugin
 - **azure-validate** - Validate Azure infrastructure before deployment

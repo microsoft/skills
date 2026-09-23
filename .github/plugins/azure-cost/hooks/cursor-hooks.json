@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.js\""
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.js\""
+      }
+    ],
+    "afterMCPExecution": [
+      {
+        "type": "command",
+        "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.js\""
+      }
+    ]
+  }
+}
