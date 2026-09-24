@@ -338,7 +338,7 @@ OccupancyDetection
 // try it! — group trace logs into sessions with 5-minute gap
 cluster("help").database("SampleLogs").TraceLogs
 | order by Source, Timestamp asc
-| extend SessionId = row_window_session(Timestamp, 5m, 1h, Source != prev(Source))
+| extend SessionId = row_window_session(Timestamp, 1h, 5m, Source != prev(Source))
 | summarize EventCount = count(), SessionStart = min(Timestamp) by Source, SessionId
 | take 5
 ```
