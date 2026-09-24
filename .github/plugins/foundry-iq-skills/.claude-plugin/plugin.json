@@ -1,7 +1,7 @@
 {
   "name": "foundry-iq-skills",
   "description": "Create and retrieve from a Foundry IQ knowledge base using File, Azure Blob, or ADLS Gen2, then connect an existing Prompt or Hosted Agent.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"

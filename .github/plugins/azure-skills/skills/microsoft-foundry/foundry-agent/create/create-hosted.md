@@ -224,6 +224,7 @@ Check the scaffold before local run:
    FOUNDRY_PROJECT_ENDPOINT=https://<account>.services.ai.azure.com/api/projects/<project>
    AZURE_AI_MODEL_DEPLOYMENT_NAME=<model-deployment-name>
    ```
+   Keep `.env` out of the deploy package: make sure the service directory's `.agentignore` lists `.env` (add it if missing).
 4. Prefer `--agent-name` at init time (above). Fallback only: if init already ran without it, rename the `azure.yaml` service key AND its `name:` to the same value, preserving its `project:` path.
 5. If you change CPU or memory, set it in the agent service's `container.resources` in `azure.yaml`.
 
