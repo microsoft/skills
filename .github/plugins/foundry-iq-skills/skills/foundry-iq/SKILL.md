@@ -5,7 +5,7 @@ license: MIT
 compatibility: Azure
 metadata:
   author: Microsoft
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # Foundry IQ

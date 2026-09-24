@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.72
+
+- fix: handle uv.lock samples behind private package index in Foundry hosted agent quick start ([#3264](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3264))
+
+## 1.2.71
+
+- feature: add discover-azure-skills skill ([#3053](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3053))
+
 ## 1.2.70
 
 - fix: use session_start telemetry event ([#3245](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3245))

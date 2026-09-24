@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+- fix: normalize Foundry IQ line endings ([#3254](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3254))
+
 ## 0.1.4
 
 - fix: use session_start telemetry event ([#3245](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3245))

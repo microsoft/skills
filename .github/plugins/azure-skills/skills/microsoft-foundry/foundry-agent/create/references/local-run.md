@@ -21,15 +21,15 @@ Use this when iterating on a hosted agent before deploying.
 
 ## Prepare the local environment
 
-For Python agents, prepare the environment from the **agent's service source directory** -- the folder that contains `requirements.txt` and the agent source (typically `<repo>/src/<service-name>/`, not the azd project root). `azd ai agent run` resolves the venv relative to this folder; a `.venv` created in the project root is ignored and azd silently creates a second one without `uv`.
+For Python agents, prepare the environment from the **agent's service source directory** -- the folder that contains `pyproject.toml` / `requirements.txt` and the agent source (typically `<repo>/src/<service-name>/`, not the azd project root). `azd ai agent run` resolves the venv relative to this folder; a `.venv` created in the project root is ignored and azd silently creates a second one without `uv`.
 
 1. `cd` into the service source directory.
 2. Create a venv, for example `python -m venv .venv`.
 3. Activate the venv.
 4. Install `uv` inside the active venv: `python -m pip install uv`.
-5. In the same shell with the service-dir `.venv` activated, run `azd ai agent run --no-client` (from any cwd in the project); it installs `requirements.txt` itself and uses `uv` from the active venv for faster Python dependency installation.
+5. In the same shell with the service-dir `.venv` activated, run `azd ai agent run --no-client` (from any cwd in the project); it installs `pyproject.toml` / `requirements.txt` dependencies itself and uses `uv` from the active venv for faster Python dependency installation.
 
-> **Important:** The venv must live next to `requirements.txt`, not in the azd project root. Install `uv` before running `azd ai agent run`, and keep that venv activated when running the command; otherwise the local run falls back to slower dependency installation. Do NOT manually run `pip install -r requirements.txt` / `uv pip install -r requirements.txt --prerelease=allow`; let `azd ai agent run` install dependencies.
+> **Important:** The venv must live next to `pyproject.toml` / `requirements.txt`, not in the azd project root. Install `uv` before running `azd ai agent run`, and keep that venv activated when running the command; otherwise the local run falls back to slower dependency installation. Do NOT manually run `pip install -r requirements.txt` / `uv pip install -r requirements.txt --prerelease=allow`; let `azd ai agent run` install dependencies.
 
 ## Start the agent locally
 
@@ -45,15 +45,16 @@ What this does:
 
 1. Resolves the agent service from `azure.yaml` (auto-picks when only one exists).
 2. Detects the project type (Python, .NET, or Node.js) from files in the service source dir.
-3. Installs dependencies if needed. For Python, `azd ai agent run` installs `requirements.txt` itself and uses `uv` from the active local environment when available.
+3. Installs dependencies if needed. For Python, `azd ai agent run` installs `pyproject.toml` / `requirements.txt` dependencies itself and uses `uv` from the active local environment when available.
 4. Starts the agent in the foreground on `localhost:8088` (default).
 5. Opens no client when `--no-client` is set. Without that flag, azd opens Agent Inspector for the Responses and Invocations protocols, and Microsoft 365 Agents Playground for the Activity protocol.
 
 > **Readiness gate — required before local invocation.**
 > - Start checking TCP connections to `localhost:<port>` immediately after launching the agent in the background; retry failed connections every 2–5 seconds.
+> - In the same loop, check whether the `azd ai agent run` process has exited. **If it exited, stop polling immediately**, read its output, and fix that specific cause (for example, a dependency install failure) before restarting.
 > - **Keep each startup wait at 5 seconds or less**, including sleeps and shell-tool output reads.
 > - **Proceed to the smoke invocation as soon as TCP connects**, keeping the server running.
-> - If the agent process exits or the startup timeout expires before a connection succeeds, inspect the server logs and resolve the cause before retrying.
+> - If the startup timeout expires before a connection succeeds, inspect the server logs and resolve the cause before retrying.
 
 `Ctrl+C` stops the agent and clears the saved local session id in an interactive terminal.
 
