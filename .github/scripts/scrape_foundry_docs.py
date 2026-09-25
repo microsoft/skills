@@ -14,18 +14,24 @@ Usage:
 
 import json
 import asyncio
-import aiohttp
 import re
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional
 from urllib.parse import urljoin
+from urllib.request import Request, urlopen
 import time
 
+try:
+    import aiohttp
+    HAS_AIOHTTP = True
+except ImportError:
+    HAS_AIOHTTP = False
+
 # Base URLs
-BASE_URL = "https://learn.microsoft.com/en-us/azure/ai-foundry/"
-TOC_URL = "https://learn.microsoft.com/en-us/azure/ai-foundry/toc.json?view=foundry"
-VIEW_PARAM = "?view=foundry"
+BASE_URL = "https://learn.microsoft.com/en-us/azure/foundry/"
+TOC_URL = "https://learn.microsoft.com/en-us/azure/foundry/toc.json"
+VIEW_PARAM = ""
 
 # Output paths
 OUTPUT_DIR = Path(__file__).parent.parent.parent / "docs"
@@ -54,26 +60,19 @@ class DocSection:
 
 
 def normalize_url(href: str, base_path: str = BASE_URL) -> str:
-    """Convert relative href to full URL with view parameter."""
+    """Convert relative href to full URL."""
     if href.startswith("http"):
-        # External URL - don't modify
-        if "learn.microsoft.com" in href and "view=" not in href:
-            return f"{href}{VIEW_PARAM}"
         return href
 
     if href.startswith("/"):
         # Absolute path within learn.microsoft.com
         url = f"https://learn.microsoft.com{href}"
     elif href.startswith(".."):
-        # Relative path going up - handle azure/ai-services context
+        # Relative path going up
         url = urljoin(base_path, href)
     else:
-        # Relative path within ai-foundry
+        # Relative path within foundry docs
         url = f"{base_path}{href}"
-
-    # Add view parameter if not present
-    if "view=" not in url:
-        url = f"{url}{VIEW_PARAM}"
 
     return url
 
@@ -162,16 +161,11 @@ def organize_into_sections(
 
 
 async def fetch_page_content(
-    session: aiohttp.ClientSession, url: str, semaphore: asyncio.Semaphore
+    session: "aiohttp.ClientSession", url: str, semaphore: "asyncio.Semaphore"
 ) -> str:
     """Fetch page content from Microsoft Learn API (markdown endpoint)."""
     async with semaphore:
         try:
-            # Try the markdown endpoint first
-            md_url = url.replace("?view=foundry", ".md?view=foundry")
-            if "?" not in url:
-                md_url = f"{url}.md"
-
             # Use the regular URL and parse HTML
             headers = {"User-Agent": "Mozilla/5.0 (compatible; LLMsTxtGenerator/1.0)"}
 
@@ -236,9 +230,6 @@ def generate_llms_txt(
     lines.append(
         "- The Foundry SDK is available for Python, C#, JavaScript/TypeScript, and Java"
     )
-    lines.append(
-        "- All URLs require `?view=foundry` parameter to access the new documentation"
-    )
     lines.append("")
 
     # Define section order
@@ -297,7 +288,7 @@ def generate_llms_txt(
     return "\n".join(lines)
 
 
-async def main():
+def main():
     """Main function to scrape docs and generate llms.txt."""
     print("=" * 60)
     print("Microsoft Foundry Documentation Scraper")
@@ -308,12 +299,13 @@ async def main():
 
     # Fetch TOC
     print("\n[1/4] Fetching Table of Contents...")
-    async with aiohttp.ClientSession() as session:
-        async with session.get(TOC_URL) as response:
-            if response.status != 200:
-                print(f"Error: Failed to fetch TOC (status {response.status})")
-                return
-            toc_data = await response.json()
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; LLMsTxtGenerator/1.0)"}
+    req = Request(TOC_URL, headers=headers)
+    with urlopen(req, timeout=30) as resp:
+        if resp.status != 200:
+            print(f"Error: Failed to fetch TOC (status {resp.status})")
+            return
+        toc_data = json.loads(resp.read())
 
     # Extract pages
     print("[2/4] Extracting page URLs...")
@@ -340,7 +332,6 @@ async def main():
     manifest = {
         "title": "Microsoft Foundry",
         "base_url": BASE_URL,
-        "view_param": VIEW_PARAM,
         "sections": {
             section: [
                 {"title": t, "href": h, "url": normalize_url(h)} for t, h in pages
@@ -361,4 +352,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
