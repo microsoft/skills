@@ -1,7 +1,6 @@
 ---
 name: azure-ai-projects-dotnet
-description: |
-  Azure AI Projects SDK for .NET. High-level client for Azure AI Foundry projects including agents, connections, datasets, deployments, evaluations, and indexes. Use for AI Foundry project management, versioned agents, and orchestration. Triggers: "AI Projects", "AIProjectClient", "Foundry project", "versioned agents", "evaluations", "datasets", "connections", "deployments .NET".
+description: "Azure AI Projects SDK for .NET. High-level client for Azure AI Foundry projects including agents, connections, datasets, deployments, evaluations, and indexes. Use for AI Foundry project management, versioned agents, and orchestration. Triggers: AI Projects, AIProjectClient, Foundry project, versioned agents, evaluations, datasets, connections, deployments .NET."
 license: MIT
 metadata:
   author: Microsoft
@@ -31,11 +30,11 @@ dotnet add package Azure.AI.Agents.Persistent --prerelease
 ## Environment Variables
 
 ```bash
-PROJECT_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/<project>  # Required: Azure AI project endpoint
-MODEL_DEPLOYMENT_NAME=gpt-4o-mini  # Required: model deployment name
-CONNECTION_NAME=<your-connection-name>  # Optional: project connection name
-AI_SEARCH_CONNECTION_NAME=<ai-search-connection>  # Optional: Azure AI Search connection name
-AZURE_TOKEN_CREDENTIALS=prod  # Required only if DefaultAzureCredential is used in production
+PROJECT_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/<project>
+MODEL_DEPLOYMENT_NAME=gpt-4o-mini
+CONNECTION_NAME=<your-connection-name>              # optional
+AI_SEARCH_CONNECTION_NAME=<ai-search-connection>    # optional
+AZURE_TOKEN_CREDENTIALS=prod                        # optional, for production credential selection
 ```
 
 ## Authentication
@@ -45,16 +44,10 @@ using Azure.Identity;
 using Azure.AI.Projects;
 
 var endpoint = Environment.GetEnvironmentVariable("PROJECT_ENDPOINT");
-// Local dev: DefaultAzureCredential. Production: set AZURE_TOKEN_CREDENTIALS=prod or AZURE_TOKEN_CREDENTIALS=<specific_credential>
 var credential = new DefaultAzureCredential(
     DefaultAzureCredential.DefaultEnvironmentVariableName
 );
-// Or use a specific credential directly in production:
-// See https://learn.microsoft.com/dotnet/api/overview/azure/identity-readme?view=azure-dotnet#credential-classes
-// var credential = new ManagedIdentityCredential();
-AIProjectClient projectClient = new AIProjectClient(
-    new Uri(endpoint), 
-    credential);
+AIProjectClient projectClient = new AIProjectClient(new Uri(endpoint), credential);
 ```
 
 ## Client Hierarchy
@@ -198,6 +191,10 @@ FileDataset fileDataset = projectClient.Datasets.UploadFile(
     filePath: "data/training.txt",
     connectionName: connectionName);
 
+// Verify upload succeeded
+AIProjectDataset uploaded = projectClient.Datasets.GetDataset("my-dataset", "1.0");
+Console.WriteLine($"Dataset uploaded: {uploaded.Name} v{uploaded.Version}");
+
 // Upload folder
 FolderDataset folderDataset = projectClient.Datasets.UploadFolder(
     name: "my-dataset",
@@ -205,9 +202,6 @@ FolderDataset folderDataset = projectClient.Datasets.UploadFolder(
     folderPath: "data/training",
     connectionName: connectionName,
     filePattern: new Regex(".*\\.txt"));
-
-// Get dataset
-AIProjectDataset dataset = projectClient.Datasets.GetDataset("my-dataset", "1.0");
 
 // Delete dataset
 projectClient.Datasets.Delete("my-dataset", "1.0");
@@ -226,6 +220,8 @@ searchIndex = (AzureAISearchIndex)projectClient.Indexes.CreateOrUpdate(
     name: "my-index",
     version: "1.0",
     index: searchIndex);
+
+Console.WriteLine($"Index created: {searchIndex.Name} (connection: {searchIndex.IndexConnectionName})");
 
 // List indexes
 foreach (AIProjectIndex index in projectClient.Indexes.GetIndexes())
@@ -259,8 +255,15 @@ Evaluation evaluation = new Evaluation(
 // Run evaluation
 Evaluation result = projectClient.Evaluations.Create(evaluation: evaluation);
 
-// Get evaluation
-Evaluation getResult = projectClient.Evaluations.Get(result.Name);
+// Poll until evaluation completes
+while (result.Status != EvaluationStatus.Completed && result.Status != EvaluationStatus.Failed)
+{
+    await Task.Delay(2000);
+    result = projectClient.Evaluations.Get(result.Name);
+}
+
+if (result.Status == EvaluationStatus.Failed)
+    throw new InvalidOperationException($"Evaluation failed: {result.Name}");
 
 // List evaluations
 foreach (var eval in projectClient.Evaluations.GetAll())
@@ -302,53 +305,13 @@ Console.WriteLine(result.Content[0].Text);
 | Azure Functions | `AzureFunctionToolDefinition` | Invoke Azure Functions |
 | MCP | `MCPToolDefinition` | Model Context Protocol tools |
 
-## Key Types Reference
-
-| Type | Purpose |
-|------|---------|
-| `AIProjectClient` | Main entry point |
-| `PersistentAgentsClient` | Low-level agent operations |
-| `PromptAgentDefinition` | Versioned agent definition |
-| `AgentVersion` | Versioned agent instance |
-| `AIProjectConnection` | Connection to Azure resource |
-| `AIProjectDeployment` | Model deployment info |
-| `AIProjectDataset` | Dataset metadata |
-| `AIProjectIndex` | Search index metadata |
-| `Evaluation` | Evaluation configuration and results |
-
 ## Best Practices
 
-1. **Use `DefaultAzureCredential`** for production authentication
-2. **Use async methods** (`*Async`) for all I/O operations
-3. **Poll with appropriate delays** (500ms recommended) when waiting for runs
-4. **Clean up resources** — delete threads, agents, and files when done
-5. **Use versioned agents** (via `Azure.AI.Projects.OpenAI`) for production scenarios
-6. **Store connection IDs** rather than names for tool configurations
-7. **Use `includeCredentials: true`** only when credentials are needed
-8. **Handle pagination** — use `AsyncPageable<T>` for listing operations
-
-## Error Handling
-
-```csharp
-using Azure;
-
-try
-{
-    var result = await projectClient.Evaluations.CreateAsync(evaluation);
-}
-catch (RequestFailedException ex)
-{
-    Console.WriteLine($"Error: {ex.Status} - {ex.ErrorCode}: {ex.Message}");
-}
-```
-
-## Related SDKs
-
-| SDK | Purpose | Install |
-|-----|---------|---------|
-| `Azure.AI.Projects` | High-level project client (this SDK) | `dotnet add package Azure.AI.Projects` |
-| `Azure.AI.Agents.Persistent` | Low-level agent operations | `dotnet add package Azure.AI.Agents.Persistent` |
-| `Azure.AI.Projects.OpenAI` | Versioned agents with OpenAI | `dotnet add package Azure.AI.Projects.OpenAI` |
+1. **Use versioned agents** (via `Azure.AI.Projects.OpenAI`) for production scenarios — they support rollback and A/B testing
+2. **Store connection IDs** rather than names for tool configurations — names can change, IDs are stable
+3. **Use `includeCredentials: true`** only when credentials are needed — reduces exposure surface
+4. **Poll with appropriate delays** (500ms for agent runs, 2s for evaluations) when waiting for async operations
+5. **All Azure SDK calls throw `RequestFailedException`** on failure — catch it to inspect `Status`, `ErrorCode`, and `Message`
 
 ## Reference Links
 
