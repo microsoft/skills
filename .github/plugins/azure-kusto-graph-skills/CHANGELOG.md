@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.19
+
+- fix: run Windows telemetry hooks with PowerShell ([#3263](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3263))
+
 ## 1.0.18
 
 - fix: use session_start telemetry event ([#3245](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3245))

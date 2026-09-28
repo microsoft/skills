@@ -4,7 +4,7 @@
       {
         "type": "command",
 
-        "windows": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1",
+        "windows": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1\"",
         "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
         "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
 
@@ -20,7 +20,7 @@
       {
         "type": "command",
 
-        "windows": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1",
+        "windows": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1\"",
         "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
         "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
 

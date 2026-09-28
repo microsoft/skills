@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.7
+
+- fix: run Windows telemetry hooks with PowerShell ([#3263](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3263))
+
+## 0.1.6
+
+- build(deps): bump pypdf ([#3215](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3215))
+
 ## 0.1.5
 
 - fix: normalize Foundry IQ line endings ([#3254](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3254))

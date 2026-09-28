@@ -1,7 +1,7 @@
 {
   "name": "azure-cost",
   "description": "Azure cost analysis, estimation, optimization, and governance workflows backed by Azure Resource Manager MCP.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"

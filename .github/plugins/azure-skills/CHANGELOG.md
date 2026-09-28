@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.73
+
+- fix: run Windows telemetry hooks with PowerShell ([#3263](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3263))
+
 ## 1.2.72
 
 - fix: handle uv.lock samples behind private package index in Foundry hosted agent quick start ([#3264](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3264))
