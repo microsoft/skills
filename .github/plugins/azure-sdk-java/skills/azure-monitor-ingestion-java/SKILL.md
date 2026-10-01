@@ -224,7 +224,7 @@ try {
 
 ## Querying Uploaded Logs
 
-Use [azure-monitor-query](../query/SKILL.md) to query ingested logs:
+Use [azure-monitor-query](../azure-monitor-query-java/SKILL.md) to query ingested logs:
 
 ```java
 // See azure-monitor-query skill for LogsQueryClient usage
