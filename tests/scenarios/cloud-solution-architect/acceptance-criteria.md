@@ -409,7 +409,48 @@ We will use Cosmos DB for orders.
 
 ---
 
-## 7. Anti-Patterns Summary
+## 7. AI Workload Design
+
+### 7.1 ✅ CORRECT: AI Workload Designed Across the Five Layers with Grounding and Routing Decisions
+
+```markdown
+## AI Workload Design: Enterprise Assistant
+
+**Client**: Thin Teams/web front end; capabilities delegated to backend layers.
+
+**Intelligence**: Orchestrator with model routing — small fast model for
+simple queries, escalation to a larger model on low confidence.
+
+**Inferencing**: Model deployments with runtime invocation and prompt/
+completion pre- and postprocessing.
+
+**Knowledge**: Search index over approved documents; retrieval enforces
+per-user authorization; chunking iterated against observed queries.
+
+**Tools**: Ticketing and HR APIs behind standardized, policy-enforced
+interfaces.
+
+**Caching**: Grounded answers cached with keys scoped by user identity,
+model version, and prompt version; TTL by data freshness; no cross-user
+caching of private answers.
+
+**Routing decision**: Model routing tolerated for broad Q&A; single model
+pinned where deterministic behavior or narrow SLOs are required.
+```
+
+### 7.2 ❌ INCORRECT: AI Advice Without Layering, Grounding, or Routing Considerations
+
+```markdown
+## AI Design
+
+- Use GPT-4 for everything
+- Add a vector database
+- Fine-tune on your documents
+```
+
+---
+
+## 8. Anti-Patterns Summary
 
 | Anti-Pattern | Impact | Fix |
 |--------------|--------|-----|
@@ -422,7 +463,7 @@ We will use Cosmos DB for orders.
 
 ---
 
-## 8. Checklist for Architecture Review
+## 9. Checklist for Architecture Review
 
 - [ ] Architecture review maps to all 5 WAF pillars
 - [ ] Design patterns selected with problem context justification
@@ -434,3 +475,4 @@ We will use Cosmos DB for orders.
 - [ ] Health modeling strategy defined
 - [ ] Deployment strategy includes zero-downtime approach
 - [ ] Security follows Zero Trust model
+- [ ] AI workloads address the five layers, grounding, and model routing
