@@ -13,7 +13,8 @@ Use for Linux VM SSH failures.
 | server closed connection | Check disk, PAM, sshd config | [SSH detail] |
 | hangs with no response | Check firewall, routes, NIC | [SSH overview] |
 | Debian-specific failure | Check Debian networking/sshd doc | [Debian] |
-| SELinux blocks sshd | Fix SELinux policy or temporarily permissive | [SELinux] |
+| Ubuntu: `sshd` unit not found, or `ssh.service` inactive | Expected on Ubuntu 24.04+ (socket-activated). Healthy = `ssh.socket` active and port 22 listening | [Ubuntu SSH] |
+| SELinux blocks sshd (RHEL family) | Fix SELinux policy or temporarily permissive | [SELinux] |
 | Entra ID SSH denied | Assign VM Admin/User Login role | [SSH overview] |
 | VM not booting/UEFI failure | Use boot diagnostics and repair VM | [UEFI] |
 
@@ -25,14 +26,20 @@ Use for Linux VM SSH failures.
 az vm user reset-ssh --name <vm> -g <rg>
 az vm user update --name <vm> -g <rg> -u <user> --ssh-key-value "<ssh-public-key>"
 az vm user update --name <vm> -g <rg> -u <user> -p '<new-password>'
+# Listener + service state. Unit is `sshd` on RHEL/SLES/Azure Linux, `ssh` on Debian/Ubuntu.
 az vm run-command invoke --name <vm> -g <rg> --command-id RunShellScript \
-  --scripts "systemctl status sshd; getenforce"
+  --scripts 'ss -tlnp | grep ":22 "; for u in sshd ssh ssh.socket; do echo "$u: $(systemctl is-active $u)"; done'
+# SELinux distros only. Ubuntu/Debian use AppArmor and have no getenforce/setenforce.
 az vm run-command invoke --name <vm> -g <rg> --command-id RunShellScript \
-  --scripts "setenforce 0"
+  --scripts 'if command -v getenforce >/dev/null; then getenforce; else echo "SELinux not installed"; fi'
+# Temporary permissive mode, SELinux distros only (reverts on reboot)
+az vm run-command invoke --name <vm> -g <rg> --command-id RunShellScript \
+  --scripts 'if command -v setenforce >/dev/null; then setenforce 0; else echo "SELinux not installed"; fi'
 ```
 
 [SSH overview]: https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/linux/troubleshoot-ssh-connection
 [SSH detail]: https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/linux/detailed-troubleshoot-ssh-connection
 [Debian]: https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/linux/cannot-connect-debian-linux
+[Ubuntu SSH]: https://documentation.ubuntu.com/release-notes/24.04/#openssh
 [SELinux]: https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/linux/linux-selinux-troubleshooting
 [UEFI]: https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/linux/azure-linux-vm-uefi-boot-failures

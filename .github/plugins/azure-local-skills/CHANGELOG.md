@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.10
+
+- misc: document azure-local-skills telemetry ([#3303](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3303))
+
 ## 1.0.9
 
 - feat: add standalone telemetry reporter bootstrap ([#3273](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3273))

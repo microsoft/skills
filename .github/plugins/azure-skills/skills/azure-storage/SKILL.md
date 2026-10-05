@@ -4,7 +4,7 @@ description: "Azure Storage Services including Blob Storage, File Shares, Queue 
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.1"
+  version: "1.2.2"
 ---
 
 # Azure Storage Services
@@ -29,7 +29,7 @@ When Azure MCP is enabled:
 - `azure__storage` with command `storage_blob_get` - Download blob content
 - `azure__storage` with command `storage_blob_put` - Upload blob content
 
-**If Azure MCP is not enabled:** Run `/azure:setup` or enable via `/mcp`.
+**If Azure MCP is not enabled:** In Copilot CLI or Claude Code, ask the user to run `/mcp` and enable Azure MCP; in other hosts, ask the user to enable Azure MCP through the host's MCP configuration.
 
 ## CLI Fallback
 

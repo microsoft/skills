@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.79
+
+- fix: distro-aware SSH probe for Ubuntu 24.04 ([#3294](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3294))
+
+## 1.2.78
+
+- fix: mcp enable command ([#3290](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3290))
+
 ## 1.2.77
 
 - use consistent line ending ([#3313](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3313))
