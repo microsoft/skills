@@ -4,7 +4,7 @@ description: "Use for Azure AI: Search, Speech, OpenAI, Document Intelligence. H
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.1"
+  version: "1.2.2"
 ---
 
 # Azure AI Services
@@ -31,7 +31,7 @@ When Azure MCP is enabled:
 - `azure__speech` with command `speech_transcribe` - Speech to text
 - `azure__speech` with command `speech_synthesize` - Text to speech
 
-**If Azure MCP is not enabled:** Run `/azure:setup` or enable via `/mcp`.
+**If Azure MCP is not enabled:** In Copilot CLI or Claude Code, ask the user to run `/mcp` and enable Azure MCP; in other hosts, ask the user to enable Azure MCP through the host's MCP configuration.
 
 ## AI Search Capabilities
 
