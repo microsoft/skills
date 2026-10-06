@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.80
+
+- fix: appinsights-instrumentation prerequisite ([#3292](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3292))
+
 ## 1.2.79
 
 - fix: distro-aware SSH probe for Ubuntu 24.04 ([#3294](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3294))
