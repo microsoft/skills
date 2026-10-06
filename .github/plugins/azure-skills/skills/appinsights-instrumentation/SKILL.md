@@ -4,7 +4,7 @@ description: "Guidance for instrumenting webapps with Azure Application Insights
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.1"
+  version: "1.2.2"
 ---
 
 # AppInsights Instrumentation Guide
@@ -35,7 +35,9 @@ This skill provides **guidance and reference material** for instrumenting webapp
 The app in the workspace must be one of these kinds
 
 - An ASP.NET Core app hosted in Azure
+- An Azure Container App
 - A Node.js app hosted in Azure
+- A Python app hosted in Azure
 
 ## Guidelines
 
