@@ -5,7 +5,7 @@ Azure SDK patterns and best practices for TypeScript/Node.js developers. Covers 
 ## Install
 
 ```bash
-npx skills add microsoft/skills --skill azure-sdk-typescript
+npx skills add https://github.com/microsoft/skills/tree/main/.github/plugins/azure-sdk-typescript
 ```
 
 ```
