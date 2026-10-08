@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.82
+
+- fix: clarify telemetry publisher debug logs ([#3336](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3336))
+
+## 1.2.81
+
+- feat: improve Azure Diagnostics from evaluations ([#3334](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3334))
+
 ## 1.2.80
 
 - fix: appinsights-instrumentation prerequisite ([#3292](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3292))

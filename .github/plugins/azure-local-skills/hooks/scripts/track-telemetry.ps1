@@ -1,5 +1,6 @@
 # Telemetry tracking hook for Azure Copilot Skills
-# Reads JSON input from stdin, tracks relevant events, and publishes via MCP
+# Reads JSON input from stdin, tracks relevant events, and publishes telemetry
+# Exit codes: 0 = hook continues, including telemetry failures
 #
 # === Client Format Reference ===
 #
@@ -123,8 +124,9 @@
 #
 # If the AZURE_SKILLS_TELEMETRY_LOG_DIR env var is set, the script will create
 # a "raw-input" subdirectory and write each raw JSON input to a timestamped file
-# for debugging. It will also append a "telemetry.log" file with MCP args for
-# each tracked event.
+# for debugging. It will also append a "telemetry.log" file identifying the
+# publisher and arguments for each tracked event, the standalone version and
+# executable path, and publisher installation/execution failures.
 #
 # When using `--plugin-dir` to load a local plugin the AZURE_SKILLS_PLUGIN_ROOT
 # env var should be set so that the script can detect local skill paths for
@@ -555,6 +557,9 @@ if ($shouldTrack) {
     if ($filePath) { $mcpArgs += "--file-reference"; $mcpArgs += ($filePath -replace '/', '\') }
 
     if ($env:AZURE_SKILLS_USE_STANDALONE_TELEMETRY -eq "true") {
+        $publisher = "Standalone ghcfa-telem (version $telemetryReporterVersion)"
+        $reporterArguments = $mcpArgs[2..($mcpArgs.Count - 1)]
+        Write-TelemetryDebugLog -Content "Publisher: $publisher | Args: $($reporterArguments -join ' ')"
         $installerPath = Join-Path $scriptDir 'install-telemetry.ps1'
         $powerShellExecutable = (Get-Process -Id $PID).Path
         $installerArguments = @(
@@ -570,34 +575,47 @@ if ($shouldTrack) {
         $installerArguments += '-Version'
         $installerArguments += $telemetryReporterVersion
 
-        $installerOutput = @(& $powerShellExecutable @installerArguments 2>&1)
+        # Capture installer stderr without changing the hook's fail-open error preference.
+        $installerOutput = @(& {
+            $ErrorActionPreference = 'Continue'
+            & $powerShellExecutable @installerArguments 2>&1
+        })
         $installerStatus = $LASTEXITCODE
-        if ($installerStatus -eq 0 -and $installerOutput.Count -gt 0) {
+        if ($installerStatus -eq 0 -and $installerOutput.Count -gt 0 -and
+            -not [string]::IsNullOrWhiteSpace([string]$installerOutput[-1])) {
             $reporterPath = [string]$installerOutput[-1]
-            $reporterArguments = $mcpArgs[2..($mcpArgs.Count - 1)]
+            Write-TelemetryDebugLog -Content "Publisher: $publisher | Executable: $reporterPath"
             try {
                 & $reporterPath @reporterArguments 2>&1 | Out-Null
                 $reporterStatus = $LASTEXITCODE
                 if ($reporterStatus -ne 0) {
-                    Write-TelemetryDebugLog -Content "Standalone telemetry reporter exited with status $reporterStatus."
+                    Write-TelemetryDebugLog -Content "Publisher: $publisher | Execution failed with status $reporterStatus."
                 }
             } catch {
-                Write-TelemetryDebugLog -Content "Standalone telemetry reporter failed: $($_.Exception.Message)"
+                Write-TelemetryDebugLog -Content "Publisher: $publisher | Execution failed to start."
             }
         }
+        elseif ($installerStatus -eq 0) {
+            Write-TelemetryDebugLog -Content "Publisher: $publisher | Installation failed: installer returned no executable path."
+        }
         else {
-            Write-TelemetryDebugLog -Content "Standalone telemetry reporter installation failed: $($installerOutput -join ' ')"
+            Write-TelemetryDebugLog -Content "Publisher: $publisher | Installation failed with status ${installerStatus}: $($installerOutput -join ' ')"
         }
     }
     else {
         # Preserve the existing publisher unless the standalone path is explicitly enabled.
+        $publisher = "Azure MCP (npx -y @azure/mcp@latest)"
+        Write-TelemetryDebugLog -Content "Publisher: $publisher | Args: $($mcpArgs -join ' ')"
         try {
             & npx -y @azure/mcp@latest @mcpArgs 2>&1 | Out-Null
-        } catch { }
+            $publisherStatus = $LASTEXITCODE
+            if ($publisherStatus -ne 0) {
+                Write-TelemetryDebugLog -Content "Publisher: $publisher | Execution failed with status $publisherStatus."
+            }
+        } catch {
+            Write-TelemetryDebugLog -Content "Publisher: $publisher | Execution failed to start."
+        }
     }
-
-    # If AZURE_SKILLS_TELEMETRY_LOG_DIR env var is set, append the args to the telemetry.log file in that directory (for debugging)
-    Write-TelemetryDebugLog -Content "MCP Args: $($mcpArgs -join ' ')"
 }
 
 # Output success to stdout (required by hooks)

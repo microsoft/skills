@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Telemetry tracking hook for Azure Copilot Skills
-# Reads JSON input from stdin, tracks relevant events, and publishes via MCP
+# Reads JSON input from stdin, tracks relevant events, and publishes telemetry
+# Exit codes: 0 = hook continues, including telemetry failures
 #
 # === Client Format Reference ===
 #
@@ -125,8 +126,9 @@
 #
 # If the AZURE_SKILLS_TELEMETRY_LOG_DIR env var is set, the script will create
 # a "raw-input" subdirectory and write each raw JSON input to a timestamped file
-# for debugging. It will also append a "telemetry.log" file with MCP args for
-# each tracked event.
+# for debugging. It will also append a "telemetry.log" file identifying the
+# publisher and arguments for each tracked event, the standalone version and
+# executable path, and publisher installation/execution failures.
 #
 # When using `--plugin-dir` to load a local plugin the AZURE_SKILLS_PLUGIN_ROOT
 # env var should be set so that the script can detect local skill paths for
@@ -483,7 +485,7 @@ if [ -z "$filePath" ] && [ -z "$skillName" ]; then
     fi
 fi
 
-# === STEP 3: Publish event via azmcp ===
+# === STEP 3: Publish event ===
 
 if [ "$shouldTrack" = true ]; then
     # The plugin-telemetry command requires a session ID for session_start events.
@@ -516,6 +518,8 @@ if [ "$shouldTrack" = true ]; then
     [ -n "$filePath" ] && mcpArgs+=("--file-reference" "$(echo "$filePath" | tr '/' '\\')")
 
     if [ "${AZURE_SKILLS_USE_STANDALONE_TELEMETRY:-}" = "true" ]; then
+        publisher="Standalone ghcfa-telem (version $TELEMETRY_REPORTER_VERSION)"
+        write_telemetry_debug_log "Publisher: $publisher | Args: ${mcpArgs[*]:2}"
         installerOutput="$(
             bash "$SCRIPT_DIR/install-telemetry.sh" \
                 --version "$TELEMETRY_REPORTER_VERSION" 2>&1
@@ -523,22 +527,27 @@ if [ "$shouldTrack" = true ]; then
         installerStatus=$?
 
         if [ "$installerStatus" -eq 0 ] && [ -n "$installerOutput" ]; then
+            write_telemetry_debug_log "Publisher: $publisher | Executable: $installerOutput"
             "$installerOutput" "${mcpArgs[@]:2}" >/dev/null 2>&1
             reporterStatus=$?
             if [ "$reporterStatus" -ne 0 ]; then
-                write_telemetry_debug_log "Standalone telemetry reporter exited with status $reporterStatus."
+                write_telemetry_debug_log "Publisher: $publisher | Execution failed with status $reporterStatus."
             fi
+        elif [ "$installerStatus" -eq 0 ]; then
+            write_telemetry_debug_log "Publisher: $publisher | Installation failed: installer returned no executable path."
         else
-            write_telemetry_debug_log "Standalone telemetry reporter installation failed: $installerOutput"
+            write_telemetry_debug_log "Publisher: $publisher | Installation failed with status $installerStatus: $installerOutput"
         fi
     else
         # Preserve the existing publisher unless the standalone path is explicitly enabled.
-        npx -y @azure/mcp@latest "${mcpArgs[@]}" >/dev/null 2>&1 || true
+        publisher="Azure MCP (npx -y @azure/mcp@latest)"
+        write_telemetry_debug_log "Publisher: $publisher | Args: ${mcpArgs[*]}"
+        npx -y @azure/mcp@latest "${mcpArgs[@]}" >/dev/null 2>&1
+        publisherStatus=$?
+        if [ "$publisherStatus" -ne 0 ]; then
+            write_telemetry_debug_log "Publisher: $publisher | Execution failed with status $publisherStatus."
+        fi
     fi
-
-    # If AZURE_SKILLS_TELEMETRY_LOG_DIR env var is set, append the args to the
-    # telemetry.log file in that directory (for debugging)
-    write_telemetry_debug_log "MCP Args: ${mcpArgs[*]}"
 fi
 
 # Output success to stdout (required by hooks)
