@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.11
+
+- fix: clarify telemetry publisher debug logs ([#3336](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3336))
+
 ## 1.0.10
 
 - misc: document azure-local-skills telemetry ([#3303](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3303))

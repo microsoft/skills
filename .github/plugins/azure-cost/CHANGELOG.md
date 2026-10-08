@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6
+
+- fix: clarify telemetry publisher debug logs ([#3336](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3336))
+
 ## 1.0.5
 
 - chore: add telemetry disclosure for azure-cost plugin ([#3296](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3296))

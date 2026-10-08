@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.11
+
+- fix: clarify telemetry publisher debug logs ([#3336](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3336))
+
 ## 0.1.10
 
 - use consistent line ending ([#3313](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3313))

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.22
+
+- fix: clarify telemetry publisher debug logs ([#3336](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3336))
+
 ## 1.0.21
 
 - misc: add telemetry disclosure to Kusto Graph plugin ([#3304](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3304))

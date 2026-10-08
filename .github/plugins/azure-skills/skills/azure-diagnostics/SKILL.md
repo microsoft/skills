@@ -1,10 +1,10 @@
 ---
 name: azure-diagnostics
-description: "Debug Azure production issues on Azure using AppLens, Azure Monitor, resource health, and safe triage. WHEN: debug production issues, troubleshoot app service, app service high CPU, app service deployment failure, troubleshoot container apps, troubleshoot functions, troubleshoot AKS, VM RDP, Linux SSH, VM black screen, can't connect to VM, reset VM password, NSG or firewall blocking, kubectl cannot connect, kube-system/CoreDNS failures, pod pending, crashloop, node not ready, upgrade failures, analyze logs, KQL, insights, image pull failures, cold start issues, health probe failures, resource health, root cause of errors, troubleshoot event hubs, troubleshoot service bus, messaging SDK error, AMQP connection failure, message lock lost, service bus dead letter."
+description: "Debug Azure production issues on Azure using AppLens, Azure Monitor, resource health, and safe triage. WHEN: debug production issues, troubleshoot app service, app service high CPU, app service deployment failure, troubleshoot container apps, container app 503 or target port mismatch, troubleshoot functions, function telemetry missing or stopped after a config/connection-string change, troubleshoot AKS, VM RDP, Linux SSH, VM black screen, can't connect to VM, reset VM password, NSG or firewall blocking, kubectl cannot connect, kube-system/CoreDNS failures, pod pending, crashloop, node not ready, upgrade failures, analyze logs, KQL, insights, image pull failures, cold start issues, health probe failures, resource health, root cause of errors, troubleshoot event hubs, troubleshoot service bus, messaging SDK error, AMQP connection failure, message lock lost, lock renewal during long-running processing, service bus dead letter."
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.8"
+  version: "1.2.9"
 ---
 
 # Azure Diagnostics
@@ -29,15 +29,18 @@ Activate this skill when user wants to:
 - Troubleshoot AKS clusters, nodes, pods, ingress, or Kubernetes networking issues
 - Troubleshoot Azure VM connectivity issues (RDP/SSH failures, port 3389/22 timeouts, NSG or firewall blocking, credential resets)
 - Troubleshoot Azure Messaging SDK issues (Event Hubs, Service Bus connection failures, AMQP errors, message lock issues)
+- Root-cause a symptom that looks like a healthy-runtime-but-wrong-destination problem (e.g., telemetry/messages stop flowing to the expected resource after a config change) — invoke this skill for the matrix even when MCP tools could answer the surface question alone
 
 ## Rules
 
 1. Start with systematic diagnosis flow
-2. Use AppLens (MCP) for AI-powered diagnostics when available
-3. Check resource health before deep-diving into logs
-4. Select appropriate troubleshooting guide based on service type
-5. Document findings and attempted remediation steps
-6. Route AKS incidents to the dedicated AKS troubleshooting document
+2. Use supplied evidence first. If the user requests evidence-only analysis or prohibits live Azure access, do not query or modify Azure. Diagnose from the supplied logs, metrics, and timeline; identify assumptions and provide optional verification steps.
+3. Use AppLens (MCP) for AI-powered diagnostics when available
+4. Check resource health before deep-diving into logs
+5. Select appropriate troubleshooting guide based on service type
+6. Document findings and attempted remediation steps
+7. Prefer bundled diagnostic scripts over ad hoc calls for permitted live collection when identifiers are known. If supplied evidence suffices or live access is prohibited, don't run them; otherwise run the applicable script first.
+8. Route AKS incidents to the dedicated AKS troubleshooting document
 
 ---
 

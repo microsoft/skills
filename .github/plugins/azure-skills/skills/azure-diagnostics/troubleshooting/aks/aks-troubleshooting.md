@@ -32,7 +32,20 @@ See [references/aks-mcp.md](references/aks-mcp.md), [references/structured-input
 - first observed time or recent change window
 - impacted namespace, workload, service, or ingress when known
 
-If cluster identity is missing, stop and ask for it.
+If cluster identity is missing and no `kubectl` context is active, don't stop and ask
+immediately. Resolve the subscription from the request or confirmed existing context.
+If none is known, list accessible subscriptions and ask the user to select one; don't
+scan AKS resources across every subscription automatically. Run `az aks list
+--subscription <subscription-id>` in the selected subscription. If exactly one cluster
+is found, establish context with `az aks get-credentials --subscription
+<subscription-id> --resource-group <resource-group> --name <cluster-name>`, then use the
+relevant script's discovery/auto-select mode (e.g. `pod-evidence.sh --all-failing`). If
+zero or multiple clusters are found, ask the user to identify the target. If
+`kubectl` already has an active context, verify that its cluster matches the incident
+before collecting evidence. Use the context only when the user confirms it or its
+cluster/subscription/resource-group matches known incident details; otherwise ask which
+cluster to use. After confirmation, use the script's discovery/auto-select mode and ask
+for remaining details only if discovery comes up empty.
 
 ## Scope Buckets
 
@@ -81,20 +94,12 @@ When AKS-MCP cannot perform the baseline read, run the **[`aks-baseline`](../../
 .\scripts\aks-baseline.ps1 -ResourceGroup <resource-group> -Cluster <cluster-name> [-Namespace <namespace>]
 ```
 
-Then deep-dive on a specific pod as the digest indicates:
-
-```bash
-az aks show -g <resource-group> -n <cluster-name>
-az aks nodepool list -g <resource-group> --cluster-name <cluster-name>
-kubectl cluster-info
-kubectl get nodes -o wide
-kubectl get pods -n kube-system
-kubectl get events -A --sort-by=.lastTimestamp
-kubectl describe pod <pod-name> -n <namespace>
-kubectl logs <pod-name> -n <namespace> --previous
-```
-
-For unhealthy pods, gather the full read-only evidence bundle (describe, current + previous logs, resources vs usage) with the pod-evidence script instead of running the commands one by one — [`../../scripts/pod-evidence.sh`](../../scripts/pod-evidence.sh) / [`../../scripts/pod-evidence.ps1`](../../scripts/pod-evidence.ps1):
+For unhealthy pods, go straight to the pod-evidence script rather than running
+`describe`/`logs`/`top` one at a time — it gathers the full read-only evidence bundle
+(describe, current + previous logs, resources vs usage) in a single call:
+[`../../scripts/pod-evidence.sh`](../../scripts/pod-evidence.sh) /
+[`../../scripts/pod-evidence.ps1`](../../scripts/pod-evidence.ps1). If the pod name isn't
+known yet, use `--all-failing` to auto-discover it instead of asking the user for it:
 
 ```bash
 ../../scripts/pod-evidence.sh <pod-name> -n <namespace>
@@ -106,6 +111,21 @@ For unhealthy pods, gather the full read-only evidence bundle (describe, current
 ```
 
 See [pod-failures.md](pod-failures.md) for how to interpret the digest.
+
+Only fall back to the individual commands below if the bundled script is unavailable or
+you need a check it doesn't cover. If `kubectl` is missing or unconfigured, install or
+configure it before running Kubernetes-side checks:
+
+```bash
+az aks show -g <resource-group> -n <cluster-name>
+az aks nodepool list -g <resource-group> --cluster-name <cluster-name>
+kubectl cluster-info
+kubectl get nodes -o wide
+kubectl get pods -n kube-system
+kubectl get events -A --sort-by=.lastTimestamp
+kubectl describe pod <pod-name> -n <namespace>
+kubectl logs <pod-name> -n <namespace> --previous
+```
 
 Keep these read-only unless the user explicitly asks for remediation.
 
