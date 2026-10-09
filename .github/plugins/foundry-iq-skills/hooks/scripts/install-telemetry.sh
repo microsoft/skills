@@ -113,8 +113,7 @@ detect_target() {
             fi
 
             if [ "$is_musl" = "true" ]; then
-                error "The standalone telemetry reporter does not yet support Alpine or musl Linux."
-                return 1
+                OS="linux-musl"
             fi
             ;;
         Darwin)
@@ -260,7 +259,7 @@ if [ -n "${AZURE_SKILLS_TELEMETRY_ZIP_PATH:-}" ]; then
         exit 1
     }
 else
-    DOWNLOAD_URL="https://github.com/${REPOSITORY}/releases/download/${VERSION}/${ASSET_NAME}"
+    DOWNLOAD_URL="https://github.com/${REPOSITORY}/releases/download/${TOOL_NAME}-${VERSION}/${ASSET_NAME}"
     download_file "$DOWNLOAD_URL" "$ARCHIVE_PATH" || {
         error "Unable to download telemetry reporter from $DOWNLOAD_URL"
         exit 1

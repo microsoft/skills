@@ -83,6 +83,12 @@
 #                             root of the skill folder the reference lives in
 #    - Example: azure-validate/references/recipes/azd/README.md
 #
+# === Plugin Identity ===
+#
+# Every tracked event includes the plugin name and version read from the
+# installed copy's .plugin/plugin.json manifest. This lets the existing
+# telemetry receiver attribute sibling-plugin events without adding fields.
+#
 # === Reference File Detection ===
 #
 # When a file read tool is invoked (Copilot CLI: "view", Claude Code/Cursor:
@@ -108,6 +114,11 @@
 #     - .claude/plugins/cache/azure-skills/azure-kusto-graph-skills/<version>/skills/...
 #     - .cursor/plugins/cache/<catalog-name>/azure-kusto-graph-skills/<revision>/skills/...
 #     - .vscode/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-kusto-graph-skills/skills/...
+#     aks-skills:
+#     - .copilot/installed-plugins/<catalog-name>/aks-skills/skills/...
+#     - .claude/plugins/cache/azure-skills/aks-skills/<version>/skills/...
+#     - .cursor/plugins/cache/<catalog-name>/aks-skills/<revision>/skills/...
+#     - .vscode/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/aks-skills/skills/...
 #     azure-local-skills:
 #     - .copilot/installed-plugins/<catalog-name>/azure-local-skills/skills/...
 #     - .claude/plugins/cache/azure-skills/azure-local-skills/<version>/skills/...
@@ -134,7 +145,7 @@
 
 $ErrorActionPreference = "SilentlyContinue"
 
-$telemetryReporterVersion = "0.1.0"
+$telemetryReporterVersion = "0.1.10-g8cc1aa1c56"
 
 # Dumps raw input to a file in the AZURE_SKILLS_TELEMETRY_LOG_DIR/raw-input/
 # directory for debugging if the env var is set.
@@ -271,6 +282,22 @@ function Get-PluginManifest {
         return $manifest
     } catch { }
     return $null
+}
+
+# Return true unless this hook's plugin ships a .mcp.json that does not
+# configure the named server. A plugin with an empty .mcp.json (for example
+# aks-skills) must not report MCP calls owned by a co-installed plugin; a
+# plugin with no .mcp.json at all keeps the pre-existing behavior.
+function Test-OwnsMcpServer {
+    param([string]$ServerName)
+    if ([string]::IsNullOrWhiteSpace($ServerName)) { return $false }
+    $mcpConfigPath = Join-Path (Split-Path -Parent $skillsDir) '.mcp.json'
+    if (-not (Test-Path -LiteralPath $mcpConfigPath)) { return $true }
+    try {
+        $config = Get-Content -LiteralPath $mcpConfigPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        return $config.mcpServers -and ($config.mcpServers.PSObject.Properties.Name -contains $ServerName)
+    } catch { }
+    return $false
 }
 
 # === Main Processing ===
@@ -421,17 +448,27 @@ if ($isSessionStart) {
 
 # Check for skill invocation via 'skill'/'Skill' tool
 if ($toolName -eq "skill" -or $toolName -eq "Skill") {
-    $skillName = $toolInput.skill
-    # Claude Code prefixes skill names with "azure:" (e.g., "azure:azure-prepare")
-    # Strip it to get the actual skill name for the allowlist
-    if ($skillName -and $skillName.StartsWith("azure:")) {
-        $skillName = $skillName.Substring(6)
+    $requestedSkillName = $toolInput.skill
+    $ownManifest = Get-PluginManifest -ClientName $clientName
+    $pluginName = if ($ownManifest) { $ownManifest.name } else { $null }
+    $skillName = $requestedSkillName
+    # Native plugin invocations use "<plugin-name>:<skill-name>". Strip only
+    # this hook copy's own namespace so another plugin cannot claim the call.
+    if ($requestedSkillName -and $requestedSkillName.Contains(":")) {
+        $skillParts = $requestedSkillName -split ':', 2
+        if ($pluginName -and $skillParts[0] -eq $pluginName) {
+            $skillName = $skillParts[1]
+        } else {
+            $skillName = $null
+        }
     }
-    $skillMdPath = Join-Path $skillsDir (Join-Path $skillName 'SKILL.md')
-    if ($skillName -and (Test-Path -LiteralPath $skillMdPath) -and (Test-OwnedSkillPath $skillMdPath)) {
-        $eventType = "skill_invocation"
-        $shouldTrack = $true
-        $skillVersion = Get-SkillVersion $skillMdPath
+    if ($skillName) {
+        $skillMdPath = Join-Path $skillsDir (Join-Path $skillName 'SKILL.md')
+        if ((Test-Path -LiteralPath $skillMdPath) -and (Test-OwnedSkillPath $skillMdPath)) {
+            $eventType = "skill_invocation"
+            $shouldTrack = $true
+            $skillVersion = Get-SkillVersion $skillMdPath
+        }
     }
 }
 
@@ -470,7 +507,7 @@ if ($toolName -eq "view" -or $toolName -eq "Read" -or $toolName -eq "read_file")
 # Cursor:       afterMCPExecution with mcp_server_name "azure"; remove Cursor's
 #               optional display prefix (e.g., MCP:get_azure_bestpractices)
 # VS Code:      "mcp_azure_mcp_*" prefix (e.g., mcp_azure_mcp_documentation)
-if ($toolName) {
+if ($toolName -and (Test-OwnsMcpServer -ServerName "azure")) {
     if ($clientName -eq "cursor" -and $hookEventName -eq "afterMCPExecution" -and $mcpServerName -eq "azure") {
         $azureToolName = $toolName
         if ($azureToolName.StartsWith("MCP:", [System.StringComparison]::Ordinal)) {

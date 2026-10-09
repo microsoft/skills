@@ -4,34 +4,12 @@ description: "Query and analyze data in Azure Data Explorer (Kusto/ADX) using KQ
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.1"
+  version: "1.2.2"
 ---
 
 # Azure Data Explorer (Kusto) Query & Analytics
 
 Execute KQL queries and manage Azure Data Explorer resources for fast, scalable big data analytics on log, telemetry, and time series data.
-
-## Skill Activation Triggers
-
-**Use this skill immediately when the user asks to:**
-- "Query my Kusto database for [data pattern]"
-- "Show me events in the last hour from Azure Data Explorer"
-- "Analyze logs in my ADX cluster"
-- "Run a KQL query on [database]"
-- "What tables are in my Kusto database?"
-- "Show me the schema for [table]"
-- "List my Azure Data Explorer clusters"
-- "Aggregate telemetry data by [dimension]"
-- "Create a time series chart from my logs"
-
-**Key Indicators:**
-- Mentions "Kusto", "Azure Data Explorer", "ADX", or "KQL"
-- Log analytics or telemetry analysis requests
-- Time series data exploration
-- IoT data analysis queries
-- SIEM or security analytics tasks
-- Requests for data aggregation on large datasets
-- Performance monitoring or APM queries
 
 ## Overview
 
@@ -45,7 +23,7 @@ Key capabilities:
 
 ## Core Workflow
 
-1. **Discover Resources**: List available clusters and databases in subscription
+1. **Discover Resources**: List available clusters and databases in subscription. If the target table's location is unknown and multiple candidate clusters, databases, or Log Analytics workspaces exist, batch the search (see Pattern 6) and only report "not found" after all candidates are checked.
 2. **Explore Schema**: Retrieve table structures to understand data model
 3. **Query Data**: Execute KQL queries for analysis, filtering, aggregation
 4. **Analyze Results**: Process query output for insights and reporting
@@ -112,6 +90,17 @@ Explore table structure before querying.
 
 **Use for**: Understanding data model, query planning
 
+### Pattern 6: Batch Search Across Candidate Sources
+When a table's location is unknown and there are several candidate clusters, databases, or workspaces, batch read-only metadata discovery instead of querying candidates one at a time. List tables in each candidate database or workspace and match the exact table name before querying data.
+
+After confirming which sources contain the table, query those sources together when needed:
+```kql
+union workspace('ws1').Requests, workspace('ws2').Requests
+| take 1
+```
+
+**Use for**: Locating a table among many candidate resources without confusing an empty result with a missing table
+
 ## Key Data Fields
 
 When executing queries, common field patterns:
@@ -131,12 +120,6 @@ Query results include:
 
 ## KQL Best Practices
 
-**🟢 Performance Optimized:**
-- Filter early: Use `where` before joins and aggregations
-- Limit result size: Use `take` or `limit` to reduce data transfer
-- Time filters: Always filter by time range for time series data
-- Indexed columns: Filter on indexed columns first
-
 **🔵 Query Patterns:**
 - Use `summarize` for aggregations instead of `count()` alone
 - Use `bin()` for time bucketing in time series
@@ -152,7 +135,7 @@ Query results include:
 
 ## Best Practices
 
-- Always include time range filters to optimize query performance
+- Filter early with time range filters to optimize query performance and use indexed columns first
 - Use `take` or `limit` for exploratory queries to avoid large result sets
 - Leverage `summarize` for aggregations instead of client-side processing
 - Store frequently-used queries as functions in the database
@@ -218,6 +201,7 @@ Switch to Azure CLI when:
 - **Query Timeout**: Optimize query with time filters, reduce result set, or increase timeout
 - **Syntax Error**: Validate KQL syntax - common issues: missing pipes, incorrect operators
 - **Empty Results**: Check time range filters (may be too restrictive), verify table name
+- **Table Location Unknown**: Use Pattern 6 to batch-search all candidate sources before concluding the data does not exist
 - **Cluster Not Found**: Check cluster name format (exclude ".kusto.windows.net" suffix)
 - **High CPU Usage**: Query too broad - add filters, reduce time range, limit aggregations
 - **Ingestion Lag**: Streaming data may have 1-30 second delay depending on ingestion method

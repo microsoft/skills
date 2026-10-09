@@ -4,7 +4,7 @@ description: "Debug Azure production issues on Azure using AppLens, Azure Monito
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.9"
+  version: "1.2.10"
 ---
 
 # Azure Diagnostics
@@ -41,6 +41,8 @@ Activate this skill when user wants to:
 6. Document findings and attempted remediation steps
 7. Prefer bundled diagnostic scripts over ad hoc calls for permitted live collection when identifiers are known. If supplied evidence suffices or live access is prohibited, don't run them; otherwise run the applicable script first.
 8. Route AKS incidents to the dedicated AKS troubleshooting document
+9. Keep baseline AKS diagnostics available even when the optional `aks-skills`
+   add-on is absent, declined, or unsupported by the host
 
 ---
 

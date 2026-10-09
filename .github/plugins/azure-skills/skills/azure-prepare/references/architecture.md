@@ -31,8 +31,8 @@ Select hosting stack and map components to Azure services.
 | **Custom operators/CRDs** |                             |                 ✓✓                  |
 | **Service mesh**          |       Dapr (built-in)       |                Istio                |
 | **Networking/dataplane**  |  Managed platform defaults  |     Azure CNI powered by Cilium     |
-| **GPU workloads**         |                             |                 ✓✓                  |
-| **Best for**              | Microservices, event-driven | Full K8s control, complex workloads |
+| **GPU workloads**         | Serverless A100/T4 inference |      Full Kubernetes control        |
+| **Best for**              | Managed microservices, event-driven apps, serverless inference | Kubernetes APIs, operators, custom scheduling/networking |
 
 #### When to Use Container Apps
 
@@ -40,13 +40,16 @@ Select hosting stack and map components to Azure services.
 - Event-driven workloads (KEDA built-in)
 - Need scale-to-zero for cost optimization
 - Teams without Kubernetes expertise
+- Serverless GPU inference that does not require Kubernetes APIs, operators, or
+  custom scheduling ([Microsoft Learn](https://learn.microsoft.com/azure/container-apps/gpu-serverless-overview))
 
 #### When to Use AKS
 
 - Need Kubernetes API/kubectl access
 - Require custom operators or CRDs
 - Service mesh requirements (Istio, Linkerd)
-- GPU/ML workloads
+- GPU/ML workloads that require Kubernetes APIs, operators, custom scheduling,
+  or advanced networking/control
 - Complex networking or multi-tenant architectures
 
 > **AKS Planning:** For AKS SKU selection (Automatic vs Standard), networking, identity, scaling, and security configuration, invoke the **azure-kubernetes** skill.
@@ -64,7 +67,8 @@ Select hosting stack and map components to Azure services.
 | Scheduled Task           | Functions (Timer) | Container Apps Jobs, Kubernetes CronJob (on AKS) |
 | Event Processor          | Functions         | Container Apps, AKS + KEDA                       |
 | Microservices (full K8s) | AKS               | Container Apps                                   |
-| GPU/ML Workloads         | AKS               | Azure ML                                         |
+| GPU inference (managed/serverless) | Container Apps | AKS (when Kubernetes control is required), Azure ML |
+| GPU/ML with Kubernetes control | AKS | Container Apps (serverless inference), Azure ML |
 
 ### Data
 

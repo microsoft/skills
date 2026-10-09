@@ -51,9 +51,15 @@ az aks nodepool add \
   --labels "kubernetes.azure.com/scalesetpriority=spot"
 ```
 
-Pods that tolerate Spot but don't require it (no `nodeSelector` or required node affinity pinning them to the Spot pool) will be rescheduled onto the regular pool after eviction. Pods pinned to Spot via `nodeSelector` cannot reschedule and will remain pending until a Spot node is available again.
+The toleration below makes Spot nodes eligible, while preferred affinity biases
+scheduling toward Spot when it is available. Because the affinity is preferred
+rather than required, compatible regular nodes remain eligible when Spot
+capacity is unavailable. This does not promise failover or capacity: the
+regular pool must have compatible labels, resources, taints, and available
+capacity. Pods pinned to Spot with a `nodeSelector` or required affinity remain
+pending when Spot capacity is unavailable.
 
-## Workload Toleration (add to Deployment YAML)
+## Workload Toleration and Preference (add to Deployment YAML)
 
 ```yaml
 tolerations:
@@ -61,8 +67,16 @@ tolerations:
   operator: "Equal"
   value: "spot"
   effect: "NoSchedule"
-nodeSelector:
-  kubernetes.azure.com/scalesetpriority: spot
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      preference:
+        matchExpressions:
+        - key: "kubernetes.azure.com/scalesetpriority"
+          operator: In
+          values:
+          - "spot"
 ```
 
 ## Suitability
@@ -96,19 +110,14 @@ spec:
               command: ["/bin/sh", "-c", "sleep 5"]  # Drain in-flight requests
 ```
 
-Set a PodDisruptionBudget to limit simultaneous evictions:
-
-```bash
-kubectl apply -f - <<EOF
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: <APP_NAME>-pdb
-  namespace: <NAMESPACE>
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: <APP_NAME>
-EOF
-```
+> A PodDisruptionBudget does not prevent Azure Spot node reclamation. PDBs
+> constrain voluntary disruptions performed through the Kubernetes Eviction
+> API, such as drains, upgrades, and cluster-autoscaler scale-down. Azure can
+> reclaim or delete the underlying Spot VM involuntarily, reducing availability
+> below the budget. See [AKS PDB guidance](https://learn.microsoft.com/azure/aks/operator-best-practices-scheduler#limit-disruption-impact-by-using-pod-disruption-budgets-pdbs)
+> and [Spot node pool limitations](https://learn.microsoft.com/azure/aks/spot-node-pool).
+>
+> Use multiple replicas distributed across nodes or other failure domains, and
+> retain enough compatible regular-pool capacity for the workload's availability
+> requirements. Preferred Spot affinity permits that fallback but cannot
+> guarantee scheduling capacity.

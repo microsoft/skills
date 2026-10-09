@@ -1,11 +1,17 @@
 # AKS Automatic Compatibility Constraint Spec — Condensed Reference
-# Version: 1.1.1 | AKS: 2026-03-15
+# Version: 1.2.0 | AKS: 2026-03-15 rules, reconciled 2026-09 against:
+#   - Learn: Deployment Safeguards (Automatic = Baseline PSS + Enforce by default)
+#   - Azure Policy built-in initiative c047ea8e v3.0.0 (Azure/azure-policy)
+#   - Learn: AKS Automatic cluster SKU migration (supported journeys)
 # This condensed version is optimized for LLM context.
+# Rule counts in comments describe THIS file; they are not a claim about the
+# exact number of policies active on any cluster. Verify live enforcement with
+# `kubectl get constraints` when a cluster is reachable.
 
 apiVersion: aks-automatic.azure.com/v1
 kind: ConstraintSpecReference
 metadata:
-  version: "1.1.1"
+  version: "1.2.0"
   aksVersion: "2026-03-15"
   policyInitiatives:
     deploymentSafeguards: c047ea8e-9c78-49b2-958b-37e56d291a44
@@ -13,7 +19,9 @@ metadata:
     podSecurityRestricted: 42b8ef37-b724-4e24-bbc8-7a7708edfe00
 
 # =============================================================================
-# CLUSTER CONSTRAINTS (23 total)
+# CLUSTER CONSTRAINTS (23 customer-facing)
+# AKS-managed HOBO taint rules (CriticalAddonsOnly NoSchedule/NoExecute, hosted
+# VM taint) are internal and intentionally omitted from customer assessment.
 # =============================================================================
 clusterConstraints:
   # -- Addons --
@@ -177,8 +185,11 @@ clusterConstraints:
     fix: "az aks nodepool update --cluster-name CLUSTER --name POOL_NAME --ssh-access disabled"
 
 # =============================================================================
-# WORKLOAD CONSTRAINTS — Deployment Safeguards (21 active policies)
+# WORKLOAD CONSTRAINTS — Deployment Safeguards (21 rules: 20 Baseline-level
+# rules active on Automatic + safeguard-host-probes, which is advisory/unverified)
 # Initiative: c047ea8e | Effect: Mixed(Deny/Warn/Mutate) on Automatic
+# Restricted-only and Windows-only rules are listed separately under
+# `conditionalSafeguards` below.
 # =============================================================================
 safeguards:
   # -- AKS Best Practices (9 policies) --
@@ -339,6 +350,11 @@ safeguards:
     category: podSecurity
     check: |
       SELinux settings are restricted to specific types, and custom user or role values are forbidden.
+      Sanitized input represents non-empty user and role values as
+      seLinuxOptions.userConfigured and seLinuxOptions.roleConfigured booleans;
+      true violates the corresponding empty-value requirement. The raw values
+      are deliberately not retained. If these booleans are absent from an older
+      projection, report that portion of the check as unavailable, not compliant.
       Check the following fields:
       - spec.securityContext.seLinuxOptions.type
       - spec.containers[*].securityContext.seLinuxOptions.type
@@ -438,7 +454,8 @@ safeguards:
 
   - id: safeguard-host-probes
     policyId: acdf8909
-    severity: requiresChanges
+    severity: informational
+    enforcement: unverified  # Not in initiative c047ea8e v3.0.0 or the Learn Safeguards PSS table; keep as advisory, do not report as a blocker
     category: podSecurity
     check: |
       The host field in probes and lifecycle hooks is disallowed
@@ -488,6 +505,82 @@ safeguards:
       Remove Unconfined, or set seccompProfile.type to RuntimeDefault or Localhost.
 
 # =============================================================================
+# CONDITIONAL SAFEGUARDS — present in initiative c047ea8e but NOT part of the
+# Baseline set AKS Automatic enforces by default. Report these only when the
+# cluster's active constraints show them, when the user opts into PSS
+# Restricted, or when the workload targets Windows nodes. Never present them
+# as default Automatic migration blockers.
+# =============================================================================
+conditionalSafeguards:
+  - id: safeguard-no-privilege-escalation
+    policyId: 1c6e92c9
+    severity: requiresChanges
+    enforcement: conditional  # Learn: "Privilege Escalation (PSS Restricted Only)"
+    appliesWhen: PSS Restricted is enabled on the cluster, or an active constraint forces allowPrivilegeEscalation=false
+    category: podSecurity
+    check: |
+      allowPrivilegeEscalation must not be true; under Restricted it must be explicitly false.
+      Check the following fields:
+      - spec.containers[*].securityContext.allowPrivilegeEscalation
+      - spec.initContainers[*].securityContext.allowPrivilegeEscalation
+      - spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation
+    patch: "add securityContext.allowPrivilegeEscalation: false"
+
+  - id: safeguard-allowed-users-groups
+    policyId: f06ddb64
+    severity: requiresChanges
+    enforcement: conditional  # Learn: "Running as Non-Root (PSS Restricted Only)"
+    appliesWhen: PSS Restricted is enabled, or an active constraint sets runAsUserRule=MustRunAsNonRoot
+    category: podSecurity
+    check: |
+      Containers must not run as root under Restricted.
+      Check the following fields:
+      - spec.securityContext.runAsNonRoot / runAsUser
+      - spec.containers[*].securityContext.runAsNonRoot / runAsUser
+    patch: "add securityContext.runAsNonRoot: true and a non-zero runAsUser the image supports"
+
+  - id: safeguard-allowed-volume-types
+    policyId: 16697877
+    severity: informational
+    enforcement: conditional  # Learn: "Volume Types (PSS Restricted Only)"
+    appliesWhen: PSS Restricted is enabled on the cluster
+    category: podSecurity
+    check: |
+      Under Restricted only these volume types are allowed:
+      configMap, csi, downwardAPI, emptyDir, ephemeral, persistentVolumeClaim, projected, secret.
+      Check the following field:
+      - spec.volumes[*]
+    fix: "Optional hardening: replace other volume types with an allowed type (hostPath is already covered by safeguard-no-host-path-volumes)"
+
+  - id: safeguard-windows-block-container-admin
+    policyId: 5485eac0
+    severity: requiresChanges
+    enforcement: conditional  # In initiative c047ea8e; not listed on the Learn Safeguards page. Windows node pools are optional on Automatic
+    appliesWhen: The workload targets Windows nodes and the constraint is active on the cluster
+    category: podSecurity
+    check: |
+      Windows containers must not run as ContainerAdministrator.
+      Check the following fields:
+      - spec.securityContext.windowsOptions.runAsUserName
+      - spec.containers[*].securityContext.windowsOptions.runAsUserName
+    fix: "Run as ContainerUser or another non-administrator Windows account"
+
+# =============================================================================
+# POD SECURITY STANDARDS — initiative metadata
+# =============================================================================
+podSecurityBaseline:
+  initiative: a8640138-9b0a-4a28-b8cb-1666c838647d
+  enforcement: mandatory on AKS Automatic (Enforce; namespace exclusions allowed, cannot switch to Warn)
+  note: Overlaps with the Baseline-level Safeguards rules above
+  policies: [NoPrivilegedContainers, BlockUsingHostNetwork, BlockUsingHostProcessIDAndIPC, ContainerCapabilities, NoHostPathVolume]
+
+podSecurityRestricted:
+  initiative: 42b8ef37-b724-4e24-bbc8-7a7708edfe00
+  enforcement: optional opt-in (not enforced by default on Automatic)
+  note: Adds the conditionalSafeguards marked "PSS Restricted Only"
+  additionalPolicies: [NoPrivilegeEscalation, AllowedVolumeTypes, AllowedUsersGroups, AllowedSeccompProfiles]
+
+# =============================================================================
 # WEBHOOK MUTATIONS (2 active mutators) — auto-applied at admission
 # =============================================================================
 mutations:
@@ -500,4 +593,3 @@ mutations:
     policyId: implicit
     target: containers
     effect: "Sets resources.requests+limits defaults cpu=500m, memory=2Gi. Minimums cpu=100m, memory=100Mi. If only limits set, requests=limits. If requests > limits, requests capped at limits (QoS fix)."
-

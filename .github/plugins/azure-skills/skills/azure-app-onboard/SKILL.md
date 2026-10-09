@@ -4,7 +4,7 @@ description: "End-to-end orchestrator: from a business idea, app idea, or existi
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.5"
+  version: "1.2.6"
 ---
 
 # Azure App Onboard

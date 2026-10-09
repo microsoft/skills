@@ -15,11 +15,12 @@ Component→Azure service selection. Apply `context.json.intent` as modifiers, `
 | Scheduled Task | Functions (Timer) | Container Apps Jobs | Cron patterns, periodic execution |
 | Event Processor | Functions | Container Apps + KEDA | Event-driven, queue/topic consumer |
 | Microservices (K8s) | AKS | Container Apps | kubectl/helm in repo, CRDs, service mesh |
-| GPU/ML Workloads | AKS | Azure ML | GPU requirements, training workloads |
+| GPU inference (managed/serverless) | Container Apps | AKS, Azure ML | A100/T4 inference without Kubernetes API, operator, or custom-scheduling requirements |
+| GPU/ML with Kubernetes control | AKS | Container Apps, Azure ML | Kubernetes APIs, operators/CRDs, custom scheduling, or advanced networking/control |
 
 **Stack shortcuts:** Containers (Docker, microservices) → Container Apps or AKS. Serverless (event-driven, variable traffic) → Functions. Traditional web (PaaS preference) → App Service.
 
-**AKS vs Container Apps:** Use Container Apps when scale-to-zero needed, no K8s expertise, or KEDA-driven event processing. Delegate AKS planning to `azure-kubernetes` skill.
+**AKS vs Container Apps:** Use Container Apps when scale-to-zero is needed, no K8s expertise is required, KEDA-driven event processing fits, or serverless GPU inference does not require Kubernetes control. Use AKS when the workload requires Kubernetes APIs, operators/CRDs, custom scheduling, or advanced networking/control. Delegate AKS planning to the `azure-kubernetes` skill. See [Azure Container Apps serverless GPUs](https://learn.microsoft.com/azure/container-apps/gpu-serverless-overview).
 
 **App Service vs Container Apps:** App Service preferred when user wants free tier (F1 $0 / B1 ~$13/mo) or single-process with no container orchestration. Container Apps preferred for REST/GraphQL APIs (scaffold generates Dockerfile if missing), scale-to-zero, multi-container/sidecar, or event-driven KEDA scaling. Budget affects SKU tier (Consumption vs Dedicated), not compute service type. Container Apps Consumption has no fixed free tier but scales to zero.
 

@@ -22,7 +22,7 @@ Sign up at [azure.microsoft.com](https://azure.microsoft.com) or use your existi
 
 ### 2. Install Node.js and NPM
 
-The Azure MCP Server runs as an NPM package. Ensure you have Node.js 18 or later installed:
+The Azure MCP Server runs as an NPM package. Ensure you have Node.js 22 or later installed:
 
 - Download from [nodejs.org](https://nodejs.org)
 - Or use a version manager like [nvm](https://github.com/nvm-sh/nvm)
@@ -132,7 +132,7 @@ For more information, visit:
 - See the [Authentication guide](https://learn.microsoft.com/azure/developer/azure-mcp-server/)
 
 ### Server Issues
-- Ensure Node.js 18 or later is installed
+- Ensure Node.js 22 or later is installed
 - Verify NPM can download packages from npmjs.com
 - Check the [Troubleshooting guide](https://github.com/microsoft/mcp/blob/main/servers/Azure.Mcp.Server/TROUBLESHOOTING.md)
 
