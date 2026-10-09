@@ -4,7 +4,7 @@ description: "Set up AI Runway on AKS — from bare cluster to running model. Co
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.1"
+  version: "1.1.2"
 argument-hint: "[skip-to-step N]"
 ---
 
@@ -25,7 +25,7 @@ This skill assumes an AKS cluster already exists. If the user does not have a cl
 | Best for | End-to-end AI Runway onboarding on AKS |
 | CLI tools | `kubectl`, `make`, `curl` |
 | MCP tools | None |
-| Related skills | `azure-kubernetes` (cluster setup), `azure-diagnostics` (troubleshooting) |
+| Related skills | `azure-kubernetes` (cluster setup), `azure-diagnostics` (baseline troubleshooting), optional `aks-gpu-inference` (existing GPU/inference Day-2 incidents only) |
 
 ## When to Use This Skill
 
@@ -36,6 +36,13 @@ Use this skill when the user wants to:
 - Choose and install an inference provider (KAITO, Dynamo, KubeRay)
 - Deploy their first AI model to AKS via AI Runway
 - Resume a partially-complete AI Runway setup from a specific step
+
+## GPU setup versus Day-2 incidents
+
+Keep initial GPU node-pool, provider, controller, and model setup in this skill.
+For an incident affecting an existing GPU or inference deployment, load
+[optional-gpu-day2.md](references/optional-gpu-day2.md) before deciding whether
+to offer the focused optional add-on.
 
 ## MCP Tools
 

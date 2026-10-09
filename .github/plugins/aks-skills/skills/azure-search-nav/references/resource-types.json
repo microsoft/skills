@@ -1,0 +1,114 @@
+{
+  "microsoft.containerservice/aimanagers": {
+    "armProvider": "Microsoft.ContainerService/aiManagers",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/containerservices": {
+    "armProvider": "Microsoft.ContainerService/containerServices",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/deploymentsafeguards": {
+    "armProvider": "Microsoft.ContainerService/deploymentSafeguards",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/fleets": {
+    "armProvider": "Microsoft.ContainerService/fleets",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/maintenancewindows": {
+    "armProvider": "Microsoft.ContainerService/maintenanceWindows",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/managedclusters": {
+    "armProvider": "Microsoft.ContainerService/managedClusters",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/managedclustersnapshots": {
+    "armProvider": "Microsoft.ContainerService/managedclustersnapshots",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/nodecustomizations": {
+    "armProvider": "Microsoft.ContainerService/nodeCustomizations",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/openshiftmanagedclusters": {
+    "armProvider": "Microsoft.ContainerService/openShiftManagedClusters",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/preparedimagespecifications": {
+    "armProvider": "Microsoft.ContainerService/preparedImageSpecifications",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.containerservice/snapshots": {
+    "armProvider": "Microsoft.ContainerService/snapshots",
+    "extension": "Microsoft_Azure_ContainerService"
+  },
+  "microsoft.kubernetes/connectedclusters": {
+    "armProvider": "Microsoft.Kubernetes/connectedClusters",
+    "extension": "Microsoft_Azure_HybridCompute"
+  },
+  "microsoft.compute/availabilitysets": {
+    "armProvider": "Microsoft.Compute/availabilitySets",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/capacityreservationgroups": {
+    "armProvider": "Microsoft.Compute/capacityReservationGroups",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/cloudservices": {
+    "armProvider": "Microsoft.Compute/cloudServices",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/diskaccesses": {
+    "armProvider": "Microsoft.Compute/diskAccesses",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/diskencryptionsets": {
+    "armProvider": "Microsoft.Compute/diskEncryptionSets",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/disks": {
+    "armProvider": "Microsoft.Compute/disks",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/galleries": {
+    "armProvider": "Microsoft.Compute/galleries",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/hostgroups": {
+    "armProvider": "Microsoft.Compute/hostGroups",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/images": {
+    "armProvider": "Microsoft.Compute/images",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/interconnectblocks": {
+    "armProvider": "Microsoft.Compute/interconnectBlocks",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/proximityplacementgroups": {
+    "armProvider": "Microsoft.Compute/proximityPlacementGroups",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/restorepointcollections": {
+    "armProvider": "Microsoft.Compute/restorePointCollections",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/snapshots": {
+    "armProvider": "Microsoft.Compute/snapshots",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/sshpublickeys": {
+    "armProvider": "Microsoft.Compute/sshPublicKeys",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/virtualmachines": {
+    "armProvider": "Microsoft.Compute/virtualMachines",
+    "extension": "Microsoft_Azure_Compute"
+  },
+  "microsoft.compute/virtualmachinescalesets": {
+    "armProvider": "Microsoft.Compute/virtualMachineScaleSets",
+    "extension": "Microsoft_Azure_Compute"
+  }
+}

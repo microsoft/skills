@@ -15,6 +15,12 @@ $pathPatternClaudeKustoGraph = '\.claude/plugins/cache/azure-skills/azure-kusto-
 $pathPatternCursorKustoGraph = '\.cursor/plugins/cache/[^/]+/azure-kusto-graph-skills/[^/]+/skills/'
 $pathPatternVscodeAgentPluginsKustoGraph = 'agent-plugins/github\.com/microsoft/azure-skills/\.github/plugins/azure-kusto-graph-skills/skills/'
 
+# --- aks-skills plugin ---
+$pathPatternCopilotAks = '\.copilot/installed-plugins/[^/]+/aks-skills/skills/'
+$pathPatternClaudeAks = '\.claude/plugins/cache/azure-skills/aks-skills/[0-9.]+/skills/'
+$pathPatternCursorAks = '\.cursor/plugins/cache/[^/]+/aks-skills/[^/]+/skills/'
+$pathPatternVscodeAgentPluginsAks = 'agent-plugins/github\.com/microsoft/azure-skills/\.github/plugins/aks-skills/skills/'
+
 # --- azure-local-skills plugin ---
 $pathPatternCopilotAzureLocal = '\.copilot/installed-plugins/[^/]+/azure-local-skills/skills/'
 $pathPatternClaudeAzureLocal = '\.claude/plugins/cache/azure-skills/azure-local-skills/[0-9.]+/skills/'
@@ -36,6 +42,10 @@ $pluginPathPatterns += @(
 	$pathPatternClaudeKustoGraph,
 	$pathPatternCursorKustoGraph,
 	$pathPatternVscodeAgentPluginsKustoGraph,
+	$pathPatternCopilotAks,
+	$pathPatternClaudeAks,
+	$pathPatternCursorAks,
+	$pathPatternVscodeAgentPluginsAks,
 	$pathPatternCopilotAzureLocal,
 	$pathPatternClaudeAzureLocal,
 	$pathPatternCursorAzureLocal,

@@ -52,6 +52,23 @@ securityContext:
 
 ---
 
+## `safeguard-no-privilege-escalation` — Disable privilege escalation (conditional: PSS Restricted)
+
+Apply when the target opts into PSS Restricted or the cluster's active constraints require it; on the default Automatic Baseline this is optional hardening.
+
+**Before:**
+```yaml
+securityContext: {}
+```
+
+**After:**
+```yaml
+securityContext:
+  allowPrivilegeEscalation: false
+```
+
+---
+
 ## `safeguard-allowed-seccomp-profiles` — Add seccomp profile
 
 **Before:**
@@ -176,6 +193,8 @@ readinessProbe:
 ---
 
 ## `safeguard-host-probes` — Remove host field in probes and lifecycle hooks
+
+Advisory only: this rule is not part of the public Deployment Safeguards initiative (c047ea8e) and is not verified as an Automatic admission block. Present it as a recommendation, not a migration blocker.
 
 **Before:**
 ```yaml

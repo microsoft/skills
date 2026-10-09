@@ -48,20 +48,33 @@ az aks nodepool update \
 
 ## Tune CAS Profile
 
-Apply when CAS is already on but idle nodes persist:
-
-> ⚠️ **Warning:** Setting `skip-nodes-with-system-pods=false` allows CAS to evict system pods. Ensure all system pods in `kube-system` have PodDisruptionBudgets before enabling this.
+Apply when CAS is already on but idle nodes persist. The following
+cost-oriented profile is an example, not a universal default. The two scale-down
+timers are shorter than their documented 10-minute defaults, while the
+utilization threshold remains at its 0.5 default:
 
 ```bash
 az aks update \
   --name "<CLUSTER_NAME>" --resource-group "<RESOURCE_GROUP>" \
   --cluster-autoscaler-profile \
-    scale-down-delay-after-add=10m \
-    scale-down-unneeded-time=10m \
+    scale-down-delay-after-add=5m \
+    scale-down-unneeded-time=5m \
     scale-down-utilization-threshold=0.5 \
-    max-graceful-termination-sec=600 \
-    skip-nodes-with-system-pods=false
+    max-graceful-termination-sec=600
 ```
+
+> Risk: Medium. Shorter scale-down timers can reduce idle cost, but they can
+> also cause node reprovisioning after brief demand changes. This thrashing
+> adds provisioning latency; use a less aggressive profile for workloads with
+> frequent short scale-out and scale-in cycles. See
+> [AKS cluster autoscaler profile settings](https://learn.microsoft.com/azure/aks/cluster-autoscaler#cluster-autoscaler-profile-settings)
+> and [aggressive scale-down guidance](https://learn.microsoft.com/azure/aks/cluster-autoscaler#configure-cluster-autoscaler-profile-for-aggressive-scale-down).
+>
+> Keep `skip-nodes-with-system-pods` at its default `true`. It prevents
+> scale-down of nodes that host non-DaemonSet `kube-system` pods. Do not use
+> `skip-nodes-with-system-pods=false` as a cost lever or assume every
+> Microsoft-managed system component can be protected by a customer-managed
+> PDB. See [AKS support policies](https://learn.microsoft.com/azure/aks/support-policies#managed-features-in-aks).
 
 To roll back to CAS defaults:
 
@@ -86,5 +99,4 @@ az aks update \
 > ```bash
 > kubectl get pdb --all-namespaces
 > ```
-
 

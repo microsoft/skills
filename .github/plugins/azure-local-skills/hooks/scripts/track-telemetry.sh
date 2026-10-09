@@ -85,6 +85,12 @@
 #                             root of the skill folder the reference lives in
 #    - Example: azure-validate/references/recipes/azd/README.md
 #
+# === Plugin Identity ===
+#
+# Every tracked event includes the plugin name and version read from the
+# installed copy's .plugin/plugin.json manifest. This lets the existing
+# telemetry receiver attribute sibling-plugin events without adding fields.
+#
 # === Reference File Detection ===
 #
 # When a file read tool is invoked (Copilot CLI: "view", Claude Code/Cursor:
@@ -110,6 +116,11 @@
 #     - .claude/plugins/cache/azure-skills/azure-kusto-graph-skills/<version>/skills/...
 #     - .cursor/plugins/cache/<catalog-name>/azure-kusto-graph-skills/<revision>/skills/...
 #     - .vscode/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-kusto-graph-skills/skills/...
+#     aks-skills:
+#     - .copilot/installed-plugins/<catalog-name>/aks-skills/skills/...
+#     - .claude/plugins/cache/azure-skills/aks-skills/<version>/skills/...
+#     - .cursor/plugins/cache/<catalog-name>/aks-skills/<revision>/skills/...
+#     - .vscode/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/aks-skills/skills/...
 #     azure-local-skills:
 #     - .copilot/installed-plugins/<catalog-name>/azure-local-skills/skills/...
 #     - .claude/plugins/cache/azure-skills/azure-local-skills/<version>/skills/...
@@ -136,7 +147,7 @@
 
 set +e  # Don't exit on errors - fail silently for privacy
 
-TELEMETRY_REPORTER_VERSION="0.1.0"
+TELEMETRY_REPORTER_VERSION="0.1.10-g8cc1aa1c56"
 
 # Skip telemetry if opted out
 if [ "${AZURE_MCP_COLLECT_TELEMETRY}" = "false" ]; then
@@ -233,6 +244,31 @@ get_plugin_field() {
             if (typeof value === "string" && value) process.stdout.write(value);
         } catch { }
     ' "$pluginManifestPath" "$fieldName" 2>/dev/null
+}
+
+# Return true unless this hook's plugin ships a .mcp.json that does not
+# configure the named server. The shared hook is copied into every plugin, so
+# a plugin with an empty .mcp.json (for example aks-skills) must not report MCP
+# calls owned by a co-installed plugin. A plugin with no .mcp.json at all keeps
+# the pre-existing behavior and reports the event.
+owns_mcp_server() {
+    local serverName="$1"
+    local mcpConfigPath
+    mcpConfigPath="$(dirname "$SKILLS_DIR")/.mcp.json"
+    [ -f "$mcpConfigPath" ] || return 0
+    node -e '
+        try {
+            const config = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+            process.exit(
+                config.mcpServers
+                && Object.prototype.hasOwnProperty.call(config.mcpServers, process.argv[2])
+                    ? 0
+                    : 1
+            );
+        } catch {
+            process.exit(1);
+        }
+    ' "$mcpConfigPath" "$serverName" 2>/dev/null
 }
 
 # === JSON Parsing Functions (using sed - portable across platforms) ===
@@ -402,10 +438,18 @@ fi
 
 # Check for skill invocation via 'skill'/'Skill' tool
 if [ "$toolName" = "skill" ] || [ "$toolName" = "Skill" ]; then
-    skillName=$(extract_toolargs_field "$rawInput" "skill")
-    # Claude Code prefixes skill names with "azure:" (e.g., "azure:azure-prepare")
-    # Strip it to get the actual skill name for the allowlist
-    skillName="${skillName#azure:}"
+    requestedSkillName=$(extract_toolargs_field "$rawInput" "skill")
+    pluginName=$(get_plugin_field "$clientName" "name")
+    skillName="$requestedSkillName"
+    # Native plugin invocations use "<plugin-name>:<skill-name>". Strip only
+    # this hook copy's own namespace so another plugin cannot claim the call.
+    if [[ "$requestedSkillName" == *:* ]]; then
+        if [ -n "$pluginName" ] && [[ "$requestedSkillName" == "$pluginName:"* ]]; then
+            skillName="${requestedSkillName#*:}"
+        else
+            skillName=""
+        fi
+    fi
     skillMdPath="$SKILLS_DIR/$skillName/SKILL.md"
     if [ -n "$skillName" ] && [ -f "$skillMdPath" ] && is_owned_skill_path "$skillMdPath"; then
         eventType="skill_invocation"
@@ -441,7 +485,7 @@ fi
 # Cursor:       afterMCPExecution with mcp_server_name "azure"; remove Cursor's
 #               optional display prefix (e.g., MCP:get_azure_bestpractices)
 # VS Code:      "mcp_azure_mcp_*" prefix (e.g., mcp_azure_mcp_documentation)
-if [ -n "$toolName" ]; then
+if [ -n "$toolName" ] && owns_mcp_server "azure"; then
     if [ "$clientName" = "cursor" ] && [ "$hookEventName" = "afterMCPExecution" ] && [ "$mcpServerName" = "azure" ]; then
         azureToolName="${toolName#MCP:}"
         eventType="tool_invocation"

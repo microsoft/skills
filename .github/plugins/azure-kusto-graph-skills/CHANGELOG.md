@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.25
+
+- feat: support musl telemetry reporter builds and releases ([#3337](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3337))
+
+## 1.0.24
+
+- fix: pin hooks to latest telemetry reporter release ([#3356](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3356))
+
+## 1.0.23
+
+- feat: add AKS operational skills sibling plugin ([#3164](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3164))
+
 ## 1.0.22
 
 - fix: clarify telemetry publisher debug logs ([#3336](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3336))

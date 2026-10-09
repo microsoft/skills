@@ -240,6 +240,17 @@
       },
       "homepage": "https://github.com/microsoft/github-copilot-for-azure",
       "repository": "https://github.com/microsoft/github-copilot-for-azure"
+    },
+    {
+      "name": "aks-skills",
+      "source": "./.github/plugins/aks-skills",
+      "description": "AKS operational skills for troubleshooting, known issues, GPU inference, and packet capture.",
+      "author": {
+        "name": "Microsoft",
+        "url": "https://www.microsoft.com"
+      },
+      "homepage": "https://github.com/microsoft/github-copilot-for-azure",
+      "repository": "https://github.com/microsoft/github-copilot-for-azure"
     }
   ]
 }
