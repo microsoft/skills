@@ -7,10 +7,6 @@
     "foundry-mcp": {
       "type": "http",
       "url": "https://mcp.ai.azure.com"
-    },
-    "microsoft-docs": {
-      "url": "https://learn.microsoft.com/api/mcp",
-      "type": "http"
     }
   }
 }
