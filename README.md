@@ -22,6 +22,13 @@ npx skills add microsoft/skills
 
 Select the skills you need from the wizard. Skills are installed to your chosen agent's directory (e.g., `.github/skills/` for GitHub Copilot) and symlinked if you use multiple agents.
 
+Autohand Code users can install the cataloged Microsoft Skills overview with:
+
+```bash
+autohand --skill-install microsoft-skills
+autohand --skill-install microsoft-skills --project
+```
+
 <details>
 <summary>Alternative installation methods</summary>
 
@@ -32,12 +39,19 @@ Select the skills you need from the wizard. Skills are installed to your chosen 
 git clone https://github.com/microsoft/skills.git
 cp -r agent-skills/.github/skills/azure-cosmos-db-py your-project/.github/skills/
 
+# Copy a specific skill into an Autohand Code project
+git clone https://github.com/microsoft/skills.git microsoft-skills
+mkdir -p your-project/.autohand/skills
+cp -r microsoft-skills/.github/skills/azure-cosmos-db-py your-project/.autohand/skills/
+
 # Or use symlinks for multi-project setups
 ln -s /path/to/agent-skills/.github/skills/mcp-builder /path/to/your-project/.github/skills/mcp-builder
+ln -s /path/to/microsoft-skills/.github/skills/mcp-builder /path/to/your-project/.autohand/skills/mcp-builder
 
 # Share skills across different agent configs in the same repo
 ln -s ../.github/skills .opencode/skills
 ln -s ../.github/skills .claude/skills
+ln -s ../.github/skills .autohand/skills
 ```
 
 </details>
