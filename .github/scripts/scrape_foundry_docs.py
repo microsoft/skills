@@ -23,9 +23,9 @@ from urllib.parse import urljoin
 import time
 
 # Base URLs
-BASE_URL = "https://learn.microsoft.com/en-us/azure/ai-foundry/"
-TOC_URL = "https://learn.microsoft.com/en-us/azure/ai-foundry/toc.json?view=foundry"
-VIEW_PARAM = "?view=foundry"
+BASE_URL = "https://learn.microsoft.com/en-us/azure/foundry/"
+TOC_URL = "https://learn.microsoft.com/en-us/azure/foundry/toc.json"
+VIEW_PARAM = ""
 
 # Output paths
 OUTPUT_DIR = Path(__file__).parent.parent.parent / "docs"
@@ -54,26 +54,19 @@ class DocSection:
 
 
 def normalize_url(href: str, base_path: str = BASE_URL) -> str:
-    """Convert relative href to full URL with view parameter."""
+    """Convert relative href to full URL."""
     if href.startswith("http"):
-        # External URL - don't modify
-        if "learn.microsoft.com" in href and "view=" not in href:
-            return f"{href}{VIEW_PARAM}"
         return href
 
     if href.startswith("/"):
         # Absolute path within learn.microsoft.com
         url = f"https://learn.microsoft.com{href}"
     elif href.startswith(".."):
-        # Relative path going up - handle azure/ai-services context
+        # Relative path going up
         url = urljoin(base_path, href)
     else:
-        # Relative path within ai-foundry
+        # Relative path within foundry
         url = f"{base_path}{href}"
-
-    # Add view parameter if not present
-    if "view=" not in url:
-        url = f"{url}{VIEW_PARAM}"
 
     return url
 
