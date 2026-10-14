@@ -105,21 +105,11 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 ### Foundry (Language-Agnostic)
 
-> 11 skills — Microsoft Foundry agent platform (preview), language-agnostic via `azd`, `az` CLI, and Foundry MCP
+> 1 skill — Microsoft Foundry agent platform (preview), language-agnostic via `azd`, `az` CLI, and Foundry MCP
 
 | Skill | Description |
 |-------|-------------|
 | [microsoft-foundry](.github/plugins/azure-skills/skills/microsoft-foundry/) | Router skill for the Foundry agent platform — maps user intent onto the right sub-skill and discovery surface (Microsoft Docs MCP, Foundry MCP, `azd ai agent`, `az` CLI). |
-| [foundry-projects-resources](.github/plugins/azure-skills/skills/foundry-projects-resources/) | Provision Foundry resources/projects, configure project connections (key, OAuth, managed identity, agent identity), and set up standard or private-network agent infrastructure. |
-| [foundry-models](.github/plugins/azure-skills/skills/foundry-models/) | Discover, deploy, and manage models on Foundry — preset/customized deployments, capacity discovery, quota management, PTU vs pay-as-you-go. |
-| [foundry-hosted-agents](.github/plugins/azure-skills/skills/foundry-hosted-agents/) | Build, deploy, and manage Foundry hosted agents — containerized agents exposing Responses or Invocations protocols, with per-agent Entra identity and dedicated endpoints. |
-| [foundry-toolboxes](.github/plugins/azure-skills/skills/foundry-toolboxes/) | Curate intent-based Foundry Toolboxes (preview) — a single MCP-compatible endpoint bundling tools (MCP, Web Search, AI Search, Code Interpreter, File Search, OpenAPI, A2A) for any agent to consume. |
-| [foundry-workflows](.github/plugins/azure-skills/skills/foundry-workflows/) | Build multi-agent workflows — declarative orchestration for handing off control between specialist agents, plus the Connected Agents pattern. |
-| [foundry-iq-knowledge-bases](.github/plugins/azure-skills/skills/foundry-iq-knowledge-bases/) | Build Foundry IQ knowledge bases (preview) — multi-source, permission-aware grounding for agents using the agentic retrieval pipeline. |
-| [foundry-managed-skills](.github/plugins/azure-skills/skills/foundry-managed-skills/) | Manage SKILL.md files as a Foundry-side resource (preview) — author behavioral guidelines once, store via the Skills REST API, load into hosted agent containers. |
-| [foundry-memory](.github/plugins/azure-skills/skills/foundry-memory/) | Build personalized Foundry agents with managed long-term memory (preview) — extract, consolidate, and retrieve user-specific context across sessions. |
-| [foundry-observability](.github/plugins/azure-skills/skills/foundry-observability/) | Trace, monitor, and evaluate Foundry hosted agents end-to-end — OpenTelemetry GenAI traces in App Insights, eval-trace correlation, batch evals, regression detection. |
-| [foundry-governance](.github/plugins/azure-skills/skills/foundry-governance/) | Govern Foundry agent fleets at scale — tool catalog visibility, AI Gateway MCP routing/policy, RBAC, agent identity, RAI policies on model deployments. |
 
 ---
 
