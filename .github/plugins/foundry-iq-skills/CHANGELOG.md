@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2
+
+- fix: enable standalone telemetry reporter by default ([#3383](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3383))
+
+## 0.2.1
+
+- feat: add Azure Advisor skills plugin ([#3310](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3310))
+
 ## 0.2.0
 
 - fix: hand off unsupported Foundry IQ scenarios ([#3376](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3376))

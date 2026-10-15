@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.94
+
+- fix: enable standalone telemetry reporter by default ([#3383](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3383))
+
+## 1.2.93
+
+- feat: add Azure Advisor skills plugin ([#3310](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3310))
+
 ## 1.2.92
 
 - feature: add Managed Harness Agent development workflow ([#3256](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3256))

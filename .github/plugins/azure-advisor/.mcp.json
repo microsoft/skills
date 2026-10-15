@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "azure": {
+      "command": "npx",
+      "args": ["-y", "@azure/mcp@latest", "server", "start"]
+    }
+  }
+}

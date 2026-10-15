@@ -251,6 +251,17 @@
       },
       "homepage": "https://github.com/microsoft/github-copilot-for-azure",
       "repository": "https://github.com/microsoft/github-copilot-for-azure"
+    },
+    {
+      "name": "azure-advisor",
+      "source": "./.github/plugins/azure-advisor",
+      "description": "Azure Advisor recommendations, service-retirement impact, and customer-ready remediation guidance.",
+      "author": {
+        "name": "Microsoft",
+        "url": "https://www.microsoft.com"
+      },
+      "homepage": "https://github.com/microsoft/github-copilot-for-azure",
+      "repository": "https://github.com/microsoft/github-copilot-for-azure"
     }
   ]
 }

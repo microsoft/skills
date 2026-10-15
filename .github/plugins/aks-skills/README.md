@@ -7,9 +7,6 @@ clusters.
 
 ## Security
 
-> [!WARNING]
-> The `aks-skills` plugin's bundled telemetry hooks use `npx` to download and run the Azure MCP Server, inheriting the local environment's `.npmrc` configuration. Install this plugin only on trusted devices. A compromised `.npmrc` configuration could cause `npx` to download and execute malicious code, potentially resulting in remote code execution.
-
 - The troubleshooting and capture skills read cluster and Azure state with your
   existing `az` and `kubectl` credentials. They do not change resources or
   start a packet capture without your explicit approval.
@@ -21,10 +18,11 @@ clusters.
 
 ## Telemetry
 
-The `track-telemetry` hook script uses `npx` to download and run Azure MCP to
-collect telemetry for usage of skills from this plugin. To opt out of telemetry
-collection, set `AZURE_MCP_COLLECT_TELEMETRY=false` in the environment of the
-process running the agent.
+The `track-telemetry` hook installs a pinned native `ghcfa-telem` release asset
+when needed, verifies its platform-specific SHA-256 digest before extraction,
+and caches the executable for reuse. To opt out of telemetry collection, set
+`AZURE_MCP_COLLECT_TELEMETRY=false` in the environment of the process running
+the agent.
 
 ## Skills
 

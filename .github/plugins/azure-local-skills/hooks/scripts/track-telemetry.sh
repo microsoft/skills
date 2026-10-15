@@ -545,52 +545,39 @@ if [ "$shouldTrack" = true ]; then
         return_success
     fi
 
-    # Build MCP command arguments (using array for proper quoting)
-    mcpArgs=(
-        "server" "plugin-telemetry"
-    )
+    # Build reporter arguments using an array for proper quoting.
+    reporterArgs=()
 
-    [ -n "$pluginName" ] && mcpArgs+=("--plugin-name" "$pluginName")
-    [ -n "$pluginVersion" ] && mcpArgs+=("--plugin-version" "$pluginVersion")
-    mcpArgs+=("--client-name" "$clientName" "--timestamp" "$timestamp")
-    [ -n "$eventType" ] && mcpArgs+=("--event-type" "$eventType")
-    [ -n "$sessionId" ] && mcpArgs+=("--session-id" "$sessionId")
-    [ -n "$skillName" ] && mcpArgs+=("--skill-name" "$skillName")
-    [ -n "$skillVersion" ] && mcpArgs+=("--skill-version" "$skillVersion")
-    [ -n "$azureToolName" ] && mcpArgs+=("--tool-name" "$azureToolName")
+    [ -n "$pluginName" ] && reporterArgs+=("--plugin-name" "$pluginName")
+    [ -n "$pluginVersion" ] && reporterArgs+=("--plugin-version" "$pluginVersion")
+    reporterArgs+=("--client-name" "$clientName" "--timestamp" "$timestamp")
+    [ -n "$eventType" ] && reporterArgs+=("--event-type" "$eventType")
+    [ -n "$sessionId" ] && reporterArgs+=("--session-id" "$sessionId")
+    [ -n "$skillName" ] && reporterArgs+=("--skill-name" "$skillName")
+    [ -n "$skillVersion" ] && reporterArgs+=("--skill-version" "$skillVersion")
+    [ -n "$azureToolName" ] && reporterArgs+=("--tool-name" "$azureToolName")
     # Convert forward slashes to backslashes for azmcp allowlist compatibility
-    [ -n "$filePath" ] && mcpArgs+=("--file-reference" "$(echo "$filePath" | tr '/' '\\')")
+    [ -n "$filePath" ] && reporterArgs+=("--file-reference" "$(echo "$filePath" | tr '/' '\\')")
 
-    if [ "${AZURE_SKILLS_USE_STANDALONE_TELEMETRY:-}" = "true" ]; then
-        publisher="Standalone ghcfa-telem (version $TELEMETRY_REPORTER_VERSION)"
-        write_telemetry_debug_log "Publisher: $publisher | Args: ${mcpArgs[*]:2}"
-        installerOutput="$(
-            bash "$SCRIPT_DIR/install-telemetry.sh" \
-                --version "$TELEMETRY_REPORTER_VERSION" 2>&1
-        )"
-        installerStatus=$?
+    publisher="Standalone ghcfa-telem (version $TELEMETRY_REPORTER_VERSION)"
+    write_telemetry_debug_log "Publisher: $publisher | Args: ${reporterArgs[*]}"
+    installerOutput="$(
+        bash "$SCRIPT_DIR/install-telemetry.sh" \
+            --version "$TELEMETRY_REPORTER_VERSION" 2>&1
+    )"
+    installerStatus=$?
 
-        if [ "$installerStatus" -eq 0 ] && [ -n "$installerOutput" ]; then
-            write_telemetry_debug_log "Publisher: $publisher | Executable: $installerOutput"
-            "$installerOutput" "${mcpArgs[@]:2}" >/dev/null 2>&1
-            reporterStatus=$?
-            if [ "$reporterStatus" -ne 0 ]; then
-                write_telemetry_debug_log "Publisher: $publisher | Execution failed with status $reporterStatus."
-            fi
-        elif [ "$installerStatus" -eq 0 ]; then
-            write_telemetry_debug_log "Publisher: $publisher | Installation failed: installer returned no executable path."
-        else
-            write_telemetry_debug_log "Publisher: $publisher | Installation failed with status $installerStatus: $installerOutput"
+    if [ "$installerStatus" -eq 0 ] && [ -n "$installerOutput" ]; then
+        write_telemetry_debug_log "Publisher: $publisher | Executable: $installerOutput"
+        "$installerOutput" "${reporterArgs[@]}" >/dev/null 2>&1
+        reporterStatus=$?
+        if [ "$reporterStatus" -ne 0 ]; then
+            write_telemetry_debug_log "Publisher: $publisher | Execution failed with status $reporterStatus."
         fi
+    elif [ "$installerStatus" -eq 0 ]; then
+        write_telemetry_debug_log "Publisher: $publisher | Installation failed: installer returned no executable path."
     else
-        # Preserve the existing publisher unless the standalone path is explicitly enabled.
-        publisher="Azure MCP (npx -y @azure/mcp@latest)"
-        write_telemetry_debug_log "Publisher: $publisher | Args: ${mcpArgs[*]}"
-        npx -y @azure/mcp@latest "${mcpArgs[@]}" >/dev/null 2>&1
-        publisherStatus=$?
-        if [ "$publisherStatus" -ne 0 ]; then
-            write_telemetry_debug_log "Publisher: $publisher | Execution failed with status $publisherStatus."
-        fi
+        write_telemetry_debug_log "Publisher: $publisher | Installation failed with status $installerStatus: $installerOutput"
     fi
 fi
 

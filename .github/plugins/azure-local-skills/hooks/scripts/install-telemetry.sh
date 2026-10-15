@@ -14,6 +14,11 @@ set -o pipefail
 VERSION=""
 TOOL_NAME="ghcfa-telem"
 REPOSITORY="microsoft/GitHub-Copilot-for-Azure"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)" || {
+    printf '%s\n' "Unable to resolve the telemetry installer directory." >&2
+    exit 1
+}
+CHECKSUM_MANIFEST="${SCRIPT_DIR}/telemetry-reporter-checksums.txt"
 
 usage() {
     cat <<'EOF'
@@ -207,6 +212,108 @@ download_file() {
     return 1
 }
 
+get_expected_sha256() {
+    local manifest_version
+    local manifest_rid
+    local manifest_hash
+    local extra
+    local line_number=0
+    local match_count=0
+    local expected_hash=""
+
+    if [ ! -f "$CHECKSUM_MANIFEST" ]; then
+        error "Telemetry checksum manifest not found: $CHECKSUM_MANIFEST"
+        return 1
+    fi
+
+    while IFS=' ' read -r manifest_version manifest_rid manifest_hash extra; do
+        line_number=$((line_number + 1))
+        case "${manifest_version:-}" in
+            ""|\#*)
+                continue
+                ;;
+        esac
+        manifest_hash="${manifest_hash%$'\r'}"
+
+        if [ -n "${extra:-}" ] ||
+           [ -z "${manifest_rid:-}" ] ||
+           [ "${#manifest_hash}" -ne 64 ]; then
+            error "Telemetry checksum manifest has a malformed entry on line $line_number."
+            return 1
+        fi
+        case "$manifest_version" in
+            *[!0-9A-Za-z.+-]*|.*|-*)
+                error "Telemetry checksum manifest has a malformed entry on line $line_number."
+                return 1
+                ;;
+        esac
+        case "$manifest_rid" in
+            win-x64|win-arm64|osx-x64|osx-arm64|linux-x64|linux-arm64|linux-musl-x64|linux-musl-arm64)
+                ;;
+            *)
+                error "Telemetry checksum manifest has a malformed entry on line $line_number."
+                return 1
+                ;;
+        esac
+        case "$manifest_hash" in
+            *[!0-9A-Fa-f]*)
+                error "Telemetry checksum manifest has a malformed entry on line $line_number."
+                return 1
+                ;;
+        esac
+
+        if [ "$manifest_version" = "$VERSION" ] &&
+           [ "$manifest_rid" = "$RUNTIME_IDENTIFIER" ]; then
+            match_count=$((match_count + 1))
+            expected_hash="$(printf '%s' "$manifest_hash" | tr '[:upper:]' '[:lower:]')"
+        fi
+    done < "$CHECKSUM_MANIFEST"
+
+    if [ "$match_count" -eq 0 ]; then
+        error "Telemetry checksum manifest has no entry for version $VERSION and runtime $RUNTIME_IDENTIFIER."
+        return 1
+    fi
+    if [ "$match_count" -gt 1 ]; then
+        error "Telemetry checksum manifest has multiple entries for version $VERSION and runtime $RUNTIME_IDENTIFIER."
+        return 1
+    fi
+
+    printf '%s\n' "$expected_hash"
+}
+
+compute_sha256() {
+    local archive_path="$1"
+    local output
+    local hash
+
+    if command -v sha256sum >/dev/null 2>&1; then
+        output="$(sha256sum "$archive_path")" || return 1
+        hash="${output%% *}"
+    elif command -v shasum >/dev/null 2>&1; then
+        output="$(shasum -a 256 "$archive_path")" || return 1
+        hash="${output%% *}"
+    elif command -v openssl >/dev/null 2>&1; then
+        output="$(openssl dgst -sha256 "$archive_path")" || return 1
+        hash="${output##* }"
+    else
+        error "sha256sum, shasum, or openssl is required to verify the telemetry reporter."
+        return 1
+    fi
+
+    if [ "${#hash}" -ne 64 ]; then
+        error "Unable to compute a valid SHA-256 for the telemetry reporter."
+        return 1
+    fi
+    case "$hash" in
+        *[!0-9A-Fa-f]*)
+            error "Unable to compute a valid SHA-256 for the telemetry reporter."
+            return 1
+            ;;
+    esac
+
+    printf '%s' "$hash" | tr '[:upper:]' '[:lower:]'
+}
+
 detect_target || exit 1
 
 CACHE_ROOT="$(get_cache_root)" || exit 1
@@ -260,10 +367,16 @@ if [ -n "${AZURE_SKILLS_TELEMETRY_ZIP_PATH:-}" ]; then
     }
 else
     DOWNLOAD_URL="https://github.com/${REPOSITORY}/releases/download/${TOOL_NAME}-${VERSION}/${ASSET_NAME}"
+    EXPECTED_SHA256="$(get_expected_sha256)" || exit 1
     download_file "$DOWNLOAD_URL" "$ARCHIVE_PATH" || {
         error "Unable to download telemetry reporter from $DOWNLOAD_URL"
         exit 1
     }
+    ACTUAL_SHA256="$(compute_sha256 "$ARCHIVE_PATH")" || exit 1
+    if [ "$ACTUAL_SHA256" != "$EXPECTED_SHA256" ]; then
+        error "SHA-256 validation failed for telemetry reporter asset $ASSET_NAME."
+        exit 1
+    fi
 fi
 
 unzip -q "$ARCHIVE_PATH" -d "$EXTRACT_DIRECTORY" || {

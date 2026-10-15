@@ -1,0 +1,22 @@
+{
+  "name": "azure-advisor",
+  "description": "Azure Advisor recommendations, service-retirement impact, and customer-ready remediation guidance.",
+  "version": "1.0.1",
+  "author": {
+    "name": "Microsoft",
+    "url": "https://www.microsoft.com"
+  },
+  "homepage": "https://github.com/microsoft/github-copilot-for-azure",
+  "repository": "https://github.com/microsoft/GitHub-Copilot-for-Azure",
+  "license": "MIT",
+  "keywords": [
+    "azure",
+    "cloud",
+    "advisor",
+    "recommendations",
+    "remediation"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "hooks": "./hooks/copilot-hooks.json"
+}
