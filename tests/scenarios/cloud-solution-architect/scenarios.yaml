@@ -438,6 +438,7 @@ scenarios:
       - "decoupling"
       - "Event Hubs"
       - "Service Bus"
+      - "Idempotent Consumer"
     forbidden_patterns:
       - "api_key"
     tags:
@@ -480,7 +481,11 @@ scenarios:
         order processing workflow.
       - Use Event Hubs for high-volume analytical events and audit logging where
         throughput matters more than per-message guarantees.
-      - Implement idempotent event handlers — events may be delivered more than once.
+      - Apply the Idempotent Consumer pattern — at-least-once delivery means events
+        may be delivered more than once. Key deduplication on a stable message
+        identifier and record processed IDs atomically with business side effects,
+        so a redelivered event has no additional effect (duplicate deliveries are
+        skipped, not reprocessed).
       - Use the Saga pattern to coordinate the multi-step order workflow with
         compensating transactions for rollback on failure.
 
@@ -490,3 +495,63 @@ scenarios:
       creating a new subscription. Each service scales independently based on its
       own load patterns. Failures are isolated; if shipping is down, orders and
       payments continue processing.
+
+  # AI Workload Design
+  - name: ai_workload_design
+    prompt: |
+      We are building an enterprise AI assistant on Azure that answers
+      employee questions over internal documents and operational data.
+      Employees across regions will use it daily. We need to control
+      model costs, keep answers grounded in approved content, and avoid
+      stale or leaking cached answers. How should we design it?
+    expected_patterns:
+      - "Client"
+      - "Intelligence"
+      - "Inferencing"
+      - "Knowledge"
+      - "Tools"
+      - "grounding"
+      - "model routing"
+      - "caching"
+    forbidden_patterns:
+      - "api_key"
+    tags:
+      - ai-workload
+      - architecture
+    mock_response: |
+      ## Enterprise AI Assistant Workload Design
+
+      ### Five-Layer Application Model
+
+      **Client layer**: Thin Teams/web chat front end. Keep it thin —
+      delegate intelligence capabilities to the backend layers.
+
+      **Intelligence layer**: Orchestrates conversations and applies
+      model routing — a small fast model handles simple queries and
+      escalates to a larger model on low confidence, balancing cost
+      against answer quality.
+
+      **Inferencing layer**: Hosts the model deployments, handles runtime
+      invocation, and preprocesses prompts and postprocesses completions.
+
+      **Knowledge layer**: Grounding data in a search index over approved
+      internal documents. Retrieval enforces per-user and per-tenant
+      authorization. Chunking and embedding strategies are iterated
+      against observed query patterns.
+
+      **Tools layer**: Business APIs the assistant can invoke (ticketing,
+      HR lookups) behind standardized, policy-enforced interfaces.
+
+      ### Key Design Decisions
+
+      - **Multi-layer caching**: Cache grounded answers and retrieved
+        snippets. Scope cache keys by user identity, model version, and
+        prompt version; set TTLs by data freshness; never serve one
+        user's private answer to another. Caching reduces model
+        invocations, cutting cost and latency.
+      - **Model routing**: Apply model routing selectively — use it where
+        the workload tolerates added variability; pin a single model when
+        deterministic behavior or narrow SLOs are required.
+      - **Grounding over fine-tuning**: Start with retrieval grounding;
+        escalate to fine-tuning only when grounding cannot meet the
+        quality bar.
