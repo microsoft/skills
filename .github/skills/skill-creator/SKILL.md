@@ -504,10 +504,10 @@ item = client.create_item(name="example", data={...})
 
 | File                                                                 | Contents                                               |
 | -------------------------------------------------------------------- | ------------------------------------------------------ |
-| references/capabilities.md             | Capability index (hero coverage + links to deep-dives) |
-| references/non-hero-scenarios.md | Concrete non-hero examples                             |
-| references/tools.md                           | Tool integrations                                      |
-| references/tools.md                   | Event streaming patterns                               |
+| [references/capabilities.md](references/capabilities.md) | Capability index (hero coverage + links to deep-dives) |
+| [references/non-hero-scenarios.md](references/non-hero-scenarios.md) | Concrete non-hero examples |
+| [references/tools.md](references/tools.md) | Tool integrations |
+| [references/streaming.md](references/streaming.md) | Event streaming patterns |                            |
 ```
 
 ### Progressive Disclosure Topologies
@@ -523,8 +523,8 @@ item = client.create_item(name="example", data={...})
 
 ## Advanced Features
 
-- **Streaming**: See references/tools.md
-- **Tools**: See references/tools.md
+- **Streaming**: See [references/streaming.md](references/streaming.md)
+- **Tools**: See [references/tools.md](references/tools.md)
 ```
 
 #### Multi-Language Reference Partitioning
@@ -886,5 +886,5 @@ Execute the following verification gates before finalizing any created or regene
 - [ ] **Prerequisites**: User supplied SDK package name or documentation URL; API patterns verified via `microsoft-docs` MCP; all snippet symbols and imports verified against current language-specific API references.
 - [ ] **Skill Content**: Frontmatter `description` states both what and when; `SKILL.md` is under 500 lines; authentication and context managers follow language rules; core workflow includes cleanup/delete; `references/capabilities.md` and `references/non-hero-scenarios.md` are populated; operation-group coverage is explicit for broad SDKs; mandatory opening rules appear in `## Best Practices` for Python and Rust skills.
 - [ ] **Categorization**: Skill resides at `.github/skills/<skill-name>/SKILL.md` and symlink at `skills/<language>/<category>/<short-name>` resolves to `../../../.github/skills/<skill-name>`.
-- [ ] **Testing**: `tests/scenarios/<skill-name>/acceptance-criteria.md` and `tests/scenarios/<skill-name>/scenarios.yaml` cover at least one hero and one non-hero scenario and pass `pnpm harness <skill> --mock` at 100%.
+- [ ] **Testing**: `tests/scenarios/<skill-name>/acceptance-criteria.md` and `tests/scenarios/<skill-name>/scenarios.yaml` cover at least one hero scenario and, when the SDK supports a distinct non-hero scenario, at least one non-hero scenario (otherwise explicitly note that none applies); all scenarios pass `pnpm harness <skill> --mock` at 100%.
 - [ ] **Documentation**: `README.md` catalog counts/tables, `docs-site/src/data/skills.json`, `docs/`, and `AGENTS.md` are synchronized.
