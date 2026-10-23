@@ -5,12 +5,6 @@
 ## Install
 
 ```bash
-# Copilot CLI
-/plugin marketplace add microsoft/skills
-/plugin install microsoft-foundry@skills
-```
-
-```bash
 # npx
 npx skills add microsoft/skills --skill microsoft-foundry
 ```
@@ -25,7 +19,6 @@ The plugin bundles three MCP servers that activate automatically on install:
 |--------|---------|
 | **Azure MCP** | Manage Azure resources, deployments, and infrastructure from your editor. 40+ services. |
 | **Foundry MCP** | Foundry-native operations at `mcp.ai.azure.com` -- model catalog, agents, toolboxes, knowledge bases, evals. |
-| **Microsoft Docs** | Search Microsoft Learn in real-time so the agent always uses current Foundry/SDK patterns. |
 
 ### Skills
 
@@ -34,16 +27,6 @@ One orchestrator routes intent to ten language-agnostic sub-skills. Each sub-ski
 | Skill | What It Covers |
 |-------|---------------|
 | `microsoft-foundry` | **Orchestrator.** Maps user intent (build a hosted agent, curate a toolbox, ground on docs, set up evals, govern tools, personalize, orchestrate) onto the right sub-skill and the right discovery surface (Microsoft Docs MCP, Foundry MCP, `azd ai agent`, `az`). |
-| `foundry-projects-resources` | Provision Foundry resources and projects, configure project connections (key-auth, OAuth, managed identity, agent identity), standard vs private-network agent infrastructure, Azure auth via `DefaultAzureCredential` / `ManagedIdentityCredential`. |
-| `foundry-models` | Discover, deploy, and manage models. Preset vs customized deployments, capacity discovery across regions, quota management, PTU vs pay-as-you-go, RAI policy on model deployments. |
-| `foundry-hosted-agents` | Build, deploy, and manage hosted agents on the refreshed preview. Responses + Invocations protocols, `agent.yaml`, `azd ai agent`, ResponsesAgentServerHost / InvocationAgentServerHost, sessions, per-agent Microsoft Entra identity, dedicated endpoints. |
-| `foundry-toolboxes` | Curate intent-based Toolboxes (preview) — a single MCP-compatible endpoint bundling 9 tool types: MCP, Web Search, Azure AI Search, Code Interpreter, File Search, OpenAPI, A2A, Browser Automation, Computer Use. Build once, consume everywhere. |
-| `foundry-workflows` | Multi-agent orchestration. When to use a declarative workflow vs an A2A tool call vs the Connected Agents pattern, plus Microsoft Agent Framework workflow patterns. Author, visualize, and test. |
-| `foundry-iq-knowledge-bases` | Foundry IQ knowledge bases (preview) — multi-source, permission-aware grounding. Connect Blob/SharePoint/OneLake/web sources, use the agentic retrieval pipeline (decomposition + parallel search + reranking), expose via MCP to agents. |
-| `foundry-managed-skills` | SKILL.md as a Foundry-side resource (preview). Author behavioral guidelines once, store centrally via the Skills REST API, download into hosted agent containers as additional session instructions. Decouples policy from code. |
-| `foundry-memory` | Long-term memory stores (preview) for personalized agents across sessions. User profile vs chat summary memory, memory search tool vs memory store APIs, scoping, prompt-injection / memory-corruption risks, retention. |
-| `foundry-observability` | Trace, monitor, and evaluate hosted agents end-to-end. OpenTelemetry GenAI traces in App Insights via KQL, eval-trace correlation, `azd ai agent monitor`, dataset curation from production traces, built-in quality + safety/RAI evaluators, batch evals, regression detection. |
-| `foundry-governance` | Govern agent fleets at scale via the Foundry Control Plane and AI Gateway. Tool catalog visibility, MCP routing/policy, RBAC and agent identity, third-party tool risk, RAI policies on model deployments, transparency notes for production rollout. |
 
 ### Companion Skills
 
@@ -118,16 +101,6 @@ microsoft-foundry/
   README.md
   skills/
     microsoft-foundry/                # Orchestrator — routes intent to sub-skills
-    foundry-projects-resources/       # Resources, projects, connections, auth
-    foundry-models/                   # Deploy, capacity, quota, RAI policy
-    foundry-hosted-agents/            # Responses + Invocations, agent.yaml, azd
-    foundry-toolboxes/                # Intent-based toolboxes (9 tool types)
-    foundry-workflows/                # Workflow vs A2A vs Connected Agents
-    foundry-iq-knowledge-bases/       # Foundry IQ + agentic retrieval
-    foundry-managed-skills/           # SKILL.md as a Foundry resource
-    foundry-memory/                   # Long-term memory stores
-    foundry-observability/            # Tracing + KQL + evals + RAI evals
-    foundry-governance/               # Control Plane + AI Gateway + RBAC
 ```
 
 Skills are symlinked to canonical sources in the `azure-skills` plugin to maintain a single source of truth.
