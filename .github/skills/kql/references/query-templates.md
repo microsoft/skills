@@ -178,9 +178,8 @@ Table
 // Group events into sessions (30-min idle gap)
 Events
 | order by UserId, Timestamp asc
-| extend SessionStart = row_window_session(Timestamp, 30m, 24h, UserId != prev(UserId))
+| extend SessionStart = row_window_session(Timestamp, 24h, 30m, UserId != prev(UserId))
 | summarize
-    SessionStart = min(Timestamp),
     SessionEnd = max(Timestamp),
     EventCount = count()
     by UserId, SessionStart
