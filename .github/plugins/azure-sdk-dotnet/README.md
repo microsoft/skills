@@ -5,7 +5,7 @@ Azure SDK patterns and best practices for .NET developers. Covers 29 skills span
 ## Install
 
 ```bash
-npx skills add microsoft/skills --skill azure-sdk-dotnet
+npx skills add https://github.com/microsoft/skills/tree/main/.github/plugins/azure-sdk-dotnet
 ```
 
 ```
