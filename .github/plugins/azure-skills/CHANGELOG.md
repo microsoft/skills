@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.103
+
+- test: expand Azure Diagnostics resource-free evaluation coverage ([#3374](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3374))
+
+## 1.2.102
+
+- Update PyJWT version in requirements.txt ([#3441](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3441))
+
+## 1.2.101
+
+- fix: run Cursor hooks with bash ([#3425](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3425))
+
 ## 1.2.100
 
 - fix: harden SQL access grant scripts ([#3435](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3435))

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.30
+
+- fix: run Cursor hooks with bash ([#3425](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3425))
+
 ## 1.0.29
 
 - feature: support per plugin hook ([#3370](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3370))

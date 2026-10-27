@@ -4,19 +4,19 @@
     "sessionStart": [
       {
         "type": "command",
-        "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.js\""
+        "command": "bash \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh\""
       }
     ],
     "postToolUse": [
       {
         "type": "command",
-        "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.js\""
+        "command": "bash \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh\""
       }
     ],
     "afterMCPExecution": [
       {
         "type": "command",
-        "command": "node \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.js\""
+        "command": "bash \"${CURSOR_PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh\""
       }
     ]
   }
