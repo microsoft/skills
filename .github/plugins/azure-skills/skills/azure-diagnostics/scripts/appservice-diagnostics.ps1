@@ -14,6 +14,8 @@
 .EXAMPLE
     .\appservice-diagnostics.ps1 -Name my-app -ResourceGroup my-rg
     # Collects config, recent deployments, app settings, and custom domains for my-app
+.NOTES
+    Exit codes: 0 = completed, 1 = collection failure, 2 = invalid arguments.
 #>
 param(
     [string]$Name,
@@ -21,11 +23,9 @@ param(
     [string]$Subscription
 )
 
-$ErrorActionPreference = "Continue"
-
 if (-not $Name -or -not $ResourceGroup) {
     Write-Error "Usage: .\appservice-diagnostics.ps1 -Name <app> -ResourceGroup <rg> [-Subscription <id>]"
-    exit 1
+    exit 2
 }
 
 $subArgs = @()

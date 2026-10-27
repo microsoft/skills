@@ -27,6 +27,8 @@
     .\aks-baseline.ps1 -ResourceGroup my-rg -Cluster my-cluster
 .EXAMPLE
     .\aks-baseline.ps1 -ResourceGroup my-rg -Cluster my-cluster -Namespace payments
+.NOTES
+    Exit codes: 0 = completed, 1 = collection failure, 2 = invalid arguments.
 #>
 param(
     [Alias("g")][string]$ResourceGroup,
@@ -42,11 +44,11 @@ function Show-Usage($exitCode) {
 
 if (-not $ResourceGroup) {
     Write-Error "Missing required -ResourceGroup. Provide the resource group containing the AKS cluster."
-    Show-Usage 1
+    Show-Usage 2
 }
 if (-not $Cluster) {
     Write-Error "Missing required -Cluster. Provide the AKS cluster name."
-    Show-Usage 1
+    Show-Usage 2
 }
 
 $azSubArgs = @()

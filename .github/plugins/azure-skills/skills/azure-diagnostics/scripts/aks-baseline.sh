@@ -20,6 +20,8 @@
 # Examples:
 #   ./aks-baseline.sh -g my-rg -n my-cluster
 #   ./aks-baseline.sh -g my-rg -n my-cluster --namespace payments
+#
+# Exit codes: 0 = completed, 1 = collection failure, 2 = invalid arguments.
 
 set -uo pipefail
 
@@ -30,14 +32,14 @@ SUBSCRIPTION=""
 
 usage() {
     echo "Usage: $0 -g <resource-group> -n <cluster> [--namespace <ns>] [--subscription <id>]" >&2
-    exit "${1:-1}"
+    exit "${1:-2}"
 }
 
 require_value() {
     # require_value <option-name> <remaining-arg-count>
     if [ "$2" -lt 2 ]; then
         echo "Missing value for $1" >&2
-        usage 1
+        usage 2
     fi
 }
 
@@ -48,12 +50,12 @@ while [ $# -gt 0 ]; do
         --namespace) require_value "$1" "$#"; NAMESPACE="$2"; shift 2 ;;
         --subscription) require_value "$1" "$#"; SUBSCRIPTION="$2"; shift 2 ;;
         -h|--help) usage 0 ;;
-        *) echo "Unknown argument: $1" >&2; usage 1 ;;
+        *) echo "Unknown argument: $1" >&2; usage 2 ;;
     esac
 done
 
-[ -z "$RESOURCE_GROUP" ] && { echo "Missing required -g/--resource-group" >&2; usage 1; }
-[ -z "$CLUSTER" ] && { echo "Missing required -n/--cluster" >&2; usage 1; }
+[ -z "$RESOURCE_GROUP" ] && { echo "Missing required -g/--resource-group" >&2; usage 2; }
+[ -z "$CLUSTER" ] && { echo "Missing required -n/--cluster" >&2; usage 2; }
 
 AZ_SUB_ARGS=()
 [ -n "$SUBSCRIPTION" ] && AZ_SUB_ARGS=(--subscription "$SUBSCRIPTION")

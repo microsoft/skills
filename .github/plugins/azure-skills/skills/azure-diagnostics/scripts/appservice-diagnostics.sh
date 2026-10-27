@@ -12,6 +12,8 @@
 # Examples:
 #   ./appservice-diagnostics.sh --name my-app --resource-group my-rg
 #   ./appservice-diagnostics.sh my-app my-rg
+#
+# Exit codes: 0 = completed, 1 = collection failure, 2 = invalid arguments.
 
 set -euo pipefail
 
@@ -28,7 +30,7 @@ require_value() {
     if [ "$2" -lt 2 ]; then
         echo "Error: option '$1' requires a value." >&2
         usage
-        exit 1
+        exit 2
     fi
 }
 
@@ -39,7 +41,8 @@ while [ $# -gt 0 ]; do
         --name|-n)             require_value "$1" "$#"; APP="$2"; shift 2 ;;
         --resource-group|-g)   require_value "$1" "$#"; RG="$2"; shift 2 ;;
         --subscription|-s)     require_value "$1" "$#"; SUBSCRIPTION="$2"; shift 2 ;;
-        --*|-?)                echo "Error: unknown option '$1'." >&2; usage; exit 1 ;;
+        -h|--help)             usage; exit 0 ;;
+        --*|-?)                echo "Error: unknown option '$1'." >&2; usage; exit 2 ;;
         *)                     POSITIONAL+=("$1"); shift ;;
     esac
 done
@@ -50,7 +53,7 @@ if [ -z "$SUBSCRIPTION" ] && [ "${#POSITIONAL[@]}" -ge 3 ]; then SUBSCRIPTION="$
 
 if [ -z "$APP" ] || [ -z "$RG" ]; then
     usage
-    exit 1
+    exit 2
 fi
 
 SUB_ARGS=()

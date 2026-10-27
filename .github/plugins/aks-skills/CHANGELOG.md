@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8
+
+- fix: run Cursor hooks with bash ([#3425](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3425))
+
 ## 1.0.7
 
 - fix: document aks-skills install for Claude Code and Codex ([#3380](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3380))

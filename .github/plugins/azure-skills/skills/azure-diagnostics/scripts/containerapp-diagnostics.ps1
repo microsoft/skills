@@ -14,6 +14,8 @@
 .EXAMPLE
     .\containerapp-diagnostics.ps1 -Name my-app -ResourceGroup my-rg
     # Collects revisions, registry/ingress config, and recent logs for my-app
+.NOTES
+    Exit codes: 0 = completed, 1 = collection failure, 2 = invalid arguments.
 #>
 param(
     [string]$Name,
@@ -21,11 +23,9 @@ param(
     [string]$Subscription
 )
 
-$ErrorActionPreference = "Continue"
-
 if (-not $Name -or -not $ResourceGroup) {
     Write-Error "Usage: .\containerapp-diagnostics.ps1 -Name <app> -ResourceGroup <rg> [-Subscription <id>]"
-    exit 1
+    exit 2
 }
 
 $subArgs = @()

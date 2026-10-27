@@ -7,7 +7,7 @@
 Add to `requirements.txt`:
 
 ```
-PyJWT[crypto]>=2.8
+PyJWT[crypto]>=2.14.0
 cryptography
 fastapi
 uvicorn
