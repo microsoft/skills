@@ -4,7 +4,7 @@ description: "Analyze actual Azure spend, bill changes, and AKS or AI costs. WHE
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # Azure Cost Analysis

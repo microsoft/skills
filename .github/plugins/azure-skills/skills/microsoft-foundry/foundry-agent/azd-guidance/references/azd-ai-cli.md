@@ -60,7 +60,7 @@ Use `sessions create` only when a session must exist before invoke or file opera
 
 ## The azure.yaml service block
 
-After `azd ai agent init`, each agent developed through azd is defined as a **service block in `azure.yaml`** (`host: azure.ai.agent`) plus the active azd env. Hosted Agents add code/container fields; a Managed Harness Agent uses `kind: prompt` and `harness.type: github_copilot_preview`.
+After `azd ai agent init`, each agent developed through azd is defined as a **service block in `azure.yaml`** (`host: azure.ai.agent`) plus the active azd env. Hosted Agents add code/container fields; new Managed Harness Agent authoring uses `kind: prompt` and `harness.type: microsoft_copilot_preview`.
 
 | Location | What it holds |
 |------|---------------|
@@ -133,12 +133,12 @@ services:
     model: gpt-5-mini
     instructions: Help the user.
     harness:
-      type: github_copilot_preview
+      type: microsoft_copilot_preview
     tools:
       - type: web_search
 ```
 
-A Managed Harness Agent has no source/runtime/container fields and no local `azd ai agent run` path. Direct Prompt Agent tools are authored in `tools[]`. In this workflow, existing Toolboxes are attached through their versioned MCP endpoint and existing Skills are referenced by name and version; connection, Toolbox, and Skill resources are managed separately with their `azd ai` commands.
+A Managed Harness Agent has no source/runtime/container fields and no local `azd ai agent run` path. Direct Prompt Agent tools are authored in `tools[]`. Existing definitions may use legacy `github_copilot_preview`; azd recognizes both families and preserves the authored harness/toolset values. In this workflow, an existing Toolbox is attached through its exact versioned MCP endpoint plus a matching `RemoteTool` / `UserEntraToken` project connection (`audience: https://ai.azure.com`); existing Skills are referenced by name and version. Connection, Toolbox, and Skill resources are managed separately with their `azd ai` commands.
 
 ### Voice Agent service blocks (`kind: voice`)
 

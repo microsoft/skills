@@ -3,7 +3,7 @@ name: azure-kubernetes
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.4"
+  version: "1.2.5"
 description: "Plan, create, and configure production-ready Azure Kubernetes Service (AKS) clusters. Covers Day-0 checklist, SKU selection (Automatic vs Standard), networking options (private API server, Azure CNI Overlay, egress configuration), security, and operations (autoscaling, upgrade strategy, cost analysis). WHEN: create AKS environment, provision AKS, enable AKS observability, design AKS networking, choose AKS SKU, secure AKS, optimize AKS, AKS spot nodes, AKS cluster-autoscaler, rightsize AKS pod, pod rightsizing, over-provisioned AKS pod, pod resource requests and limits, Vertical Pod Autoscaler, VPA recommendations."
 ---
 
@@ -19,7 +19,7 @@ description: "Plan, create, and configure production-ready Azure Kubernetes Serv
 | Best for | AKS cluster planning and Day-0 decisions |
 | MCP Tools | `mcp_azure_mcp_aks` |
 | CLI | `az aks create`, `az aks show`, `kubectl get`, `kubectl describe` |
-| Related skills | azure-kubernetes-app-deploy (deploy an app to an existing cluster), azure-diagnostics (baseline AKS troubleshooting), azure-validate (readiness checks), azure-kubernetes-automatic-readiness (migrate existing cluster to AKS Automatic), optional `aks-skills` operations add-on (focused incident, exact-signature, packet-capture, and GPU Day-2 workflows) |
+| Related skills | azure-kubernetes-app-deploy (deploy an app to an existing cluster), azure-diagnostics (baseline AKS troubleshooting), azure-validate (readiness checks), azure-kubernetes-automatic-readiness (migrate existing cluster to AKS Automatic), optional `aks-skills` operations add-on (focused incident, advanced cost-efficiency, exact-signature, packet-capture, and GPU Day-2 workflows) |
 
 ## When to Use This Skill
 Activate this skill when user wants to:
@@ -114,7 +114,12 @@ If the user is unsure, use safe defaults.
 
 ### 7. Node Pools & Compute
 - **Dedicated system node pool**: At least 2 nodes, tainted for system workloads only (`CriticalAddonsOnly`)
-- Enable **Node Auto Provisioning (NAP)** on all pools for cost savings and responsive scaling
+- **Node Auto Provisioning (NAP)** is enabled per cluster and can reduce cost
+  when dynamic capacity fits workload demand; savings are not guaranteed.
+  Enable NAP for new clusters. For existing clusters, use
+  [optional AKS operations](./references/optional-aks-operations.md) to invoke
+  `aks-cost-optimization` when available for NAP readiness. Otherwise, continue with
+  [base NAP readiness](./references/azure-aks-nap-readiness.md).
 - Use **latest generation SKUs (v5/v6)** for host-level optimizations
 - **Avoid B-series VMs** — burstable SKUs cause performance/reliability issues
 - Use SKUs with **at least 4 vCPUs** for production workloads
@@ -130,9 +135,10 @@ If the user is unsure, use safe defaults.
 ### 9. Cost Controls
 - Use **Spot node pools** for batch/interruptible workloads (up to 90% savings)
 - **Stop/Start** dev/test clusters: `az aks stop/start`
-- Consider **Reserved Instances** or **Savings Plans** for steady-state workloads
 
-**Deep-dive scenarios** — load only the relevant reference file:
+#### Focused AKS Cost Workflows
+
+For a focused request, load only the relevant reference file.
 
 | Scenario | Trigger Keywords | Reference |
 |----------|-----------------|-----------|
@@ -140,8 +146,27 @@ If the user is unsure, use safe defaults.
 | VPA Setup | vertical pod autoscaler, VPA recommendations, VPA enable | [azure-aks-vpa.md](./references/azure-aks-vpa.md) |
 | Cluster Autoscaler | idle nodes, CAS off, enable autoscaler, scale-down profile, node utilization | [azure-aks-autoscaler.md](./references/azure-aks-autoscaler.md) |
 | Spot Node Pools | Spot VMs, Spot nodes, batch workloads, cheaper nodes | [azure-aks-spot.md](./references/azure-aks-spot.md) |
+| Advanced AKS Cost Efficiency | NAP readiness, node-pool bin packing, blocked scale-down, Kubernetes storage cost | [optional AKS operations](./references/optional-aks-operations.md) |
 
 > **Disambiguation:** If a prompt matches multiple rows (e.g., "cheaper nodes" could suggest both Spot and autoscaler), prefer the most specific match. If ambiguous, ask the user to clarify their intent before loading a reference file.
+
+#### Comprehensive AKS Cost Review
+
+When the user requests an overall AKS cost assessment rather than one focused
+workflow, this skill owns triage and coordinates one unified review:
+
+1. Confirm the target subscription, resource group, and AKS cluster. If `cost-analysis` is available, collect one billed-cost baseline for that scope and reuse it throughout the review.
+2. Evaluate the applicable rightsizing, VPA, Cluster Autoscaler, and Spot workflows.
+3. Invoke `aks-cost-optimization` when available for NAP readiness, node-pool bin packing, node-scaling bottlenecks, or Kubernetes-to-Azure storage optimization.
+4. Check for stable non-Spot demand. If present, invoke `cost-optimization` when available for commitment analysis. If the capability or evidence is unavailable, report commitment analysis as a gap. Do not recommend a purchase from this review alone.
+
+Investigate applicable levers and return one ranked report. Rank by comparable
+estimated cost impact when available; keep unknown monetary impact unknown
+rather than zero. Do not present one narrow analysis as the complete review.
+Mark unavailable capabilities or evidence as gaps.
+
+| Rank | Lever | Evidence | Estimated cost impact and basis | Risk | Approval needed | Confidence |
+|---|---|---|---|---|---|---|
 
 ## Guardrails / Safety
 - Do not request or output secrets (tokens, keys).

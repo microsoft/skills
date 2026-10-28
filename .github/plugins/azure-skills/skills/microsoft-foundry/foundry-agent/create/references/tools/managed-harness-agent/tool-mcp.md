@@ -38,3 +38,5 @@ Use a connection supplied by the user or already referenced by the Agent. Create
 Follow only the connection-creation and validation sections; do not create a Toolbox unless explicitly requested.
 
 Agent Service requires a remotely reachable MCP endpoint. Do not place literal credentials in `headers` or `azure.yaml`.
+
+A generic MCP URL remains a generic MCP workflow. Do not infer that it is a Foundry Toolbox or automatically create a Toolbox connection merely because its URL contains `/toolboxes/`. When the user explicitly requests a Foundry Toolbox, follow [Toolbox](tool-toolbox.md).

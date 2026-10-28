@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+- fix: update hook telemetry reporter to 0.1.16 ([#3443](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3443))
+
 ## 1.0.3
 
 - fix: run Cursor hooks with bash ([#3425](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3425))
