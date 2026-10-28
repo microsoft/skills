@@ -15,7 +15,7 @@ Invoke ordinary Prompt Agents with Foundry MCP. Invoke Hosted and Managed Harnes
 | Hosted | `activity` | Microsoft 365 channel, such as Teams | Activity conversation and channel state |
 | Hosted (custom real-time/audio) | `invocations_ws` | Custom WebSocket client; follow [invocations-ws](../invocations-ws/invocations-ws.md) | Agent-managed state keyed by `agent_session_id` |
 
-Classify `azure.yaml` services in order: Voice is a **Voice Agent** (`conversationEngine.type: hosted_agent` for Hosted Voice wrapper, `modelType: managed` or `self_deployed` for Prompt Voice); apply the top-level compatibility classification for legacy manifests. `kind: hosted` is **Hosted**; `kind: prompt` plus `harness.type: github_copilot_preview` is a **Managed Harness Agent**; other `kind: prompt` services are ordinary **Prompt Agents**. If still unknown, use `agent_get` only to classify.
+Classify `azure.yaml` services in order: Voice is a **Voice Agent** (`conversationEngine.type: hosted_agent` for Hosted Voice wrapper, `modelType: managed` or `self_deployed` for Prompt Voice); apply the top-level compatibility classification for legacy manifests. `kind: hosted` is **Hosted**; `kind: prompt` plus `harness.type: microsoft_copilot_preview` or legacy `github_copilot_preview` is a **Managed Harness Agent**; other `kind: prompt` services are ordinary **Prompt Agents**. If still unknown, use `agent_get` only to classify.
 
 ## Voice Agent Workflow (Prompt Voice and Hosted Voice Wrapper)
 
@@ -71,7 +71,7 @@ When a **Hosted Voice Agent** fails or needs target-level isolation, test the `k
 
 ### Step 1: Verify the Managed Harness Agent
 
-Inside the azd project, confirm the selected service is `kind: prompt` with `harness.type: github_copilot_preview`, then run:
+Inside the azd project, confirm the selected service is `kind: prompt` with either recognized Copilot harness discriminator, then run:
 
 ```bash
 azd ai agent show --output json
@@ -214,7 +214,7 @@ Ordinary Prompt Agents do not use hosted sessions or hosted file operations.
 | Error | Resolution |
 |-------|------------|
 | Agent service cannot be resolved | Use the `azure.yaml` service name, correct the service block, or use `--agent-endpoint` outside the project |
-| Managed Harness Agent is routed to Hosted session/file commands | Reclassify from `kind: prompt` plus `harness.type: github_copilot_preview` and use the Managed Harness Agent workflow |
+| Managed Harness Agent is routed to Hosted session/file commands | Reclassify from `kind: prompt` plus either recognized Copilot harness discriminator and use the Managed Harness Agent workflow |
 | Managed Harness Agent published definition lacks harness | Fix `azure.yaml`, verify the extension version, and redeploy |
 | Hosted version is not active | Inspect `azd ai agent show --output json` and deployment logs |
 | Session is missing or expired | Run `azd ai agent sessions list`, then use a valid ID or invoke with `--new-session` |

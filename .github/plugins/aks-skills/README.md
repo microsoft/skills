@@ -1,9 +1,9 @@
 # AKS Skills
 
 Optional Azure Kubernetes Service (AKS) operational skills for live incident
-diagnosis, known-issue matching, GPU inference troubleshooting, and packet
-capture. Install it alongside the base `azure` plugin when you operate AKS
-clusters.
+diagnosis, advanced cost-efficiency analysis, known-issue matching, GPU
+inference troubleshooting, and packet capture. Install it alongside the base
+`azure` plugin when you operate AKS clusters.
 
 ## Security
 
@@ -32,6 +32,7 @@ the agent.
 | **aks-known-issues** | Match a named AKS error signature to its documented cause, fix, and Microsoft Learn reference |
 | **aks-network-capture** | Collect bounded packet captures from selected AKS nodes for wire-level troubleshooting |
 | **aks-gpu-inference** | Diagnose GPU and KAITO inference workloads: scheduling, out-of-memory, observability, and scaling |
+| **aks-cost-optimization** | Assess NAP readiness, diagnose node-scaling bottlenecks, model node-pool bin-packing, optimize Kubernetes-aware storage, and prepare AKS demand evidence for commitment analysis |
 | **azure-search-nav** | Get an Azure portal deep link to a specific blade for a supported AKS, Arc-enabled Kubernetes, or Compute resource |
 
 ## Relationship to the base `azure` plugin
@@ -41,6 +42,14 @@ baseline diagnostics. This plugin adds deeper operational skills and is never
 installed automatically: when one would help, the agent explains why and asks
 before installing it. If you decline, or your host can't install it, the agent
 continues with the base guidance.
+
+## Relationship to the optional `azure-cost` plugin
+
+`aks-cost-optimization` contributes Kubernetes-aware storage, placement, and
+stable node-demand evidence. Use `cost-analysis` for billed AKS spend, namespace
+allocation, and anomalies. Use `cost-optimization` for Reservation and Savings
+Plan utilization, coverage, recommendations, economics, purchases, and
+renewals.
 
 ## Install
 

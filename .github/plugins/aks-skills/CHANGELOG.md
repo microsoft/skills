@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.10
+
+- fix: update hook telemetry reporter to 0.1.16 ([#3443](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3443))
+
+## 1.0.9
+
+- feat: add aks-cost-optimization skill to aks skills ([#3369](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3369))
+
 ## 1.0.8
 
 - fix: run Cursor hooks with bash ([#3425](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3425))

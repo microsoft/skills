@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.106
+
+- feature: adopt Copilot harness discriminator contract ([#3398](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3398))
+
+## 1.2.105
+
+- fix: update hook telemetry reporter to 0.1.16 ([#3443](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3443))
+
+## 1.2.104
+
+- feat: add aks-cost-optimization skill to aks skills ([#3369](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3369))
+
 ## 1.2.103
 
 - test: expand Azure Diagnostics resource-free evaluation coverage ([#3374](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3374))

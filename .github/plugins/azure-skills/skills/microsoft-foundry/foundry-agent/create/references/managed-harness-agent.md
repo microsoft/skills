@@ -1,6 +1,6 @@
 # Managed Harness Agent Authoring
 
-A Microsoft Foundry Managed Harness Agent is a Prompt Agent configured with the Foundry-managed GitHub Copilot harness. This skill uses azd to author and deploy it:
+A Microsoft Foundry Managed Harness Agent is a Prompt Agent configured with the Foundry-managed Copilot harness. This skill uses azd to author and deploy it:
 
 ```yaml
 services:
@@ -11,10 +11,18 @@ services:
     model: gpt-5-mini
     instructions: Help the user.
     harness:
-      type: github_copilot_preview
+      type: microsoft_copilot_preview
 ```
 
 Use REST field names, normally `snake_case`, inside `tools[]`. azd strictly validates the harness and Copilot toolset; most other nested tool fields pass through to Foundry.
+
+## Compatibility
+
+- New authoring uses `microsoft_copilot_preview` and, when declared, `microsoft_copilot_toolset_preview`.
+- Existing `github_copilot_preview` and `github_copilot_toolset_preview` values remain accepted.
+- Preserve the exact harness and toolset discriminator values already present, including mixed existing definitions. Do not migrate them during read, edit, save, redeploy, or revision flows.
+- Author `defaultConfig` in `azure.yaml`; azd translates it to REST `default_config` only at the API boundary.
+- Both discriminator families use `Foundry-Features: MicrosoftCopilot=V1Preview`. Do not retry with the legacy `GitHubCopilot=V1Preview` header.
 
 ## Direct tools
 
@@ -30,39 +38,18 @@ Read [Managed Harness Agent Tools](tools/managed-harness-agent/agent-tools.md) f
 
 ## Toolbox attachment
 
-A Managed Harness Agent prefers direct tools. When the user explicitly requests an existing Toolbox, create or update it separately with `azd ai toolbox`, then attach its versioned MCP endpoint as a direct tool:
+A Managed Harness Agent prefers direct tools. When the user explicitly requests a Toolbox, manage it separately with `azd ai toolbox`, create or reuse a matching authenticated project connection, then attach its exact versioned MCP endpoint as a direct tool:
 
 ```yaml
 tools:
   - type: mcp
     server_label: research-tools
     server_url: https://<account>.services.ai.azure.com/api/projects/<project>/toolboxes/<toolbox>/versions/<version>/mcp?api-version=v1
-    require_approval: never
-```
-
-Resolve the endpoint from the separately managed Toolbox:
-
-```bash
-azd ai toolbox show <toolbox-name> \
-  --version <version> \
-  --project-endpoint "<project-endpoint>" \
-  --output json
-```
-
-Do not declare `host: azure.ai.toolbox` in this phase: that would make `azd deploy` create or update the Toolbox. Do not use the Agent's singular `toolbox` field, which expects an azd-managed sibling Toolbox service.
-
-If the Toolbox endpoint requires a project connection, add its connection ID:
-
-```yaml
-tools:
-  - type: mcp
-    server_label: research-tools
-    server_url: <versioned-toolbox-mcp-endpoint>
     project_connection_id: <toolbox-connection>
-    require_approval: never
+    require_approval: always
 ```
 
-Do not use Hosted Agent `TOOLBOX_ENDPOINT` code wiring for a Managed Harness Agent.
+The connection must be `RemoteTool` with `UserEntraToken`, audience `https://ai.azure.com`, and target exactly equal to `server_url`. See [Toolbox](tools/managed-harness-agent/tool-toolbox.md) for creation, reuse, metadata, and validation. Do not use connectionless Toolbox MCP.
 
 ## Skill attachment
 
@@ -92,9 +79,10 @@ Do not declare `host: azure.ai.skill` in this phase: that would make `azd deploy
 After deploy, read the published definition and verify:
 
 - `kind` remains `prompt`.
-- `harness.type` remains `github_copilot_preview`.
+- New definitions use `microsoft_copilot_preview`; existing definitions retain their authored Copilot harness discriminator.
 - Direct tools retain their authored fields.
-- The versioned Toolbox MCP endpoint remains in the direct `mcp` tool.
+- Existing Copilot toolset discriminators remain unchanged.
+- The versioned Toolbox MCP endpoint and matching `project_connection_id` remain in the direct `mcp` tool.
 - Skill references retain both `name` and `version`.
 
 Managed Harness Agents, ordinary Prompt Agents, and Hosted Agents are not converted in place.

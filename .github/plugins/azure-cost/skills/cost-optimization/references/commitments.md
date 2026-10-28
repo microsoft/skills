@@ -14,25 +14,33 @@
    - **savings**: tool-reported benefit for its stated period.
    High utilization can coexist with low coverage, and low utilization does not
    prove that a new purchase is needed.
+4. When the target usage includes AKS, check the host skill inventory and
+   invoke `aks-cost-optimization` for its commitment-demand handoff when
+   available. Reuse its time-aligned SKU or compatible compute group, region
+   and zone, Spot/on-demand capacity type, observed hours and node counts,
+   lookback coverage, exact resource mapping, planned changes, CRG impact,
+   variability, and evidence gaps. If representative compute history is missing, report stable demand as
+   unverified and do not validate an AKS commitment recommendation. Do not
+   install the optional plugin without user consent.
 
 ## Analyze Current Commitments
 
-4. Report utilization per commitment. Treat less than 90% as an investigation
+5. Report utilization per commitment. Treat less than 90% as an investigation
    signal, not an automatic exchange or refund recommendation.
-5. Call `query_costs` with `AmortizedCost`, grouped by `PricingModel`, for the
+6. Call `query_costs` with `AmortizedCost`, grouped by `PricingModel`, for the
    same period. Report committed and eligible on-demand spend per currency.
    Compare actual and amortized views when a recent purchase distorts cash cost.
-6. For low utilization, inspect `list_reservation_transactions` over the
+7. For low utilization, inspect `list_reservation_transactions` over the
    supported lookback and correlate purchases, refunds, or exchanges with scope,
    region, family, and resource-inventory changes. Missing history is
    inconclusive.
 
 ## Evaluate New Recommendations
 
-7. Call `get_benefit_recommendations`. Preserve lookback, term, scope, savings
+8. Call `get_benefit_recommendations`. Preserve lookback, term, scope, savings
    amount and percentage, coverage, and expected utilization. Do not relabel
    period savings as monthly savings or combine currencies.
-8. Check whether rightsizing, shutdowns, migrations, expiring commitments, or
+9. Check whether rightsizing, shutdowns, migrations, expiring commitments, or
    policy restrictions would invalidate the recommendation. Present exchange,
    scope adjustment, workload alignment, expiration planning, or a new purchase
    as distinct options with evidence and tradeoffs.

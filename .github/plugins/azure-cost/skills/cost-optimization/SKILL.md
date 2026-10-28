@@ -4,7 +4,7 @@ description: "Optimize existing Azure resources and analyze Reservations or Savi
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Azure Cost Optimization

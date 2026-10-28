@@ -3,7 +3,7 @@
 Provision Azure resources when needed, deploy the agent, and smoke-test it.
 For **hosted agents** (custom container or code), use `azd deploy`.
 For **Voice Agents**, use `azd deploy` and smoke-test over the `voice` WebSocket endpoint.
-For **Managed Harness Agents** (`kind: prompt` plus the GitHub Copilot harness), use `azd deploy`.
+For **Managed Harness Agents** (`kind: prompt` plus the Copilot harness), use `azd deploy`.
 For **ordinary prompt agents**, use the Foundry MCP `agent_update` tool.
 
 ## Quick Reference
@@ -24,7 +24,7 @@ For **ordinary prompt agents**, use the Foundry MCP `agent_update` tool.
 
 - Voice Agent (single-agent Prompt Voice or two-agent Hosted Voice wrapper + `kind: hosted` target) -> **Voice** (azd Voice workflow below).
 - Shipping Python / .NET code (`kind: hosted`) -> **Hosted** (azd workflow below).
-- Explicit `kind: prompt` plus `harness.type: github_copilot_preview` -> **Managed Harness Agent** (azd workflow below).
+- Explicit `kind: prompt` plus `harness.type: microsoft_copilot_preview` or legacy `github_copilot_preview` -> **Managed Harness Agent** (azd workflow below).
 - Ordinary Prompt Agent model / instructions / tools -> **Prompt** (MCP workflow below).
 
 ## Deploy Mode Selection -- Hosted agents
@@ -269,16 +269,20 @@ A Microsoft Foundry Managed Harness Agent is a declarative Prompt Agent configur
 
 ### Step 1: Resolve and validate
 
-Inside the azd project, select the service and verify:
+Inside the azd project, select the service and verify that it is a Prompt Agent
+using either recognized Copilot harness discriminator. New authoring uses:
 
 ```yaml
 host: azure.ai.agent
 kind: prompt
 harness:
-  type: github_copilot_preview
+  type: microsoft_copilot_preview
 ```
 
-Reject Hosted-only code/container fields. Do not convert an ordinary Prompt or Hosted Agent in place.
+Existing services may use legacy `github_copilot_preview`; preserve the
+authored harness and toolset discriminator family. Reject Hosted-only
+code/container fields. Do not convert an ordinary Prompt or Hosted Agent in
+place.
 
 Resolve the active environment:
 
@@ -313,12 +317,14 @@ azd ai agent show --output json
 Verify the version is active/deployed and the published definition retains:
 
 - `kind: prompt`
-- `harness.type: github_copilot_preview`
+- New definitions use `harness.type: microsoft_copilot_preview`.
+- Existing definitions retain their authored Microsoft or legacy GitHub harness/toolset discriminator family.
 - Requested direct tools
-- Versioned Toolbox MCP endpoint, when explicitly configured
+- Exact versioned Toolbox MCP endpoint and matching short `project_connection_id`, when explicitly configured
 - Versioned Skill references, when explicitly configured
 
 A successful deploy that drops the harness is a failure.
+A redeploy that silently changes an existing Copilot harness or toolset discriminator family is also a failure.
 
 Run one remote smoke invocation:
 
@@ -340,6 +346,7 @@ Show Agent name, version, project, model, harness, tools, optional Toolbox, depl
 | Published definition lacks harness | Fix `harness.type`, verify the extension version, and redeploy |
 | Tool shape rejected | Read the matching Managed Harness Agent tool reference and preserve REST field names |
 | Connection missing | Use a user-supplied/existing configured connection, or create it only on explicit request |
+| Toolbox MCP returns `401` | Verify the MCP tool has a matching `UserEntraToken` project connection with audience `https://ai.azure.com` and target equal to the exact versioned Toolbox endpoint |
 
 ## Workflow -- Voice Agent (azd)
 

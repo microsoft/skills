@@ -46,4 +46,4 @@ Replace the pinned version before redeploying the Agent.
 
 ## Boundary
 
-Do not add a `host: azure.ai.skill` service during this phase; it would make `azd deploy` create or update the Skill. Do not route Skills through a Toolbox: the GitHub Copilot harness accepts top-level versioned Skill references.
+Do not add a `host: azure.ai.skill` service during this phase; it would make `azd deploy` create or update the Skill. Do not route Skills through a Toolbox: the Copilot harness accepts top-level versioned Skill references.
