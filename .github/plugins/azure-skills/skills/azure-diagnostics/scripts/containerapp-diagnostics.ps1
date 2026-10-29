@@ -30,29 +30,48 @@ if (-not $Name -or -not $ResourceGroup) {
 
 $subArgs = @()
 if ($Subscription) { $subArgs = @("--subscription", $Subscription) }
+$collectionFailed = $false
+
+function Invoke-CollectionStep($failureMessage, [scriptblock]$action) {
+    try {
+        & $action
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error $failureMessage
+            $script:collectionFailed = $true
+        }
+    } catch {
+        Write-Error "$failureMessage $($_.Exception.Message)"
+        $script:collectionFailed = $true
+    }
+}
 
 Write-Host "=== Container App Diagnostics: $Name (resource group: $ResourceGroup) ==="
 Write-Host "Collecting revisions, registry/ingress configuration, and recent logs."
 Write-Host ""
 
 Write-Host "--- Revisions ---"
-az containerapp revision list --name $Name -g $ResourceGroup @subArgs -o table
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to list revisions)" }
+Invoke-CollectionStep "(failed to list revisions)" {
+    az containerapp revision list --name $Name -g $ResourceGroup @subArgs -o table
+}
 Write-Host ""
 
 Write-Host "--- Registry Config ---"
-az containerapp show --name $Name -g $ResourceGroup @subArgs --query "properties.configuration.registries"
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to read registry config)" }
+Invoke-CollectionStep "(failed to read registry config)" {
+    az containerapp show --name $Name -g $ResourceGroup @subArgs --query "properties.configuration.registries"
+}
 Write-Host ""
 
 Write-Host "--- Ingress Config ---"
-az containerapp show --name $Name -g $ResourceGroup @subArgs --query "properties.configuration.ingress"
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to read ingress config)" }
+Invoke-CollectionStep "(failed to read ingress config)" {
+    az containerapp show --name $Name -g $ResourceGroup @subArgs --query "properties.configuration.ingress"
+}
 Write-Host ""
 
 Write-Host "--- Recent Logs (last 20 lines) ---"
-az containerapp logs show --name $Name -g $ResourceGroup @subArgs --tail 20
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to read logs)" }
+Invoke-CollectionStep "(failed to read logs)" {
+    az containerapp logs show --name $Name -g $ResourceGroup @subArgs --tail 20
+}
 Write-Host ""
 
 Write-Host "=== Diagnostics collection complete for $Name ==="
+if ($collectionFailed) { exit 1 }

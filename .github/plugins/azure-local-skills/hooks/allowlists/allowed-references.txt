@@ -1,0 +1,17 @@
+azure-local-multi-rack\references\cli-and-prereqs.md
+azure-local-multi-rack\references\docs-map.md
+azure-local-multi-rack\references\resource-types.md
+azure-local-multi-rack\references\safety-rules.md
+azure-local-multi-rack\workflows\networking\networking.md
+azure-local-multi-rack\workflows\operate-and-monitor\operate-and-monitor.md
+azure-local-multi-rack\workflows\plan-and-deploy\plan-and-deploy.md
+azure-local-multi-rack\workflows\workload-management\workload-management.md
+azure-local\references\docs-map.md
+azure-local\references\mcp-and-cli-tools.md
+azure-local\references\resource-types.md
+azure-local\references\safety-rules.md
+azure-local\workflows\networking-and-security\networking-and-security.md
+azure-local\workflows\operate-and-update\operate-and-update.md
+azure-local\workflows\plan-and-deploy\plan-and-deploy.md
+azure-local\workflows\troubleshooting\troubleshooting.md
+azure-local\workflows\workload-management\workload-management.md

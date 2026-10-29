@@ -4,7 +4,7 @@ description: "Debug Azure production issues using AppLens, Azure Monitor, resour
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.12"
+  version: "1.2.14"
 ---
 
 # Azure Diagnostics

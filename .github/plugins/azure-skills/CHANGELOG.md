@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.108
+
+- fix: use compatible array expansion with old bash versions ([#3463](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3463))
+
+## 1.2.107
+
+- test: address Azure Diagnostics review feedback ([#3438](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3438))
+
 ## 1.2.106
 
 - feature: adopt Copilot harness discriminator contract ([#3398](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3398))

@@ -53,6 +53,7 @@ if (-not $Cluster) {
 
 $azSubArgs = @()
 if ($Subscription) { $azSubArgs = @("--subscription", $Subscription) }
+$collectionFailed = $false
 
 function Write-Section($title) {
     Write-Host ""
@@ -65,10 +66,12 @@ function Invoke-Step($description, [scriptblock]$action) {
     try {
         & $action
         if ($LASTEXITCODE -ne 0) {
-            Write-Host "  [!] Could not gather: $description (command failed or unavailable)"
+            Write-Error "Could not gather: $description (command failed or unavailable)"
+            $script:collectionFailed = $true
         }
     } catch {
-        Write-Host "  [!] Could not gather: $description ($($_.Exception.Message))"
+        Write-Error "Could not gather: $description ($($_.Exception.Message))"
+        $script:collectionFailed = $true
     }
 }
 
@@ -113,6 +116,11 @@ Invoke-Step "node readiness" { kubectl get nodes -o wide }
 # finished jobs are not falsely flagged.
 Write-Section "5. Unhealthy pods (CrashLoopBackOff, not Ready, restarting, or bad status)"
 $allPods = @(kubectl get pods -A -o wide 2>$null)
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Could not gather: pods across namespaces (command failed or unavailable)"
+    $collectionFailed = $true
+    $allPods = @()
+}
 if (-not $allPods) {
     Write-Host "  No pods reported (or cluster unreachable)."
 } else {
@@ -164,3 +172,4 @@ Write-Host "provisioning state, NotReady nodes, unhealthy or restarting pods, wa
 Write-Host "before deep-diving with 'kubectl describe' / 'kubectl logs' on a specific pod."
 Write-Host ""
 Write-Host "No changes were made to any resource."
+if ($collectionFailed) { exit 1 }

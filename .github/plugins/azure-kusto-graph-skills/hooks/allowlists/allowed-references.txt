@@ -1,0 +1,8 @@
+azure-kusto-graph\references\EXAMPLES.md
+azure-kusto-graph\references\KUSTO_EXPLORER_LAUNCH.md
+azure-kusto-graph\references\SCENARIOS.md
+azure-kusto-irql-graph\references\DEPLOY_IRQL_FUNCTIONS.md
+azure-kusto-irql-graph\references\EXAMPLES.md
+azure-kusto-irql-graph\references\KUSTO_EXPLORER_LAUNCH.md
+azure-kusto-irql\references\EXAMPLES.md
+azure-kusto-irql\references\KUSTO_EXPLORER_LAUNCH.md

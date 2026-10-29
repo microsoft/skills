@@ -58,29 +58,44 @@ fi
 
 SUB_ARGS=()
 if [ -n "$SUBSCRIPTION" ]; then SUB_ARGS=(--subscription "$SUBSCRIPTION"); fi
+COLLECTION_FAILED=0
+
+run_step() {
+    local failure_message="$1"
+    shift
+    if ! "$@"; then
+        echo "$failure_message" >&2
+        COLLECTION_FAILED=1
+    fi
+}
 
 echo "=== App Service Diagnostics: $APP (resource group: $RG) ==="
 echo "Collecting app config, recent deployments, app settings, and custom domains."
 echo ""
 
 echo "--- App Config ---"
-az webapp show -n "$APP" -g "$RG" "${SUB_ARGS[@]}" \
+run_step "(failed to read app config)" \
+    az webapp show -n "$APP" -g "$RG" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} \
     --query "{state:state, runtime:siteConfig.linuxFxVersion, healthCheck:siteConfig.healthCheckPath, alwaysOn:siteConfig.alwaysOn}" \
-    -o table || echo "(failed to read app config)"
+    -o table
 echo ""
 
 echo "--- Recent Deployments (last 3) ---"
-az webapp deployment list -n "$APP" -g "$RG" "${SUB_ARGS[@]}" \
-    --query "[:3].{id:id, status:status, time:end_time}" -o table || echo "(failed to list deployments)"
+run_step "(failed to list deployments)" \
+    az webapp deployment list -n "$APP" -g "$RG" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} \
+    --query "[:3].{id:id, status:status, time:end_time}" -o table
 echo ""
 
 echo "--- App Settings (names only) ---"
-az webapp config appsettings list -n "$APP" -g "$RG" "${SUB_ARGS[@]}" \
-    --query "[].name" -o tsv || echo "(failed to list app settings)"
+run_step "(failed to list app settings)" \
+    az webapp config appsettings list -n "$APP" -g "$RG" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} \
+    --query "[].name" -o tsv
 echo ""
 
 echo "--- Custom Domains ---"
-az webapp config hostname list -g "$RG" --webapp-name "$APP" "${SUB_ARGS[@]}" -o table || echo "(failed to list custom domains)"
+run_step "(failed to list custom domains)" \
+    az webapp config hostname list -g "$RG" --webapp-name "$APP" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} -o table
 echo ""
 
 echo "=== Diagnostics collection complete for $APP ==="
+exit "$COLLECTION_FAILED"
