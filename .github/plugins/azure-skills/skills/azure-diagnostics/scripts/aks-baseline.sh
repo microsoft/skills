@@ -29,6 +29,7 @@ RESOURCE_GROUP=""
 CLUSTER=""
 NAMESPACE=""
 SUBSCRIPTION=""
+COLLECTION_FAILED=0
 
 usage() {
     echo "Usage: $0 -g <resource-group> -n <cluster> [--namespace <ns>] [--subscription <id>]" >&2
@@ -71,7 +72,8 @@ run() {
     # run "<description>" <command...>
     local desc="$1"; shift
     if ! "$@"; then
-        echo "  [!] Could not gather: $desc (command failed or unavailable)"
+        echo "  [!] Could not gather: $desc (command failed or unavailable)" >&2
+        COLLECTION_FAILED=1
     fi
 }
 
@@ -112,7 +114,11 @@ run "node readiness" kubectl get nodes -o wide
 # "Running" — are caught. Terminal pods (Completed/Succeeded) are excluded so
 # finished jobs are not falsely flagged.
 section "5. Unhealthy pods (CrashLoopBackOff, not Ready, restarting, or bad status)"
-ALL_PODS="$(kubectl get pods -A -o wide 2>/dev/null)"
+if ! ALL_PODS="$(kubectl get pods -A -o wide 2>/dev/null)"; then
+    echo "  [!] Could not gather: pods across namespaces (command failed or unavailable)" >&2
+    COLLECTION_FAILED=1
+    ALL_PODS=""
+fi
 if [ -z "$ALL_PODS" ]; then
     echo "  No pods reported (or cluster unreachable)."
 else
@@ -159,3 +165,4 @@ echo "provisioning state, NotReady nodes, unhealthy or restarting pods, warning 
 echo "before deep-diving with 'kubectl describe' / 'kubectl logs' on a specific pod."
 echo ""
 echo "No changes were made to any resource."
+exit "$COLLECTION_FAILED"

@@ -1,0 +1,2 @@
+azure-local
+azure-local-multi-rack

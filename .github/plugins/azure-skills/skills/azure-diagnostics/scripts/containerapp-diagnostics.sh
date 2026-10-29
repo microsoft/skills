@@ -58,27 +58,42 @@ fi
 
 SUB_ARGS=()
 if [ -n "$SUBSCRIPTION" ]; then SUB_ARGS=(--subscription "$SUBSCRIPTION"); fi
+COLLECTION_FAILED=0
+
+run_step() {
+    local failure_message="$1"
+    shift
+    if ! "$@"; then
+        echo "$failure_message" >&2
+        COLLECTION_FAILED=1
+    fi
+}
 
 echo "=== Container App Diagnostics: $APP (resource group: $RG) ==="
 echo "Collecting revisions, registry/ingress configuration, and recent logs."
 echo ""
 
 echo "--- Revisions ---"
-az containerapp revision list --name "$APP" -g "$RG" "${SUB_ARGS[@]}" -o table || echo "(failed to list revisions)"
+run_step "(failed to list revisions)" \
+    az containerapp revision list --name "$APP" -g "$RG" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} -o table
 echo ""
 
 echo "--- Registry Config ---"
-az containerapp show --name "$APP" -g "$RG" "${SUB_ARGS[@]}" \
-    --query "properties.configuration.registries" || echo "(failed to read registry config)"
+run_step "(failed to read registry config)" \
+    az containerapp show --name "$APP" -g "$RG" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} \
+    --query "properties.configuration.registries"
 echo ""
 
 echo "--- Ingress Config ---"
-az containerapp show --name "$APP" -g "$RG" "${SUB_ARGS[@]}" \
-    --query "properties.configuration.ingress" || echo "(failed to read ingress config)"
+run_step "(failed to read ingress config)" \
+    az containerapp show --name "$APP" -g "$RG" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} \
+    --query "properties.configuration.ingress"
 echo ""
 
 echo "--- Recent Logs (last 20 lines) ---"
-az containerapp logs show --name "$APP" -g "$RG" "${SUB_ARGS[@]}" --tail 20 || echo "(failed to read logs)"
+run_step "(failed to read logs)" \
+    az containerapp logs show --name "$APP" -g "$RG" ${SUB_ARGS[@]+"${SUB_ARGS[@]}"} --tail 20
 echo ""
 
 echo "=== Diagnostics collection complete for $APP ==="
+exit "$COLLECTION_FAILED"

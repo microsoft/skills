@@ -1,0 +1,3 @@
+azure-kusto-graph
+azure-kusto-irql
+azure-kusto-irql-graph

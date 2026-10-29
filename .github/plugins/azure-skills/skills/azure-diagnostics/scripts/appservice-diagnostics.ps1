@@ -30,29 +30,48 @@ if (-not $Name -or -not $ResourceGroup) {
 
 $subArgs = @()
 if ($Subscription) { $subArgs = @("--subscription", $Subscription) }
+$collectionFailed = $false
+
+function Invoke-CollectionStep($failureMessage, [scriptblock]$action) {
+    try {
+        & $action
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error $failureMessage
+            $script:collectionFailed = $true
+        }
+    } catch {
+        Write-Error "$failureMessage $($_.Exception.Message)"
+        $script:collectionFailed = $true
+    }
+}
 
 Write-Host "=== App Service Diagnostics: $Name (resource group: $ResourceGroup) ==="
 Write-Host "Collecting app config, recent deployments, app settings, and custom domains."
 Write-Host ""
 
 Write-Host "--- App Config ---"
-az webapp show -n $Name -g $ResourceGroup @subArgs --query "{state:state, runtime:siteConfig.linuxFxVersion, healthCheck:siteConfig.healthCheckPath, alwaysOn:siteConfig.alwaysOn}" -o table
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to read app config)" }
+Invoke-CollectionStep "(failed to read app config)" {
+    az webapp show -n $Name -g $ResourceGroup @subArgs --query "{state:state, runtime:siteConfig.linuxFxVersion, healthCheck:siteConfig.healthCheckPath, alwaysOn:siteConfig.alwaysOn}" -o table
+}
 Write-Host ""
 
 Write-Host "--- Recent Deployments (last 3) ---"
-az webapp deployment list -n $Name -g $ResourceGroup @subArgs --query "[:3].{id:id, status:status, time:end_time}" -o table
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to list deployments)" }
+Invoke-CollectionStep "(failed to list deployments)" {
+    az webapp deployment list -n $Name -g $ResourceGroup @subArgs --query "[:3].{id:id, status:status, time:end_time}" -o table
+}
 Write-Host ""
 
 Write-Host "--- App Settings (names only) ---"
-az webapp config appsettings list -n $Name -g $ResourceGroup @subArgs --query "[].name" -o tsv
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to list app settings)" }
+Invoke-CollectionStep "(failed to list app settings)" {
+    az webapp config appsettings list -n $Name -g $ResourceGroup @subArgs --query "[].name" -o tsv
+}
 Write-Host ""
 
 Write-Host "--- Custom Domains ---"
-az webapp config hostname list -g $ResourceGroup --webapp-name $Name @subArgs -o table
-if ($LASTEXITCODE -ne 0) { Write-Host "(failed to list custom domains)" }
+Invoke-CollectionStep "(failed to list custom domains)" {
+    az webapp config hostname list -g $ResourceGroup --webapp-name $Name @subArgs -o table
+}
 Write-Host ""
 
 Write-Host "=== Diagnostics collection complete for $Name ==="
+if ($collectionFailed) { exit 1 }
