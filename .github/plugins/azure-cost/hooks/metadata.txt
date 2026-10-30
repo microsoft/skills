@@ -1,0 +1,3 @@
+plugin-name=azure-cost
+plugin-version=1.0.17
+mcp-server=azure-resource-manager-mcp

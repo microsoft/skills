@@ -71,10 +71,9 @@
 #
 # === Plugin and Skill Versions ===
 #
-# The plugin name and version are read from the active client's plugin.json:
-#   - Copilot CLI / VS Code: .plugin/plugin.json
-#   - Claude Code:           .claude-plugin/plugin.json
-#   - Cursor:                .cursor-plugin/plugin.json
+# The plugin name, version, and MCP ownership are read from hooks/metadata.txt,
+# which the build generates after validating the stamped plugin manifests and
+# .mcp.json configuration.
 #
 # The skill version is read from the SKILL.md frontmatter (metadata.version),
 # which the build stamps at package time. It is resolved as follows:
@@ -87,9 +86,9 @@
 #
 # === Plugin Identity ===
 #
-# Every tracked event includes the plugin name and version read from the
-# installed copy's .plugin/plugin.json manifest. This lets the existing
-# telemetry receiver attribute sibling-plugin events without adding fields.
+# Every tracked event includes the plugin name and version from the installed
+# copy's generated metadata. This lets the existing telemetry receiver
+# attribute sibling-plugin events without adding fields.
 #
 # === Reference File Detection ===
 #
@@ -188,6 +187,12 @@ write_telemetry_debug_log() {
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd)"
 SKILLS_DIR="$(cd "$SCRIPT_DIR/../.." 2>/dev/null && pwd)/skills"
 PLUGIN_PATH_ALLOW_PATTERN="$SCRIPT_DIR/pluginPathAllowPattern.sh"
+PLUGIN_METADATA_PATH="$SCRIPT_DIR/../metadata.txt"
+PLUGIN_METADATA_LOADED=false
+PLUGIN_METADATA_VALID=false
+PLUGIN_METADATA_NAME=""
+PLUGIN_METADATA_VERSION=""
+PLUGIN_METADATA_MCP_SERVERS=""
 
 # Return true only when a target belongs to this hook's plugin. Since this hook
 # is copied into every plugin, comparing through the skills directory prevents
@@ -220,58 +225,76 @@ get_skill_version() {
         | sed -E 's/^[[:space:]]*version:[[:space:]]*//; s/^["'"'"']//; s/["'"'"'][[:space:]]*$//; s/[[:space:]]*$//'
 }
 
-# Extract one field from the plugin manifest for the active client.
-# Prints nothing if the file or expected JSON value cannot be read.
+# Load and validate the build-generated plugin metadata once per invocation.
+load_plugin_metadata() {
+    local line
+    local nameCount=0
+    local versionCount=0
+
+    [ "$PLUGIN_METADATA_LOADED" = false ] || return 0
+    PLUGIN_METADATA_LOADED=true
+    [ -f "$PLUGIN_METADATA_PATH" ] || return 0
+
+    while IFS= read -r line; do
+        case "$line" in
+            plugin-name=*)
+                PLUGIN_METADATA_NAME="${line#*=}"
+                nameCount=$((nameCount + 1))
+                ;;
+            plugin-version=*)
+                PLUGIN_METADATA_VERSION="${line#*=}"
+                versionCount=$((versionCount + 1))
+                ;;
+            mcp-server=*)
+                if [ -n "$PLUGIN_METADATA_MCP_SERVERS" ]; then
+                    PLUGIN_METADATA_MCP_SERVERS="$PLUGIN_METADATA_MCP_SERVERS
+${line#*=}"
+                else
+                    PLUGIN_METADATA_MCP_SERVERS="${line#*=}"
+                fi
+                ;;
+        esac
+    done < "$PLUGIN_METADATA_PATH"
+
+    [ "$nameCount" -eq 1 ] && [ -n "$PLUGIN_METADATA_NAME" ] || return 0
+    [ "$versionCount" -eq 1 ] && [ -n "$PLUGIN_METADATA_VERSION" ] || return 0
+    PLUGIN_METADATA_VALID=true
+}
+
+# Read one value from the build-generated plugin metadata.
 get_plugin_field() {
     local clientName="$1"
     local fieldName="$2"
-    local manifestDir=".plugin"
-    local pluginManifestPath
 
-    case "$clientName" in
-        cursor)
-            manifestDir=".cursor-plugin"
+    [ -n "$clientName" ] || return 0
+    load_plugin_metadata
+    [ "$PLUGIN_METADATA_VALID" = true ] || return 0
+    case "$fieldName" in
+        name)
+            printf '%s' "$PLUGIN_METADATA_NAME"
             ;;
-        claude-code)
-            manifestDir=".claude-plugin"
+        version)
+            printf '%s' "$PLUGIN_METADATA_VERSION"
             ;;
     esac
-
-    pluginManifestPath="$(dirname "$SKILLS_DIR")/$manifestDir/plugin.json"
-    [ -f "$pluginManifestPath" ] || return 0
-    node -e '
-        try {
-            const manifest = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
-            const value = manifest[process.argv[2]];
-            if (typeof value === "string" && value) process.stdout.write(value);
-        } catch { }
-    ' "$pluginManifestPath" "$fieldName" 2>/dev/null
 }
 
-# Return true unless this hook's plugin ships a .mcp.json that does not
-# configure the named server. The shared hook is copied into every plugin, so
-# a plugin with an empty .mcp.json (for example aks-skills) must not report MCP
-# calls owned by a co-installed plugin. A plugin with no .mcp.json at all keeps
-# the pre-existing behavior and reports the event.
+# Return true only when generated metadata says this plugin owns the named server.
 owns_mcp_server() {
     local serverName="$1"
-    local mcpConfigPath
-    mcpConfigPath="$(dirname "$SKILLS_DIR")/.mcp.json"
-    [ -f "$mcpConfigPath" ] || return 0
-    node -e '
-        try {
-            const config = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
-            process.exit(
-                config.mcpServers
-                && Object.prototype.hasOwnProperty.call(config.mcpServers, process.argv[2])
-                    ? 0
-                    : 1
-            );
-        } catch {
-            process.exit(1);
-        }
-    ' "$mcpConfigPath" "$serverName" 2>/dev/null
+    local configuredServer
+
+    load_plugin_metadata
+    [ "$PLUGIN_METADATA_VALID" = true ] || return 1
+    while IFS= read -r configuredServer; do
+        [ "$configuredServer" = "$serverName" ] && return 0
+    done <<EOF
+$PLUGIN_METADATA_MCP_SERVERS
+EOF
+    return 1
 }
+
+load_plugin_metadata
 
 # === JSON Parsing Functions (using sed - portable across platforms) ===
 
@@ -540,16 +563,15 @@ if [ "$shouldTrack" = true ]; then
     pluginName=$(get_plugin_field "$clientName" "name")
     pluginVersion=$(get_plugin_field "$clientName" "version")
 
-    # Session telemetry must identify the plugin.
-    if [ "$eventType" = "session_start" ] && { [ -z "$pluginName" ] || [ -z "$pluginVersion" ]; }; then
+    # Every telemetry event must identify the plugin.
+    if [ -z "$pluginName" ] || [ -z "$pluginVersion" ]; then
         return_success
     fi
 
     # Build reporter arguments using an array for proper quoting.
     reporterArgs=()
 
-    [ -n "$pluginName" ] && reporterArgs+=("--plugin-name" "$pluginName")
-    [ -n "$pluginVersion" ] && reporterArgs+=("--plugin-version" "$pluginVersion")
+    reporterArgs+=("--plugin-name" "$pluginName" "--plugin-version" "$pluginVersion")
     reporterArgs+=("--client-name" "$clientName" "--timestamp" "$timestamp")
     [ -n "$eventType" ] && reporterArgs+=("--event-type" "$eventType")
     [ -n "$sessionId" ] && reporterArgs+=("--session-id" "$sessionId")

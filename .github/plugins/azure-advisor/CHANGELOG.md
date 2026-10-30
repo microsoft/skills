@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- fix: remove runtime JSON parsing from Bash telemetry hook ([#3459](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3459))
+
 ## 1.0.4
 
 - fix: update hook telemetry reporter to 0.1.16 ([#3443](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3443))
