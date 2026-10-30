@@ -1,0 +1,2 @@
+plugin-name=foundry-iq-skills
+plugin-version=0.2.6

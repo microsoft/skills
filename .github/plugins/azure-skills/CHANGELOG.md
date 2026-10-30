@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.109
+
+- fix: remove runtime JSON parsing from Bash telemetry hook ([#3459](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3459))
+
 ## 1.2.108
 
 - fix: use compatible array expansion with old bash versions ([#3463](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3463))

@@ -69,10 +69,9 @@
 #
 # === Plugin and Skill Versions ===
 #
-# The plugin name and version are read from the active client's plugin.json:
-#   - Copilot CLI / VS Code: .plugin/plugin.json
-#   - Claude Code:           .claude-plugin/plugin.json
-#   - Cursor:                .cursor-plugin/plugin.json
+# The plugin name, version, and MCP ownership are read from hooks/metadata.txt,
+# which the build generates after validating the stamped plugin manifests and
+# .mcp.json configuration.
 #
 # The skill version is read from the SKILL.md frontmatter (metadata.version),
 # which the build stamps at package time. It is resolved as follows:
@@ -85,9 +84,9 @@
 #
 # === Plugin Identity ===
 #
-# Every tracked event includes the plugin name and version read from the
-# installed copy's .plugin/plugin.json manifest. This lets the existing
-# telemetry receiver attribute sibling-plugin events without adding fields.
+# Every tracked event includes the plugin name and version from the installed
+# copy's generated metadata. This lets the existing telemetry receiver
+# attribute sibling-plugin events without adding fields.
 #
 # === Reference File Detection ===
 #
@@ -227,6 +226,7 @@ $scriptDir = $PSScriptRoot
 if (-not $scriptDir) { $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
 $skillsDir = Join-Path (Split-Path -Parent (Split-Path -Parent $scriptDir)) 'skills'
 $pluginPathAllowPattern = Join-Path $scriptDir 'pluginPathAllowPattern.ps1'
+$pluginMetadataPath = Join-Path (Split-Path -Parent $scriptDir) 'metadata.txt'
 
 # Return true only when a target belongs to this hook's plugin. Since this hook
 # is copied into every plugin, comparing through the skills directory prevents
@@ -263,41 +263,47 @@ function Get-SkillVersion {
     return $null
 }
 
-# Read the plugin manifest for the active client.
-# Returns $null if the file or expected JSON value cannot be read.
-function Get-PluginManifest {
-    param([string]$ClientName)
+# Read values for one key from the build-generated plugin metadata.
+function Get-PluginMetadataValues {
+    param([string]$Key)
 
-    $manifestDir = '.plugin'
-    if ($ClientName -eq 'cursor') {
-        $manifestDir = '.cursor-plugin'
-    } elseif ($ClientName -eq 'claude-code') {
-        $manifestDir = '.claude-plugin'
+    if ([string]::IsNullOrWhiteSpace($Key) -or
+        -not (Test-Path -LiteralPath $pluginMetadataPath)) {
+        return @()
     }
 
-    $pluginManifestPath = Join-Path (Split-Path -Parent $skillsDir) "$manifestDir/plugin.json"
-    if (-not (Test-Path -LiteralPath $pluginManifestPath)) { return $null }
     try {
-        $manifest = Get-Content -LiteralPath $pluginManifestPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
-        return $manifest
+        $prefix = "$Key="
+        return @(
+            Get-Content -LiteralPath $pluginMetadataPath -ErrorAction Stop |
+                Where-Object { $_.StartsWith($prefix, [System.StringComparison]::Ordinal) } |
+                ForEach-Object { $_.Substring($prefix.Length) }
+        )
     } catch { }
-    return $null
+    return @()
 }
 
-# Return true unless this hook's plugin ships a .mcp.json that does not
-# configure the named server. A plugin with an empty .mcp.json (for example
-# aks-skills) must not report MCP calls owned by a co-installed plugin; a
-# plugin with no .mcp.json at all keeps the pre-existing behavior.
+# Read the plugin identity from the generated metadata.
+function Get-PluginMetadata {
+    $names = @(Get-PluginMetadataValues -Key 'plugin-name')
+    $versions = @(Get-PluginMetadataValues -Key 'plugin-version')
+    if ($names.Count -ne 1 -or $versions.Count -ne 1 -or
+        [string]::IsNullOrWhiteSpace($names[0]) -or
+        [string]::IsNullOrWhiteSpace($versions[0])) {
+        return $null
+    }
+
+    return [PSCustomObject]@{
+        name = $names[0]
+        version = $versions[0]
+    }
+}
+
+# Return true only when generated metadata says this plugin owns the named server.
 function Test-OwnsMcpServer {
     param([string]$ServerName)
     if ([string]::IsNullOrWhiteSpace($ServerName)) { return $false }
-    $mcpConfigPath = Join-Path (Split-Path -Parent $skillsDir) '.mcp.json'
-    if (-not (Test-Path -LiteralPath $mcpConfigPath)) { return $true }
-    try {
-        $config = Get-Content -LiteralPath $mcpConfigPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
-        return $config.mcpServers -and ($config.mcpServers.PSObject.Properties.Name -contains $ServerName)
-    } catch { }
-    return $false
+    return @(Get-PluginMetadataValues -Key 'mcp-server') -contains $ServerName
 }
 
 # === Main Processing ===
@@ -447,7 +453,7 @@ if ($isSessionStart) {
 # Check for skill invocation via 'skill'/'Skill' tool
 if ($toolName -eq "skill" -or $toolName -eq "Skill") {
     $requestedSkillName = $toolInput.skill
-    $ownManifest = Get-PluginManifest -ClientName $clientName
+    $ownManifest = Get-PluginMetadata
     $pluginName = if ($ownManifest) { $ownManifest.name } else { $null }
     $skillName = $requestedSkillName
     # Native plugin invocations use "<plugin-name>:<skill-name>". Strip only
@@ -564,21 +570,21 @@ if ($shouldTrack) {
         Write-Success
     }
 
-    $pluginManifest = Get-PluginManifest -ClientName $clientName
+    $pluginManifest = Get-PluginMetadata
     $pluginName = $pluginManifest.name
     $pluginVersion = $pluginManifest.version
 
-    # Session telemetry must identify the plugin.
-    if ($eventType -eq "session_start" -and
-        ([string]::IsNullOrWhiteSpace($pluginName) -or [string]::IsNullOrWhiteSpace($pluginVersion))) {
+    # Every telemetry event must identify the plugin.
+    if ([string]::IsNullOrWhiteSpace($pluginName) -or
+        [string]::IsNullOrWhiteSpace($pluginVersion)) {
         Write-Success
     }
 
     # Build reporter arguments
     $reporterArguments = @()
 
-    if ($pluginName) { $reporterArguments += "--plugin-name"; $reporterArguments += $pluginName }
-    if ($pluginVersion) { $reporterArguments += "--plugin-version"; $reporterArguments += $pluginVersion }
+    $reporterArguments += "--plugin-name"; $reporterArguments += $pluginName
+    $reporterArguments += "--plugin-version"; $reporterArguments += $pluginVersion
     $reporterArguments += "--client-name"; $reporterArguments += $clientName
     $reporterArguments += "--timestamp"; $reporterArguments += $timestamp
     if ($eventType) { $reporterArguments += "--event-type"; $reporterArguments += $eventType }

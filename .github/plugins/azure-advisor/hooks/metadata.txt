@@ -1,0 +1,3 @@
+plugin-name=azure-advisor
+plugin-version=1.0.5
+mcp-server=azure

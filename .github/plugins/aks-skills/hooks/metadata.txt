@@ -1,0 +1,2 @@
+plugin-name=aks-skills
+plugin-version=1.0.11
