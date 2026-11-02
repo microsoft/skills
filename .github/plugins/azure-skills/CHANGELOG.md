@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.110
+
+- feat: adopt Agent Plugins 1.0 package format ([#3469](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3469))
+
 ## 1.2.109
 
 - fix: remove runtime JSON parsing from Bash telemetry hook ([#3459](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3459))
