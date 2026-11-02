@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "azure-advisor",
+  "description": "Azure Advisor recommendations, service-retirement impact, and customer-ready remediation guidance.",
+  "version": "1.0.6",
+  "author": {
+    "name": "Microsoft",
+    "url": "https://www.microsoft.com"
+  },
+  "homepage": "https://github.com/microsoft/github-copilot-for-azure",
+  "repository": "https://github.com/microsoft/GitHub-Copilot-for-Azure",
+  "license": "MIT",
+  "keywords": [
+    "azure",
+    "cloud",
+    "advisor",
+    "recommendations",
+    "remediation"
+  ]
+}
