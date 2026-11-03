@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.8
+
+- fix: pin plugin npx package versions ([#3471](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3471))
+
 ## 0.2.7
 
 - feat: adopt Agent Plugins 1.0 package format ([#3469](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3469))

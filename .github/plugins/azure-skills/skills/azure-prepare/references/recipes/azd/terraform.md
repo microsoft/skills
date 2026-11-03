@@ -325,7 +325,7 @@ For Terraform module selection, enforce this order:
 Use `mcp_azure_mcp_documentation` (`azure-documentation`) for current guidance and AVM context first, then use Context7 only as supplemental examples if required. If Context7 is not available, instruct the user to install it:
 
 ```bash
-npx @upstash/context7-mcp@latest
+npx @upstash/context7-mcp@4.4.4
 ```
 
 ## Migration from Pure Terraform
