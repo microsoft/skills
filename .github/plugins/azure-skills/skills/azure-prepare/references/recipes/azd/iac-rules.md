@@ -22,7 +22,7 @@ If no pattern module exists for the active provider, default immediately to AVM 
 
 - **Primary (authoritative):** Use `mcp_azure_mcp_documentation` (`azure-documentation`) for current Azure guidance and AVM integration documentation.
 - **Primary (module catalog):** Use `mcp_bicep_list_avm_metadata` plus official AVM indexes to select concrete modules.
-- **Secondary (supplemental):** Use Context7 only for implementation examples when `mcp_azure_mcp_documentation` does not provide enough detail. If Context7 is not available, instruct the user to install it: `npx -y @upstash/context7-mcp@latest`.
+- **Secondary (supplemental):** Use Context7 only for implementation examples when `mcp_azure_mcp_documentation` does not provide enough detail. If Context7 is not available, instruct the user to install it: `npx -y @upstash/context7-mcp@4.4.4`.
 
 ## Validation Plan
 

@@ -4,7 +4,7 @@ description: "Searches the Azure skills catalog and recommends installable agent
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 Follow these steps to discover the available azure skill matching the given task description.

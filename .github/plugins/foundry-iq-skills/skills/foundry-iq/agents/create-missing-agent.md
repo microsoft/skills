@@ -34,7 +34,7 @@ PowerShell commands:
 With MCP already configured, the skill-only option is:
 
 ```text
-npx skills add https://github.com/microsoft/azure-skills --skill microsoft-foundry
+npx skills@1.7.4 add https://github.com/microsoft/azure-skills --skill microsoft-foundry
 ```
 
 Skill-only installation does not install or authenticate MCP tools. After
