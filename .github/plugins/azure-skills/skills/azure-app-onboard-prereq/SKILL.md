@@ -4,7 +4,7 @@ description: "Assess whether source code is ready to deploy to Azure — the che
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.3"
+  version: "1.2.4"
 ---
 
 # Azure App Onboard Prereq — Repository Evaluation
@@ -74,7 +74,7 @@ Populate `buildRequirements` per component after evaluation. Verdict propagation
 
 ### Step 4: Write Artifacts + Readiness Gate
 
-⛔ Verify `context.json` exists on disk. Read [readiness-gate.md](references/readiness-gate.md) (verdicts, tiers, batch-then-approve, fast-track) then [prereq-artifacts.md](references/prereq-artifacts.md) (write procedures, schemas).
+⛔ Verify `context.json` exists on disk. ⛔ **You MUST read [readiness-gate.md](references/readiness-gate.md)** (verdicts, tiers, batch-then-approve, fast-track), then ⛔ **You MUST read [prereq-artifacts.md](references/prereq-artifacts.md)** (write procedures, schemas).
 
 ### Step 5: Present Findings
 

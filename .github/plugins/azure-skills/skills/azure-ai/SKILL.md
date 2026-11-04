@@ -1,10 +1,10 @@
 ---
 name: azure-ai
-description: "Use for Azure AI: Search, Speech, OpenAI, Document Intelligence. Helps with search, vector/hybrid search, speech-to-text, text-to-speech, transcription, OCR. WHEN: AI Search, query search, vector search, hybrid search, semantic search, speech-to-text, text-to-speech, transcribe, OCR, convert text to speech."
+description: "Build and troubleshoot Azure AI Search, Speech, OpenAI, and Document Intelligence apps. WHEN: AI Search, query search, vector search, hybrid search, semantic search, speech-to-text, text-to-speech, transcribe, Speech SDK logs, session ID, result ID, OCR, convert text to speech."
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.2"
+  version: "1.2.3"
 ---
 
 # Azure AI Services
@@ -14,7 +14,7 @@ metadata:
 | Service | Use When | MCP Tools | CLI |
 |---------|----------|-----------|-----|
 | AI Search | Full-text, vector, hybrid search | `azure__search` | `az search` |
-| Speech | Speech-to-text, text-to-speech | `azure__speech` | - |
+| Speech | Speech-to-text, text-to-speech, SDK logs | `azure__speech` | - |
 | OpenAI | GPT models, embeddings, DALL-E | - | `az cognitiveservices` |
 | Document Intelligence | Form extraction, OCR | - | - |
 
@@ -50,6 +50,7 @@ When Azure MCP is enabled:
 | Text-to-speech | Neural voices, SSML support |
 | Speaker diarization | Identify who spoke when |
 | Custom models | Domain-specific vocabulary |
+| Client SDK diagnostics | [Speech SDK client diagnostics](references/speech/diagnostics.md) for log collection, offline analysis, features, and session/result IDs (no MCP or login required) |
 
 ## SDK Quick References
 
@@ -69,3 +70,4 @@ For deep documentation on specific services:
 
 - AI Search indexing and queries -> [Azure AI Search documentation](https://learn.microsoft.com/azure/search/search-what-is-azure-search)
 - Speech transcription patterns -> [Azure AI Speech documentation](https://learn.microsoft.com/azure/ai-services/speech-service/overview)
+- Speech SDK client logs and troubleshooting -> [Speech SDK client diagnostics](references/speech/diagnostics.md)

@@ -53,6 +53,8 @@ output principalId string = appService.identity.principalId
 
 > ⛔ **Every App Service module MUST include:** (1) `identity: { type: 'SystemAssigned' }`, (2) `scm` basicPublishingCredentialsPolicies with `allow: true` (IaC sets enabled for deploy convenience — deploy phase re-disables via REST API after code upload), (3) `ftp` basicPublishingCredentialsPolicies with `allow: false`. Missing any of these → self-review L1 `FLAGGED`.
 
+> ⛔ **PHP runtime:** set `linuxFxVersion` by the PHP security row in [dockerfile-generation.md](dockerfile-generation.md) (e.g. `PHP|8.3` when the app's constraints allow 8.3). Branches 8.1 and older no longer receive the PHP2Shell security fixes.
+
 ## Native Module Deploy Strategy
 
 When `prepare-plan.json.deployStrategy` exists with `codeDeployPattern: "startup-install"`, apply these patterns to the App Service Bicep:

@@ -9,6 +9,8 @@
 
 > **Quick test:** ONE config value change, no import changes? → ❌ FAIL. Otherwise → 🔶.
 
+**PHP:** the runtime is the PHP version of the image (`FROM php:`, or any image that embeds PHP); `require.php` is a constraint, not the runtime. A floating minor tag tracks the latest patch. WARN `W-PHP-EOL` (PHP2Shell, critical RCE — [advisory](https://techcommunity.microsoft.com/blog/azurenetworksecurityblog/addressing-php2shell-cve-2026-109618-and-cve-2026-109619-upgrade-guidance-and-az/4566623)), not a verdict from the table above, when that version is on an unsupported branch or below the patched releases (8.5.12, 8.4.27, 8.3.36, 8.2.35). If it can't be determined (for example a digest pin), WARN as unverified with `fixPhase: "post-deploy"`. **fix** (prereq only reports it; the scaffold approval gate offers and applies it, so a standalone scan edits nothing): floating minor tag on the nearest supported branch the app's `composer.json`/`composer.lock` PHP constraints allow, `fixPhase: "scaffold"`; if none is allowed, `fixPhase: "post-deploy"` naming the constraint. With no Dockerfile, warn only in that last case. Never `blocked`.
+
 **Ecosystem-era check (Python):** ALL pinned deps pre-2018, no Python 3.10+ wheels → ❌ FAIL. Signals: `flask_script`, `werkzeug<1.0`, `itsdangerous<1.0`, imports from `werkzeug.contrib.*` / `flask.ext.*`.
 
 ## EOL / Unmaintained Frameworks

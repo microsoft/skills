@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.113
+
+- feat(azure-ai): add Speech SDK client diagnostics and offline log analyzer ([#3422](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3422))
+
+## 1.2.112
+
+- fix: flag PHP2Shell-vulnerable PHP and offer a fix at the scaffold gate ([#3464](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3464))
+
 ## 1.2.111
 
 - fix: pin plugin npx package versions ([#3471](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3471))

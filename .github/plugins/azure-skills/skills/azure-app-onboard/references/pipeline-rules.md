@@ -64,7 +64,7 @@ Set by prereq: (1) auto-approves readiness gate, (2) simplifies prepare Step 3 a
 
 ## Deploy as-is
 
-⛔ Do NOT refactor or upgrade working application code. Deploy what works. Fixing broken code IS allowed (build errors, missing deps) through the approval gate. Upgrade suggestions → `prepare-plan.json.postDeployRecommendations[]`. Infrastructure changes = allowed; code rewrites = forbidden; Azure compatibility changes (TLS, SSL, port) = allowed when detected by prereq AND approved. Never prompt for passwords — auto-generate into Key Vault.
+⛔ Do NOT refactor or upgrade working application code. Deploy what works. Fixing broken code IS allowed (build errors, missing deps) through the approval gate. Upgrade suggestions → `prepare-plan.json.postDeployRecommendations[]`. Infrastructure changes = allowed; code rewrites = forbidden; Azure compatibility changes (TLS, SSL, port) and fixes the user approves at the scaffold gate ([approval-gates.md](approval-gates.md)) = allowed when detected by prereq AND approved. Never prompt for passwords — auto-generate into Key Vault.
 
 ## Known Platform Bugs
 
