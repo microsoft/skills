@@ -44,7 +44,7 @@ export interface PrereqWarning {
   fix: string;
   /** When the fix should be applied in the pipeline.
    *  "prereq" = prereq can fix this NOW with user approval (code/config changes that prevent deploy failures).
-   *  "scaffold" = handled in generated IaC only (env var override, probe config). NEVER modifies user code.
+   *  "scaffold" = applied at the scaffold gate: generated IaC (env var override, probe config) and, only if the user chooses it there, a fix to their own files (approval-gates.md § Fix offer). Prereq never edits for it.
    *  "deploy-gate" = surface at deploy approval gate for user awareness. No code changes.
    *  "post-deploy" = informational — add to postDeployRecommendations[], no action during pipeline. */
   fixPhase: "prereq" | "scaffold" | "deploy-gate" | "post-deploy";
