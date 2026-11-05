@@ -69,6 +69,7 @@ azure-app-onboard-prereq\references\session-schemas.ts
 azure-app-onboard-prereq\references\subagent-starter-scaffold.md
 azure-app-onboard-prereq\references\subscription-resolution.md
 azure-app-onboard-prereq\references\zero-code-path.md
+azure-app-onboard\deploy\PHASE.md
 azure-app-onboard\deploy\references\approval-gate-template.md
 azure-app-onboard\deploy\references\blocked-patterns.md
 azure-app-onboard\deploy\references\code-deployment-appservice.md
@@ -84,6 +85,7 @@ azure-app-onboard\deploy\references\mcp-tools.md
 azure-app-onboard\deploy\references\portal-links.md
 azure-app-onboard\deploy\references\preflight-checks.md
 azure-app-onboard\deploy\references\subagent-preflight.md
+azure-app-onboard\prepare\PHASE.md
 azure-app-onboard\prepare\references\deploy-strategy.md
 azure-app-onboard\prepare\references\mcp-tools.md
 azure-app-onboard\prepare\references\naming-patterns.md
@@ -107,6 +109,7 @@ azure-app-onboard\references\pipeline-rules.md
 azure-app-onboard\references\session-protocol.md
 azure-app-onboard\references\session-schemas.ts
 azure-app-onboard\references\subscription-resolution.md
+azure-app-onboard\scaffold\PHASE.md
 azure-app-onboard\scaffold\references\bicep-app-service.md
 azure-app-onboard\scaffold\references\bicep-container-apps.md
 azure-app-onboard\scaffold\references\bicep-patterns-data.md

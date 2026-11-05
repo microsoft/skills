@@ -19,7 +19,7 @@ Invoked by the `azure-app-onboard` orchestrator at Phase 4 when `scaffold-manife
 
 | Scenario | Use Instead |
 |----------|-------------|
-| Plan architecture, map services, estimate costs | [prepare](../prepare/SKILL.md) |
+| Plan architecture, map services, estimate costs | [prepare](../prepare/PHASE.md) |
 | Generate IaC files from a plan | `azure-app-onboard` Step 7 (scaffold) |
 | Run `azd up` or execute existing deployment templates | `azure-deploy` |
 | Debug a running app after deployment | `azure-diagnostics` |
@@ -37,7 +37,7 @@ plugin installation flow; do not imply the handoff completed.
 
 > ⛔ **Region lock:** Before `az deployment` retry, compare `--location` against `prepare-plan.json.deploymentVariables.location`. If changed → re-approval gate required. Update plan after approval.
 
-> ⛔ **After compaction or any `az deployment`/`az webapp deploy`/`az acr build`/failed health check: re-read `deploy-checklist.md`.** If missing → fill from [`deploy-checklist-template.md`](references/deploy-checklist-template.md). On significant context loss: also re-read this SKILL.md.
+> ⛔ **After compaction or any `az deployment`/`az webapp deploy`/`az acr build`/failed health check: re-read `deploy-checklist.md`.** If missing → fill from [`deploy-checklist-template.md`](references/deploy-checklist-template.md). On significant context loss: also re-read this PHASE.md.
 
 | # | Step | Action | Artifact | Reference |
 |---|------|--------|----------|-----------|

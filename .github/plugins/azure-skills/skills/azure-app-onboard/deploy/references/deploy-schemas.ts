@@ -1,6 +1,6 @@
 /**
  * Deploy artifact schema — deploy-result.json.
- * Read by deploy SKILL.md Step 8 (finalize artifacts).
+ * Read by deploy PHASE.md Step 8 (finalize artifacts).
  */
 
 export type HealthStatus = "healthy" | "degraded" | "unreachable" | "unknown";
