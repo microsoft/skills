@@ -1,6 +1,6 @@
 /**
  * Prepare artifact schema — prepare-plan.json.
- * Read by prepare SKILL.md Step 9 (write prepare-plan.json).
+ * Read by prepare PHASE.md Step 9 (write prepare-plan.json).
  */
 
 // ─── Shared type (inlined from session-schemas.ts to avoid cross-ref) ────────

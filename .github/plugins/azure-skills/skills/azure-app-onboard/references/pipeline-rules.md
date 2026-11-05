@@ -46,11 +46,11 @@ Update `context.json` at phase boundaries — combine `completedPhases` update w
 
 ## Phase transition rule
 
-> ⛔ **Before executing the FIRST command of any new phase, re-read that phase's sub-SKILL.md.** After prereq → read `prepare/SKILL.md`. After prepare → `scaffold/SKILL.md`. After scaffold gate → `deploy/SKILL.md`. This applies at EVERY transition.
+> ⛔ **Before executing the FIRST command of any new phase, re-read that phase's PHASE.md.** After prereq → read `prepare/PHASE.md`. After prepare → `scaffold/PHASE.md`. After scaffold gate → `deploy/PHASE.md`. This applies at EVERY transition.
 
 ## Post-compaction recovery
 
-> ⛔ After ANY compaction, re-read current phase SKILL.md + this file. Check `scaffold-manifest.json` and `completedPhases` exist if mid-scaffold/deploy.
+> ⛔ After ANY compaction, re-read current phase PHASE.md + this file. Check `scaffold-manifest.json` and `completedPhases` exist if mid-scaffold/deploy.
 
 Begin responses with: "Started session at `.copilot-azure/sessions/{uuid}/`" or "Resuming session from [date] — {statusSummary}".
 

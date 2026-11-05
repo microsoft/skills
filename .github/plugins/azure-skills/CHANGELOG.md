@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.114
+
+- fix: keep onboarding phase documents out of skill discovery ([#3483](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3483))
+
 ## 1.2.113
 
 - feat(azure-ai): add Speech SDK client diagnostics and offline log analyzer ([#3422](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3422))

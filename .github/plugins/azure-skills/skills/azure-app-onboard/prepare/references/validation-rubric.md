@@ -1,6 +1,6 @@
 # Validation Rubric
 
-Run all 4 dimensions before writing `prepare-plan.json`. All must pass — a failure in any dimension triggers the [Error Handling](../SKILL.md#error-handling) procedures.
+Run all 4 dimensions before writing `prepare-plan.json`. All must pass — a failure in any dimension triggers the [Error Handling](../PHASE.md#error-handling) procedures.
 
 ## Dimensions
 
@@ -15,7 +15,7 @@ Run all 4 dimensions before writing `prepare-plan.json`. All must pass — a fai
 
 - **During plan creation (steps 3–7):** Use Goal Alignment and WAF Alignment as selection criteria. Use Dependency Completeness as cross-check after mapping.
 - **Before writing (step 10):** Run all 4 as validation pass. Deployment Viability catches issues that surface after quota/naming.
-- **On failure:** Fix inline via the [Error Handling](../SKILL.md#error-handling) procedures. Document tradeoffs (e.g., WAF Reliability vs cost-optimized budget) in `assumptions[]`.
+- **On failure:** Fix inline via the [Error Handling](../PHASE.md#error-handling) procedures. Document tradeoffs (e.g., WAF Reliability vs cost-optimized budget) in `assumptions[]`.
 
 ## References
 

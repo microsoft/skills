@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8
+
+- feat: align Azure Advisor skill routing with MCP summary and list tools ([#3474](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3474))
+
 ## 1.0.7
 
 - fix: pin plugin npx package versions ([#3471](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3471))

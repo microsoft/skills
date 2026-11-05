@@ -21,7 +21,7 @@ See [deploy-checklist-template.md § Deployment Summary](../deploy/references/de
 
 > ⛔ **Artifact self-check — MANDATORY before handoff.** Verify these exist before presenting cleanup or next steps:
 > 1. `deploy-result.json` in session folder — if missing, read [`deploy-schemas.ts`](../deploy/references/deploy-schemas.ts) and write it NOW with status, endpoints, health, `orphanedResourceGroups[]`
-> 2. Portal deployment link printed in chat — if missing, generate from `$resId` pattern (see deploy/SKILL.md Step 6) and print now
+> 2. Portal deployment link printed in chat — if missing, generate from `$resId` pattern (see deploy/PHASE.md Step 6) and print now
 > 3. `deployment-summary.md` in session folder — if missing, `create` it NOW with the same content you are about to present in chat (status, subscription, RG, region, services table, endpoints, cleanup commands). One `create` call — do NOT skip.
 
 ## Post-Deploy Recommendations

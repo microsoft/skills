@@ -1,6 +1,6 @@
 # Approval Gates — Steps 6 & 8
 
-> **Gate summary:** AppOnboard has **2 approval gates**: (1) **Scaffold Gate** (orchestrator Step 6) — approve architecture plan before generating IaC, (2) **Deploy Gate** (orchestrator Step 8 / deploy/SKILL.md Step 4) — approve cost + resource summary before `az deployment`. Both are mandatory and SEPARATE — scaffold approval does NOT imply deploy approval.
+> **Gate summary:** AppOnboard has **2 approval gates**: (1) **Scaffold Gate** (orchestrator Step 6) — approve architecture plan before generating IaC, (2) **Deploy Gate** (orchestrator Step 8 / deploy/PHASE.md Step 4) — approve cost + resource summary before `az deployment`. Both are mandatory and SEPARATE — scaffold approval does NOT imply deploy approval.
 
 ## Scaffold Approval Gate (Step 6)
 
@@ -56,7 +56,7 @@ Display:
 - Services + SKUs + estimated cost
 - End with **"🚀 Ready to deploy? (Yes / Run manually / Edit plan / Cancel)"**
 
-> ⛔ **After deploy approval:** Your NEXT action MUST be: read `deploy/SKILL.md`, then read `.copilot-azure/sessions/{id}/deploy-checklist.md`. Do NOT call the `azure-deploy` skill — AppOnboard uses its own embedded deploy sub-skill.
+> ⛔ **After deploy approval:** Your NEXT action MUST be: read `deploy/PHASE.md`, then read `.copilot-azure/sessions/{id}/deploy-checklist.md`. Do NOT call the `azure-deploy` skill — AppOnboard uses its own embedded deploy sub-skill.
 
 If "Run manually" is selected → point to [deploy-checklist-template.md § Deployment Summary](../deploy/references/deploy-checklist-template.md) for manual execution steps.
 
@@ -64,10 +64,10 @@ If validation failed or any FLAGGED findings exist at L1 (Security) or L3 (Hallu
 
 Only after user approves: proceed to deploy sub-skill (Step 9). `context.json` already has `currentPhase: "deploy"` from the post-scaffold checkpoint (main SKILL.md Step 7).
 
-> ⛔ **Before entering deploy:** ⛔ Read [`deploy/SKILL.md`](../deploy/SKILL.md) before any deployment action. After mid-session compaction, re-read `deploy/SKILL.md` Steps 4-8. You MUST write `deploy-result.json`.
+> ⛔ **Before entering deploy:** ⛔ Read [`deploy/PHASE.md`](../deploy/PHASE.md) before any deployment action. After mid-session compaction, re-read `deploy/PHASE.md` Steps 4-8. You MUST write `deploy-result.json`.
 
 > ⛔ Deploy via `az deployment sub create` (see [pipeline-rules.md](pipeline-rules.md)). AppOnboard-generated `azure.yaml` found → never delete/overwrite; move to `.copilot-azure/sessions/<id>/replaced-files/` (mirror path).
 
 > ⛔ **Container Apps code deploy is NOT optional.** After IaC placeholder deploys, complete: `az acr build` → update image params → redeploy → health check. Do NOT present manual CLI "Next Steps" for core deploy tasks. If `hasBuildKitSyntax`, create `Dockerfile.azure` first.
 
-> ⛔ **Phase exit:** `deploy-result.json` MUST be written before proceeding to Step 9. See deploy/SKILL.md for the full exit gate checklist.
+> ⛔ **Phase exit:** `deploy-result.json` MUST be written before proceeding to Step 9. See deploy/PHASE.md for the full exit gate checklist.

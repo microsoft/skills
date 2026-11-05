@@ -66,7 +66,7 @@ Read [../../references/handoff-protocol.md](../../references/handoff-protocol.md
 ```
 # Deploy Checklist for {appName}
 # RG: {rgName} | Sub: {subscriptionId} | Session: {sessionId}
-# ⚠️ If compaction recently occurred: re-read deploy/SKILL.md Steps 6-8
+# ⚠️ If compaction recently occurred: re-read deploy/PHASE.md Steps 6-8
 ```
 
 Delete inapplicable sections (e.g., remove App Service section for Container Apps deploys).

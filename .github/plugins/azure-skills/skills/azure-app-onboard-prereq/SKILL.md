@@ -4,7 +4,7 @@ description: "Assess whether source code is ready to deploy to Azure — the che
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.4"
+  version: "1.2.5"
 ---
 
 # Azure App Onboard Prereq — Repository Evaluation

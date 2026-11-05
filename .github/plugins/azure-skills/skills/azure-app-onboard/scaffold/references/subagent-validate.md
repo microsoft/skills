@@ -70,7 +70,7 @@ FIXABLE errors: fix the Bicep → re-run `az bicep build` → proceed to Step 3c
 
 ### Step 3c — Record plan conformance result
 
-The main thread (SKILL.md Step 10a-conf) already ran the conformance script and passed you its JSON. Record it in `scaffold-manifest.json.conformance` = `{ passed, failures, source: "script" }`. ⛔ Do NOT set `validationResult.status: "Validated"` while any BLOCK failure is unresolved.
+The main thread (PHASE.md Step 10a-conf) already ran the conformance script and passed you its JSON. Record it in `scaffold-manifest.json.conformance` = `{ passed, failures, source: "script" }`. ⛔ Do NOT set `validationResult.status: "Validated"` while any BLOCK failure is unresolved.
 
 **Fallback** (only if the caller passed NO result AND `infra/main.bicep` exists — the gate is Bicep-only, skip for Terraform): run `{scaffoldDir}/scripts/scaffold-conformance.ps1 -SessionPath "{sessionPath}" -InfraPath infra` (or `.sh` on bash) yourself, then record with `source: "script"`. Never hand-judge when a shell is available.
 
