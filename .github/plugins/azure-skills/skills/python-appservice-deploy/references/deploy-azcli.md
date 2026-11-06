@@ -6,6 +6,7 @@ Use this path when there is **no** `azure.yaml` or it doesn't target `appservice
 
 ## Prerequisites
 
+- Verify the latest stable Azure CLI is installed ([installation/update guide](https://learn.microsoft.com/cli/azure/install-azure-cli-windows?pivots=winget)).
 - `az login` complete
 - Subscription, resource group, region, and app name decided (see [create-app.md](create-app.md))
 - App Service Plan (Linux, P0v3) and Web App (Python runtime) exist (see [create-app.md](create-app.md))
@@ -46,38 +47,86 @@ For other frameworks (generic WSGI / ASGI / unknown), **skip this step** and emi
 
 ## 3. Package the code
 
+For Django remote builds, require `STATIC_ROOT` and successful `python manage.py check` and `python manage.py collectstatic --noinput` before packaging.
+
+### Normalize Linux scripts
+
+Before every deployment/redeployment, explicitly select shipped `.sh` files, text executables with a shebang, and referenced startup scripts. Exclude binaries and dependency folders. From the application/service root, replace the example path below with the selected files; skip only if none exist.
+
+This command works in Bash and PowerShell, preserves encoding/permissions, normalizes CRLF/lone CR, then re-reads bytes to verify LF:
+
+```bash
+python -c "import sys; from pathlib import Path
+for name in sys.argv[1:]:
+    p = Path(name)
+    data = p.read_bytes()
+    if b'\0' in data: raise ValueError(p)
+    lf = data.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+    if lf != data: p.write_bytes(lf)
+    if b'\r' in p.read_bytes(): raise ValueError(p)
+" "./startup.sh"
+```
+
+Immediately check the result **in the same shell call** before packaging:
+
+```bash
+if [ "$?" -ne 0 ]; then exit 1; fi
+```
+
+```powershell
+if (-not $? -or $LASTEXITCODE -ne 0) { throw "LF normalization/validation failed" }
+```
+
+### Create a fresh ZIP
+
+Package only after normalization/validation succeeds. Stop on any failure; deployment requires successful packaging, not merely an existing archive.
+
 Zip the project (excluding venv, caches, git, node_modules):
 
 ```bash
 # bash
+rm -f app.zip || exit 1
 zip -r app.zip . \
   -x ".git/*" -x ".venv/*" -x "venv/*" -x "__pycache__/*" \
-  -x "*.pyc" -x ".env" -x "node_modules/*"
+  -x "*.pyc" -x ".env" -x "node_modules/*" -x "app.zip" \
+  || { rm -f app.zip; exit 1; }
 ```
 
 ```powershell
 # PowerShell
-$exclude = @('.git','.venv','venv','__pycache__','node_modules')
-$items = Get-ChildItem -Force | Where-Object { $exclude -notcontains $_.Name }
-Compress-Archive -Path $items -DestinationPath app.zip -Force
+if (Test-Path app.zip) { Remove-Item app.zip -ErrorAction Stop }
+$exclude = @('.git','.venv','venv','__pycache__','node_modules','app.zip')
+$items = Get-ChildItem -Force -ErrorAction Stop | Where-Object { $exclude -notcontains $_.Name }
+try {
+    Compress-Archive -Path $items -DestinationPath app.zip -Force -ErrorAction Stop
+} catch {
+    if (Test-Path app.zip) { Remove-Item app.zip -ErrorAction Stop }
+    throw
+}
 ```
 
 ## 4. Deploy the zip
+
+Proceed only if normalization, validation and ZIP creation all succeeded in this attempt. Never deploy a stale/partial archive or continue after a failed packaging call.
 
 ```bash
 az webapp deploy \
   -n <app> -g <rg> \
   --src-path app.zip \
   --type zip \
-  --track-status false
+  --track-status false \
+  --enriched-errors true
 ```
 ```powershell
 az webapp deploy `
   -n <app> -g <rg> `
   --src-path app.zip `
   --type zip `
-  --track-status false
+  --track-status false `
+  --enriched-errors true
 ```
+
+Do not use `--only-show-errors` or suppress enriched diagnostics. Report failures with suggested fixes and the Copilot prompt, not success.
 
 > 💡 `--track-status false` returns once the ZIP is **accepted by the SCM endpoint** — this is **not** the same as "Oryx build succeeded". The server-side `pip install` / startup-command rendering happens asynchronously after the CLI returns. A zero exit code only confirms the upload + a deployment record. If the site never starts, inspect the build outcome via `az webapp log deployment list/show` — that is the only authoritative confirmation that the build itself succeeded.
 
