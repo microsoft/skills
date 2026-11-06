@@ -41,7 +41,7 @@ Example: folder `my-flask-app/` → `my-flask-app-a3f9c1d2`.
    $region = az config get defaults.location -o tsv 2>$null; if ($LASTEXITCODE -ne 0) { $region = "" }
    ```
 3. Else default to `eastus2`.
-4. Only call `ask_user` if `az group create` later fails with a region/quota/availability error.
+4. Before creating a plan, invoke `azure-quotas` to check quota and regional availability. Ask before changing a user-specified region; stop if quota is unavailable or unverifiable rather than switching SKU.
 
 ### 1e. Show the defaults summary BEFORE creating
 Print one concise block so the user can interrupt to override.

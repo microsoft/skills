@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.115
+
+- fix: harden Python App Service deployment preflight and packaging ([#3461](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3461))
+
 ## 1.2.114
 
 - fix: keep onboarding phase documents out of skill discovery ([#3483](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3483))
