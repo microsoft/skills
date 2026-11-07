@@ -8,8 +8,24 @@ scoring:
 defaults:
   runs: 1
   timeout: 60m
-  model: claude-sonnet-4.6
-  judge_model: gpt-5.5
+  model: ${MODEL=gpt-5.6-terra}
+  judge_model: ${GRADER_MODEL=claude-sonnet-4.6}
+environment:
+  skills:
+    - ../../../../.github/plugins/azure-sdk-rust/skills/azure-keyvault-keys-rust
+  files:
+    - src: ../../_shared/vally/tools/find-cargo-root.js
+      dest: .vally/tools/find-cargo-root.js
+    - src: ../../_shared/vally/tools/check-azure-crates.rs
+      dest: .vally/tools/check-azure-crates.rs
+    - src: ../../_shared/vally/tools/check-token-credential.rs
+      dest: .vally/tools/check-token-credential.rs
+    - src: ../../_shared/vally/tools/check-async-runtime.rs
+      dest: .vally/tools/check-async-runtime.rs
+    - src: ../../_shared/vally/tools/check-no-secrets.rs
+      dest: .vally/tools/check-no-secrets.rs
+    - src: workspace/cargo.toml
+      dest: Cargo.toml
 stimuli:
   - name: rust-keyvault-keys-operations
     prompt: |
@@ -80,22 +96,6 @@ stimuli:
         - "**/target/**"
         - "**/*.rlib"
         - "**/*.rmeta"
-    environment:
-      skills:
-        - ../../../../.github/plugins/azure-sdk-rust/skills/azure-keyvault-keys-rust
-      files:
-        - src: ../../_shared/vally/tools/find-cargo-root.js
-          dest: .vally/tools/find-cargo-root.js
-        - src: ../../_shared/vally/tools/check-azure-crates.rs
-          dest: .vally/tools/check-azure-crates.rs
-        - src: ../../_shared/vally/tools/check-token-credential.rs
-          dest: .vally/tools/check-token-credential.rs
-        - src: ../../_shared/vally/tools/check-async-runtime.rs
-          dest: .vally/tools/check-async-runtime.rs
-        - src: ../../_shared/vally/tools/check-no-secrets.rs
-          dest: .vally/tools/check-no-secrets.rs
-        - src: workspace/cargo.toml
-          dest: Cargo.toml
     constraints:
       expect_skills:
         - azure-keyvault-keys-rust
@@ -155,39 +155,23 @@ stimuli:
             - "+nightly"
             - "-Zscript"
             - ".vally/tools/check-no-secrets.rs"
-      - name: Rust Cargo Trajectory Build Failure
-        type: rust-cargo-build-failure-check
+      - name: Rust Cargo Build
+        type: program
         weight: 1.0
         config:
-          collect_trajectory_compiler_errors: true
-          emit_in_metadata: true
-          error_exceptions:
-            - error_code: E0277
-              message_pattern: "Option<std::string::String>"
-              action: ignore_for_fail
-
-      - name: Post prompt Rust Cargo Build Failure
-        type: rust-cargo-build-failure-check
+          program: cargo
+          args:
+            - build
+      - name: Rust Cargo Clippy
+        type: program
         weight: 1.0
         config:
-          commands:
-            - command: cargo build
-          emit_in_metadata: true
-          error_exceptions:
-            - error_code: E0277
-              message_pattern: "Option<std::string::String>"
-              action: ignore_for_fail
-      - name: Post prompt Rust Cargo Clippy Failure
-        type: rust-cargo-build-failure-check
-        weight: 1.0
-        config:
-          commands:
-            - command: cargo clippy -- -D warnings
-          emit_in_metadata: true
-          error_exceptions:
-            - error_code: E0277
-              message_pattern: "Option<std::string::String>"
-              action: ignore_for_fail
+          program: cargo
+          args:
+            - clippy
+            - "--"
+            - "-D"
+            - warnings
 
       - name: KeyClient Creation
         type: prompt

@@ -3,18 +3,13 @@ name: azure-ai-projects-py-skill-experiment
 evals:
     - eval.yaml
 vary:
-  - /defaults/model
   - /environment/skills
-baseline: sonnet_baseline
+baseline: baseline
 variants:
-  sonnet_skill:
-    overrides:
-      model: claude-sonnet-4.6
+  skill:
     environment:
       skills:
         - ../../../../.github/plugins/azure-sdk-python/skills/azure-ai-projects-py
-  sonnet_baseline:
-    overrides:
-      model: claude-sonnet-4.6
+  baseline:
     environment:
       skills: []
