@@ -14,8 +14,9 @@ Design well-architected, production-grade cloud systems following Azure Architec
 
 - **10 design principles** for Azure applications
 - **6 architecture styles** with selection guidance
-- **44 cloud design patterns** mapped to WAF pillars
+- **44 cloud design patterns** mapped to WAF pillars, with selection and composition guidance
 - **Technology choice frameworks** for compute, storage, data, messaging
+- **AI workload design** guidance for the five-layer application model
 - **Performance antipatterns** to avoid
 - **Architecture review workflow** for systematic design validation
 
@@ -62,79 +63,96 @@ Design well-architected, production-grade cloud systems following Azure Architec
 
 44 patterns organized by primary concern. WAF pillar mapping: **R**=Reliability, **S**=Security, **CO**=Cost Optimization, **OE**=Operational Excellence, **PE**=Performance Efficiency.
 
+### Selecting a Pattern
+
+Cloud workloads are vulnerable to the fallacies of distributed computing — assumptions like "the network is reliable," "latency is zero," and "bandwidth is infinite." These misconceptions produce flawed designs; patterns compensate for them.
+
+- **Choose a pattern by problem, not technology.** Start from a specific constraint or risk: a service that fails under load, a data store that can't keep up with reads, a dependency you can't fully trust.
+- **A pattern fits when its problem statement matches your challenge** and the trade-offs it introduces are ones you can accept in your workload.
+- **Every pattern has trade-offs,** and some affect other WAF pillars. Focus on why you choose a pattern, not just how to implement it.
+
 ### Messaging & Communication
 
 | Pattern | Summary | Pillars |
 |---------|---------|---------|
-| **Asynchronous Request-Reply** | Decouple request/response with polling or callbacks | R, PE |
-| **Claim Check** | Split large messages; store payload separately, pass reference | R, PE |
-| **Choreography** | Services coordinate via events without central orchestrator | R, OE |
-| **Competing Consumers** | Multiple consumers process messages from shared queue concurrently | R, PE |
-| **Messaging Bridge** | Connect incompatible messaging systems | R, OE |
-| **Pipes and Filters** | Decompose complex processing into reusable filter stages | R, OE |
-| **Priority Queue** | Prioritize requests so higher-priority work is processed first | R, PE |
-| **Publisher/Subscriber** | Decouple senders from receivers via topics/subscriptions | R, PE |
-| **Queue-Based Load Leveling** | Buffer requests with a queue to smooth intermittent loads | R, PE |
-| **Sequential Convoy** | Process related messages in order while allowing parallel groups | R, PE |
+| [Asynchronous Request-Reply](https://learn.microsoft.com/en-us/azure/architecture/patterns/asynchronous-request-reply) | Decouple request/response with polling or callbacks | PE |
+| [Claim Check](https://learn.microsoft.com/en-us/azure/architecture/patterns/claim-check) | Split large messages; store payload separately, pass reference | R, S, CO, PE |
+| [Choreography](https://learn.microsoft.com/en-us/azure/architecture/patterns/choreography) | Services coordinate via events without central orchestrator | OE, PE |
+| [Competing Consumers](https://learn.microsoft.com/en-us/azure/architecture/patterns/competing-consumers) | Multiple consumers process messages from shared queue concurrently | R, CO, PE |
+| [Messaging Bridge](https://learn.microsoft.com/en-us/azure/architecture/patterns/messaging-bridge) | Connect incompatible messaging systems | CO, OE |
+| [Pipes and Filters](https://learn.microsoft.com/en-us/azure/architecture/patterns/pipes-and-filters) | Decompose complex processing into reusable filter stages | R |
+| [Priority Queue](https://learn.microsoft.com/en-us/azure/architecture/patterns/priority-queue) | Prioritize requests so higher-priority work is processed first | R, PE |
+| [Publisher/Subscriber](https://learn.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) | Decouple senders from receivers via topics/subscriptions | R, S, CO, OE, PE |
+| [Queue-Based Load Leveling](https://learn.microsoft.com/en-us/azure/architecture/patterns/queue-based-load-leveling) | Buffer requests with a queue to smooth intermittent loads | R, CO, PE |
+| [Sequential Convoy](https://learn.microsoft.com/en-us/azure/architecture/patterns/sequential-convoy) | Process related messages in order while allowing parallel groups | R |
 
 ### Reliability & Resilience
 
 | Pattern | Summary | Pillars |
 |---------|---------|---------|
-| **Bulkhead** | Isolate resources per workload to prevent cascading failure | R |
-| **Circuit Breaker** | Stop calling a failing service; fail fast to protect resources | R |
-| **Compensating Transaction** | Undo previously committed steps when a later step fails | R |
-| **Health Endpoint Monitoring** | Expose health checks for load balancers and orchestrators | R, OE |
-| **Leader Election** | Coordinate distributed instances by electing a leader | R |
-| **Retry** | Handle transient faults by retrying with exponential backoff | R |
-| **Saga** | Manage data consistency across microservices with compensating transactions | R |
-| **Scheduler Agent Supervisor** | Coordinate distributed actions with retry and failure handling | R |
+| [Bulkhead](https://learn.microsoft.com/en-us/azure/architecture/patterns/bulkhead) | Isolate resources per workload to prevent cascading failure | R, S, PE |
+| [Circuit Breaker](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker) | Stop calling a failing service; fail fast to protect resources | R, PE |
+| [Compensating Transaction](https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction) | Undo previously committed steps when a later step fails | R |
+| [Health Endpoint Monitoring](https://learn.microsoft.com/en-us/azure/architecture/patterns/health-endpoint-monitoring) | Expose health checks for load balancers and orchestrators | R, OE, PE |
+| [Idempotent Consumer](https://learn.microsoft.com/en-us/azure/architecture/patterns/idempotent-consumer) | Handle duplicate message delivery so reprocessing has no additional effect | R |
+| [Leader Election](https://learn.microsoft.com/en-us/azure/architecture/patterns/leader-election) | Coordinate distributed instances by electing a leader | R |
+| [Retry](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry) | Handle transient faults by retrying with exponential backoff | R |
+| [Saga](https://learn.microsoft.com/en-us/azure/architecture/patterns/saga) | Manage data consistency across microservices with compensating transactions | R |
+| [Scheduler Agent Supervisor](https://learn.microsoft.com/en-us/azure/architecture/patterns/scheduler-agent-supervisor) | Coordinate distributed actions with retry and failure handling | R, PE |
 
 ### Data Management
 
 | Pattern | Summary | Pillars |
 |---------|---------|---------|
-| **Cache-Aside** | Load data on demand into cache from data store | PE |
-| **CQRS** | Separate read and write models for independent scaling | PE, R |
-| **Event Sourcing** | Store state as append-only sequence of domain events | R, OE |
-| **Index Table** | Create indexes over frequently queried fields in data stores | PE |
-| **Materialized View** | Pre-compute views over data for efficient queries | PE |
-| **Sharding** | Distribute data across partitions for scale and performance | PE, R |
-| **Static Content Hosting** | Serve static content from cloud storage/CDN directly | PE, CO |
-| **Valet Key** | Grant clients limited direct access to storage resources | S, PE |
+| [Cache-Aside](https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside) | Load data on demand into cache from data store | R, PE |
+| [CQRS](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs) | Separate read and write models for independent scaling | PE |
+| [Event Sourcing](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing) | Store state as append-only sequence of domain events | R, PE |
+| [Index Table](https://learn.microsoft.com/en-us/azure/architecture/patterns/index-table) | Create indexes over frequently queried fields in data stores | R, PE |
+| [Materialized View](https://learn.microsoft.com/en-us/azure/architecture/patterns/materialized-view) | Pre-compute views over data for efficient queries | PE |
+| [Sharding](https://learn.microsoft.com/en-us/azure/architecture/patterns/sharding) | Distribute data across partitions for scale and performance | R, CO |
+| [Static Content Hosting](https://learn.microsoft.com/en-us/azure/architecture/patterns/static-content-hosting) | Serve static content from cloud storage/CDN directly | CO |
+| [Valet Key](https://learn.microsoft.com/en-us/azure/architecture/patterns/valet-key) | Grant clients limited direct access to storage resources | S, CO, PE |
 
 ### Design & Structure
 
 | Pattern | Summary | Pillars |
 |---------|---------|---------|
-| **Ambassador** | Offload cross-cutting concerns to a helper sidecar proxy | OE |
-| **Anti-Corruption Layer** | Translate between new and legacy system models | OE, R |
-| **Backends for Frontends** | Create separate backends per frontend type (mobile, web, etc.) | OE, PE |
-| **Compute Resource Consolidation** | Combine multiple workloads into fewer compute instances | CO |
-| **External Configuration Store** | Externalize configuration from deployment packages | OE |
-| **Sidecar** | Deploy helper components alongside the main service | OE |
-| **Strangler Fig** | Incrementally migrate legacy systems by replacing pieces | OE, R |
+| [Ambassador](https://learn.microsoft.com/en-us/azure/architecture/patterns/ambassador) | Offload cross-cutting concerns to a helper sidecar proxy | R, S |
+| [Anti-Corruption Layer](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) | Translate between new and legacy system models | OE |
+| [Backends for Frontends](https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends) | Create separate backends per frontend type (mobile, web, etc.) | R, S, PE |
+| [Compute Resource Consolidation](https://learn.microsoft.com/en-us/azure/architecture/patterns/compute-resource-consolidation) | Combine multiple workloads into fewer compute instances | CO, OE, PE |
+| [External Configuration Store](https://learn.microsoft.com/en-us/azure/architecture/patterns/external-configuration-store) | Externalize configuration from deployment packages | OE |
+| [Sidecar](https://learn.microsoft.com/en-us/azure/architecture/patterns/sidecar) | Deploy helper components alongside the main service | S, OE |
+| [Strangler Fig](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig) | Incrementally migrate legacy systems by replacing pieces | R, CO, OE |
 
 ### Security & Access
 
 | Pattern | Summary | Pillars |
 |---------|---------|---------|
-| **Federated Identity** | Delegate authentication to an external identity provider | S |
-| **Gatekeeper** | Protect services using a dedicated broker that validates requests | S |
-| **Quarantine** | Isolate and validate external assets before allowing use | S |
-| **Rate Limiting** | Control consumption rate of resources by consumers | R, S |
-| **Throttling** | Control resource consumption to sustain SLAs under load | R, PE |
+| [Federated Identity](https://learn.microsoft.com/en-us/azure/architecture/patterns/federated-identity) | Delegate authentication to an external identity provider | R, S, PE |
+| [Gatekeeper](https://learn.microsoft.com/en-us/azure/architecture/patterns/gatekeeper) | Protect services using a dedicated broker that validates requests | S, PE |
+| [Quarantine](https://learn.microsoft.com/en-us/azure/architecture/patterns/quarantine) | Isolate and validate external assets before allowing use | S, OE |
+| [Rate Limiting](https://learn.microsoft.com/en-us/azure/architecture/patterns/rate-limiting-pattern) | Control consumption rate of resources by consumers | R |
+| [Throttling](https://learn.microsoft.com/en-us/azure/architecture/patterns/throttling) | Control resource consumption to sustain SLAs under load | R, S, CO, PE |
 
 ### Deployment & Scaling
 
 | Pattern | Summary | Pillars |
 |---------|---------|---------|
-| **Deployment Stamps** | Deploy multiple independent copies of application components | R, PE |
-| **Edge Workload Configuration** | Configure workloads differently across diverse edge devices | OE |
-| **Gateway Aggregation** | Aggregate multiple backend calls into a single client request | PE |
-| **Gateway Offloading** | Offload shared functionality (SSL, auth) to a gateway | OE, S |
-| **Gateway Routing** | Route requests to multiple backends using a single endpoint | OE |
-| **Geode** | Deploy backends to multiple regions for active-active serving | R, PE |
+| [Deployment Stamps](https://learn.microsoft.com/en-us/azure/architecture/patterns/deployment-stamp) | Deploy multiple independent copies of application components | OE, PE |
+| [Gateway Aggregation](https://learn.microsoft.com/en-us/azure/architecture/patterns/gateway-aggregation) | Aggregate multiple backend calls into a single client request | R, S, OE, PE |
+| [Gateway Offloading](https://learn.microsoft.com/en-us/azure/architecture/patterns/gateway-offloading) | Offload shared functionality (SSL, auth) to a gateway | R, S, CO, OE, PE |
+| [Gateway Routing](https://learn.microsoft.com/en-us/azure/architecture/patterns/gateway-routing) | Route requests to multiple backends using a single endpoint | R, OE, PE |
+| [Geode](https://learn.microsoft.com/en-us/azure/architecture/patterns/geodes) | Deploy backends to multiple regions for active-active serving | R, PE |
+
+### Combining Patterns
+
+Patterns are composable. A single pattern addresses one problem, but a workload usually faces several at once:
+
+- **Retry + Circuit Breaker** — retry transient faults, but stop retrying when a fault persists.
+- **Queue-Based Load Leveling + Competing Consumers** — buffer load with a queue, then scale out the processing of that load.
+- **Gateway Routing + Gateway Aggregation + Gateway Offloading** — layer all three behind a single gateway endpoint.
+- **Saga + Compensating Transaction** — maintain data consistency across services when a distributed operation fails partway through.
 
 See [Design Patterns Reference](./references/design-patterns.md) for detailed implementation guidance.
 
@@ -219,6 +237,29 @@ See [Mission-Critical Reference](./references/mission-critical.md) for detailed 
 
 ---
 
+## AI Workload Design
+
+AI workloads need the same pattern discipline as any distributed system, plus coordination approaches for nondeterministic, autonomous components. Design intelligent capabilities across five layers, each enforcing its own policies, identity, and caching:
+
+| Layer | Responsibility |
+|-------|----------------|
+| **Client** | User interface and client applications; keep this layer thin |
+| **Intelligence** | Routing, orchestration, and agent capabilities that coordinate AI operations |
+| **Inferencing** | Model loading, runtime invocation, input/output pre- and postprocessing |
+| **Knowledge** | Grounding data, retrieval services, and access policy enforcement for context |
+| **Tools** | Business APIs and action capabilities the intelligence layer can invoke |
+
+Key design considerations:
+
+- **Multi-layer caching** — cache results and answers, retrieved grounding snippets, and intermediate model outputs. Scope cache keys by tenant/user identity, policy context, model version, and prompt version. Risks: data leakage, stale data, privacy violations.
+- **Model routing** — route requests across models for availability or per-task quality. Use when the workload tolerates added variability and latency; avoid when deterministic behavior or fine-tuned models with narrow SLOs are required.
+- **Grounding data design** — externalize grounding data to a search index rather than querying source systems directly; chunk to fit context windows; iterate on chunking and embeddings based on observed query patterns.
+- **AI agent orchestration** — for multi-agent workloads, apply the dedicated [AI agent orchestration patterns](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/ai-agent-design-patterns).
+
+For full guidance, see [Well-Architected Framework guidance for AI workloads](https://learn.microsoft.com/azure/well-architected/ai/).
+
+---
+
 ## Well-Architected Framework (WAF) Pillars
 
 Every architecture decision should be evaluated against all five pillars:
@@ -269,7 +310,9 @@ Use the technology choices decision framework. Prefer managed services (PaaS) ov
 
 ### Step 4: Apply Design Patterns
 
-Select relevant patterns from the 44 cloud design patterns based on identified concerns.
+Select relevant patterns from the 44 cloud design patterns based on identified concerns. Choose by problem statement, not technology, and accept each pattern's trade-offs consciously.
+
+Perform [failure mode analysis](https://learn.microsoft.com/en-us/azure/architecture/resiliency/failure-mode-analysis/) on the resulting design: for each component, identify possible failure modes, their blast radius, and the detection and recovery response.
 
 ### Step 5: Address Cross-Cutting Concerns
 
@@ -277,6 +320,7 @@ Select relevant patterns from the 44 cloud design patterns based on identified c
 - **Monitoring** — Application Insights, Azure Monitor, Log Analytics
 - **Security** — Network segmentation, encryption at rest/in transit, Key Vault
 - **CI/CD** — GitHub Actions, Azure DevOps Pipelines, infrastructure as code
+- **AI workloads** — five-layer design (client, intelligence, inferencing, knowledge, tools), grounding data design, model routing trade-offs
 
 ### Step 6: Validate Against WAF Pillars
 
@@ -309,6 +353,9 @@ Use Architecture Decision Records (ADRs):
 - [Technology Choices Reference](./references/technology-choices.md) — Decision trees for Azure services
 - [Best Practices Reference](./references/best-practices.md) — Implementation guidance
 - [Mission-Critical Reference](./references/mission-critical.md) — High-availability design
+- [Design Principles Reference](./references/design-principles.md) — The ten design principles in depth
+- [Architecture Styles Reference](./references/architecture-styles.md) — Architecture style comparisons
+- [Performance Antipatterns Reference](./references/performance-antipatterns.md) — Detection and remediation
 
 ---
 
