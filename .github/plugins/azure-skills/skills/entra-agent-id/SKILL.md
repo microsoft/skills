@@ -17,7 +17,7 @@ Create and manage OAuth 2.0-capable identities for AI agents using Microsoft Gra
 |----------|-------|
 | Service | Microsoft Entra Agent ID |
 | API | Microsoft Graph (`https://graph.microsoft.com/v1.0`) |
-| Required role | Agent Identity Developer, Agent Identity Administrator, or Application Administrator |
+| Required role | Agent ID Developer or Agent ID Administrator (AI Administrator also permits Agent Identity creation; blueprint owners can create identities via delegated permissions without a role) |
 | Object model | Blueprint (application) → BlueprintPrincipal (SP) → Agent Identity (SP) |
 | Runtime exchange | Two-step `fmi_path` exchange (autonomous and OBO) |
 | .NET helper | `Microsoft.Identity.Web.AgentIdentities` |
@@ -127,7 +127,7 @@ headers = {
 
 ### Step 1: Create Agent Identity Blueprint
 
-Use the typed endpoint. Sponsors must be **Users** at Blueprint creation. This snippet assumes the `requests` client and `headers` dict from the Python authentication block above.
+Use the typed endpoint. A sponsor is **required at creation** and can be a user (guests allowed) or a **supported group** — dynamic membership groups (security or Microsoft 365) and assigned Microsoft 365 groups. Role-assignable groups, assigned security groups, and service principals are rejected as sponsors (service principals can be owners). With delegated permissions, the calling user is added as sponsor automatically when none is specified; app-only requests must set sponsors explicitly. This snippet assumes the `requests` client and `headers` dict from the Python authentication block above.
 
 ```python
 import subprocess
@@ -350,7 +350,9 @@ After admin consent, tokens may not include new claims for 30–120 seconds — 
 
 | Resource | URL |
 |----------|-----|
-| Agent ID Setup Guide | https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-id-setup-instructions |
-| AI-Guided Setup | https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-id-ai-guided-setup |
+| Best practices for Microsoft Entra Agent ID | https://learn.microsoft.com/en-us/entra/agent-id/best-practices-agent-id |
+| Agent ID FAQ (limits, blocked permissions, monitoring) | https://learn.microsoft.com/en-us/entra/agent-id/faq |
+| Owners, sponsors, and managers | https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-owners-sponsors-managers |
+| AI-Guided Setup | https://learn.microsoft.com/en-us/entra/agent-id/agent-id-ai-guided-setup |
 | Microsoft Entra SDK for AgentID | https://learn.microsoft.com/en-us/entra/msidweb/agent-id-sdk/overview |
 | Microsoft.Identity.Web.AgentIdentities (.NET) | https://github.com/AzureAD/microsoft-identity-web/blob/master/src/Microsoft.Identity.Web.AgentIdentities/README.AgentIdentities.md |
