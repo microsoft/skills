@@ -6,7 +6,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@azure/mcp@4.0.0-beta.4",
+        "@azure/mcp@4.0.0-beta.6",
         "server",
         "start"
       ]

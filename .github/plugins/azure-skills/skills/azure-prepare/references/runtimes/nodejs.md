@@ -2,6 +2,8 @@
 
 Configure Express/Node.js applications for production deployment on Azure Container Apps and App Service.
 
+Use a supported GA LTS runtime, Node.js 22 or later. Prefer Node.js 24 when the target supports it; keep Docker build and runtime stages on the same major.
+
 ## Required Production Settings
 
 ### 1. Trust Proxy (CRITICAL)
@@ -153,7 +155,7 @@ app.listen(port, '0.0.0.0', () => {
 ## Dockerfile for Azure
 
 ```dockerfile
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 

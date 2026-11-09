@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "azure-advisor",
   "description": "Azure Advisor recommendations, service-retirement impact, and customer-ready remediation guidance.",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"

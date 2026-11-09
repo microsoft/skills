@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.10
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.6 ([#3494](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3494))
+
+## 0.2.9
+
+- feat: automate Azure MCP tool allowlist refresh ([#3484](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3484))
+
 ## 0.2.8
 
 - fix: pin plugin npx package versions ([#3471](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3471))

@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "azure-kusto-graph-skills",
   "description": "Kusto graph analysis, IRQL security hunting pipelines, and graph visualization skills for Azure Data Explorer.",
-  "version": "1.0.34",
+  "version": "1.0.36",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"
