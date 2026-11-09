@@ -3,24 +3,21 @@
     "SessionStart": [
       {
         "type": "command",
-        "windows": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1\"",
-        "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
-        "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
-        "bash": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
-        "powershell": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1",
-        "env": {
-          "AZURE_SKILLS_HOOK_CLIENT_FAMILY": "copilot-vscode"
-        }
+        "windows": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1\" -Harness copilot-vscode",
+        "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh --harness copilot-vscode",
+        "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh --harness copilot-vscode",
+        "bash": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh --harness copilot-vscode",
+        "powershell": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1 -Harness copilot-vscode"
       }
     ],
     "PostToolUse": [
       {
         "type": "command",
-        "windows": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1\"",
-        "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
-        "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
-        "bash": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh",
-        "powershell": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1"
+        "windows": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1\" -Harness copilot-vscode",
+        "osx": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh --harness copilot-vscode",
+        "linux": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh --harness copilot-vscode",
+        "bash": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.sh --harness copilot-vscode",
+        "powershell": "${PLUGIN_ROOT}/hooks/scripts/track-telemetry.ps1 -Harness copilot-vscode"
       }
     ]
   }

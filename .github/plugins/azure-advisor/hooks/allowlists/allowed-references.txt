@@ -1,0 +1,11 @@
+azure-advisor-cost-optimization\references\README.md
+azure-advisor-cost-optimization\references\examples.md
+azure-advisor-cost-optimization\references\lifecycle.md
+azure-advisor-cost-optimization\references\output-and-savings.md
+azure-advisor-cost-optimization\references\scope-resolution.md
+azure-advisor-cost-optimization\references\selection-and-handoff.md
+azure-advisor-cost-optimization\references\state-updates.md
+azure-advisor-cost-optimization\references\table-format.md
+azure-advisor-cost-optimization\references\tools-and-recovery.md
+azure-advisor-cost-optimization\references\workflow.md
+azure-advisor\references\workflow.md

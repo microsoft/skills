@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.120
+
+- fix: pass packaged allowlists to telemetry reporter ([#3505](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3505))
+
+## 1.2.119
+
+- fix: improve telemetry hook host identification ([#3497](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3497))
+
 ## 1.2.118
 
 - fix: require supported Node.js 22+ deployment runtimes ([#3491](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3491))

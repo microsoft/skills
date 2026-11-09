@@ -1,2 +1,3 @@
 azure-advisor
 azure-advisor-actionability
+azure-advisor-cost-optimization
