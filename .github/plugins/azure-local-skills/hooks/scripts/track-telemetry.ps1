@@ -1,6 +1,7 @@
 # Telemetry tracking hook for Azure Copilot Skills
 # Reads JSON input from stdin, tracks relevant events, and publishes telemetry
-# Exit codes: 0 = hook continues, including telemetry failures
+# Usage: track-telemetry.ps1 [-Harness <value>] [-Application <client-name>]
+# Exit codes: 0 = hook continues, including telemetry failures; 1 = parameter binding error
 #
 # === Client Format Reference ===
 #
@@ -9,20 +10,21 @@
 #   - Tool names:     lowercase (skill, view)
 #   - MCP prefix:     azure-<command>  (e.g., azure-documentation)
 #   - Skill prefix:   none (skill name as-is)
-#   - Detection:      COPILOT_CLI env var is "1" (>=0.0.421); fallback: "toolArgs" without "hook_event_name" (<0.0.421)
+#   - Detection:      COPILOT_CLI is "1" with standalone launcher evidence,
+#                     unless a stronger application marker identifies another host
 #
 # Claude Code:
 #   - Field names:    snake_case (tool_name, session_id, tool_input, hook_event_name)
 #   - Tool names:     PascalCase (Skill, Read, Edit)
 #   - MCP prefix:     mcp__plugin_azure_azure__<command>  (double underscores)
 #   - Skill prefix:   azure:<skill-name>  (e.g., azure:azure-prepare)
-#   - Detection:      has "hook_event_name", tool_use_id does NOT contain "__vscode"
+#   - Detection:      explicit "claude-code" harness or application parameter
 #
 # Cursor:
 #   - Field names:    snake_case (tool_name, session_id, tool_input, hook_event_name)
 #   - Tool names:     PascalCase for file reads (Read); raw MCP tool name from afterMCPExecution
 #   - Skill paths:    .cursor/plugins/cache/<catalog>/azure/<revision>/skills/<name>/SKILL.md
-#   - Detection:      has "hook_event_name" and "cursor_version"
+#   - Detection:      explicit "cursor" harness or "cursor_version" payload field
 #   - MCP detection:  afterMCPExecution event with mcp_server_name "azure"
 #
 # VS Code:
@@ -32,8 +34,9 @@
 #   - Skill paths:    .vscode/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-skills/skills/<name>/SKILL.md          (VS Code)
 #                     .vscode-insiders/agent-plugins/github.com/microsoft/azure-skills/.github/plugins/azure-skills/skills/<name>/SKILL.md (VS Code Insiders)
 #                     .agents/skills/<name>/SKILL.md
-#   - Detection:      has "hook_event_name", tool_use_id contains "__vscode"
-#                     or transcript_path contains "Code"
+#   - Detection:      AI_AGENT is "github_copilot_vscode_agent", extension-host
+#                     evidence, tool_use_id contains "__vscode", or transcript
+#                     path contains "Code"; standalone CLI evidence beats ancestry
 #   - Client name:    "Visual Studio Code" (stable) or "Visual Studio Code - Insiders"
 #                     derived from transcript_path (e.g., .../Code - Insiders/User/...)
 #   - Note:           Skills under .agents/skills/ are tracked as "Visual Studio Code" but
@@ -142,9 +145,14 @@
 # env var should be set so that the script can detect local skill paths for
 # reference_file_read events.
 
+param(
+    [string]$Harness,
+    [string]$Application
+)
+
 $ErrorActionPreference = "SilentlyContinue"
 
-$telemetryReporterVersion = "0.1.16-g03871c5229"
+$telemetryReporterVersion = "0.1.20-gc133b914e3"
 
 # Dumps raw input to a file in the AZURE_SKILLS_TELEMETRY_LOG_DIR/raw-input/
 # directory for debugging if the env var is set.
@@ -365,27 +373,32 @@ if (-not $toolInput) {
 $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 $isSessionStart = $hookEventName -eq "SessionStart" -or $hookEventName -eq "sessionStart"
 
-# Detect client name based on input format
-# Copilot CLI (>=0.0.421): COPILOT_CLI env var is "1" — primary signal, checked first
-# Copilot CLI (<0.0.421):  has "toolArgs" field without "hook_event_name" — backward compat fallback
-# Cursor: has hook_event_name AND a "cursor_version" field
-# VS Code: has hook_event_name AND tool_use_id contains "__vscode" or transcript_path contains "Code"
-# Claude Code: has hook_event_name, tool_use_id does NOT contain "__vscode"
-$hasHookEventName = $inputData.PSObject.Properties.Name -contains "hook_event_name"
-$hasToolArgs = $inputData.PSObject.Properties.Name -contains "toolArgs"
+# Application and runtime are separate: VS Code can embed the Copilot runtime.
 $toolUseId = $inputData.tool_use_id
 $transcriptPath = $inputData.transcript_path
 $cursorVersion = $inputData.cursor_version
 $isVscodeToolUseId = $toolUseId -and ($toolUseId -match '__vscode')
 # Match path separators around "Code" or "Code - Insiders" to avoid matching "Claude Code"
 $isVscodeTranscript = $transcriptPath -and ($transcriptPath -match '[/\\]Code( - Insiders)?[/\\]')
+$isCopilotRuntime = $env:COPILOT_CLI -eq "1"
+$hasStandaloneCopilotLauncher = $env:COPILOT_CLI_PATH -or $env:COPILOT_CLI_BINARY_VERSION -or $env:COPILOT_LOADER_PID
+$isVscodeAgent = $env:AI_AGENT -ceq "github_copilot_vscode_agent"
+$isVscodeExtensionHost = $env:VSCODE_PID -and (
+    $env:VSCODE_CRASH_REPORTER_PROCESS_TYPE -ceq "extensionHost" -or
+    $env:VSCODE_ESM_ENTRYPOINT -ceq "vs/workbench/api/node/extensionHostProcess"
+)
+$isCopilotFamily = $Harness -ceq "copilot-vscode" -or $env:AZURE_SKILLS_HOOK_CLIENT_FAMILY -eq "copilot-vscode"
 
-# Copilot CLI check first — env var available since v0.0.421
-if ($env:COPILOT_CLI -eq "1") {
-    $clientName = "copilot-cli"
-} elseif ($hasHookEventName -and $cursorVersion) {
+# Product markers beat ambient CLI variables; CLI evidence still beats ancestry.
+if ($Application) {
+    $clientName = $Application
+} elseif ($Harness -and $Harness -cne "copilot-vscode") {
+    $clientName = $Harness
+} elseif ($cursorVersion -is [string] -and $cursorVersion) {
     $clientName = "cursor"
-} elseif ($hasHookEventName -and ($env:AZURE_SKILLS_HOOK_CLIENT_FAMILY -eq "copilot-vscode" -or $isVscodeToolUseId -or $isVscodeTranscript)) {
+} elseif ($isCopilotRuntime -and $hasStandaloneCopilotLauncher -and -not $isVscodeAgent) {
+    $clientName = "copilot-cli"
+} elseif ($isVscodeAgent -or $isVscodeExtensionHost -or $isVscodeToolUseId -or $isVscodeTranscript) {
     # Detect VS Code variant from transcript_path
     # Insiders: ...AppData\Roaming\Code - Insiders\User\...
     # Stable:   ...AppData\Roaming\Code\User\...
@@ -394,12 +407,9 @@ if ($env:COPILOT_CLI -eq "1") {
     } else {
         $clientName = "Visual Studio Code"
     }
-} elseif ($hasHookEventName) {
-    $clientName = "claude-code"
-} elseif ($hasToolArgs) {
-    # Backward compat: old Copilot CLI (<0.0.421) sent toolArgs without hook_event_name
-    # Claude Code never sends toolArgs, so this is unambiguous
-    $clientName = "copilot-cli"
+} elseif ($isCopilotFamily -or $isCopilotRuntime -or $hasStandaloneCopilotLauncher -or
+    $env:COPILOT_CLI_RUN_AS_NODE -eq "1" -or $env:VSCODE_PID) {
+    $clientName = "unknown"
 } else {
     $clientName = "unknown"
 }
@@ -512,7 +522,7 @@ if ($toolName -eq "view" -or $toolName -eq "Read" -or $toolName -eq "read_file")
 #               optional display prefix (e.g., MCP:get_azure_bestpractices)
 # VS Code:      "mcp_azure_mcp_*" prefix (e.g., mcp_azure_mcp_documentation)
 if ($toolName -and (Test-OwnsMcpServer -ServerName "azure")) {
-    if ($clientName -eq "cursor" -and $hookEventName -eq "afterMCPExecution" -and $mcpServerName -eq "azure") {
+    if ($hookEventName -eq "afterMCPExecution" -and $mcpServerName -eq "azure") {
         $azureToolName = $toolName
         if ($azureToolName.StartsWith("MCP:", [System.StringComparison]::Ordinal)) {
             $azureToolName = $azureToolName.Substring(4)
@@ -583,6 +593,10 @@ if ($shouldTrack) {
     # Build reporter arguments
     $reporterArguments = @()
 
+    $allowlistsDir = Join-Path (Split-Path -Parent $scriptDir) 'allowlists'
+    $reporterArguments += "--allowed-skills"; $reporterArguments += (Join-Path $allowlistsDir 'allowed-skills.txt')
+    $reporterArguments += "--allowed-references"; $reporterArguments += (Join-Path $allowlistsDir 'allowed-references.txt')
+    $reporterArguments += "--allowed-tools"; $reporterArguments += (Join-Path $allowlistsDir 'allowed-tools.json')
     $reporterArguments += "--plugin-name"; $reporterArguments += $pluginName
     $reporterArguments += "--plugin-version"; $reporterArguments += $pluginVersion
     $reporterArguments += "--client-name"; $reporterArguments += $clientName

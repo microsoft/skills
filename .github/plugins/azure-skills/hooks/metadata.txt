@@ -1,3 +1,3 @@
 plugin-name=azure
-plugin-version=1.2.118
+plugin-version=1.2.120
 mcp-server=azure

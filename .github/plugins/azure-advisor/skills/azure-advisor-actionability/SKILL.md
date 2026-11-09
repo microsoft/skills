@@ -1,10 +1,10 @@
 ---
 name: azure-advisor-actionability
-description: "Remediate Azure Advisor recommendations. WHEN: \"fix Advisor recommendation\"."
+description: "Get remediation instructions for selected Azure Advisor recommendations. WHEN: fix a selected recommendation, generate remediation commands. DO NOT USE FOR: unused-resource discovery, savings or deletion prevalidation (use azure-advisor-cost-optimization)."
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Azure Advisor Actionability

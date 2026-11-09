@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "azure-cost",
   "description": "Azure cost analysis, estimation, optimization, and governance workflows backed by Azure Resource Manager MCP.",
-  "version": "1.0.20",
+  "version": "1.0.22",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"
