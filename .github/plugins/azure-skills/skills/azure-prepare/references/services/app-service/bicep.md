@@ -8,8 +8,8 @@
 |----------|-------|---------|
 | Plan `reserved` | `true` | omit (defaults to `false`) |
 | Site `kind` | `'app,linux'` | `'app'` |
-| Site `linuxFxVersion` | e.g. `'NODE\|24-lts'` | omit |
-| Site `WEBSITE_NODE_DEFAULT_VERSION` | omit | e.g. `'~22'` |
+| Site `linuxFxVersion` | e.g. `'NODE\|20-lts'` | omit |
+| Site `WEBSITE_NODE_DEFAULT_VERSION` | omit | e.g. `'~20'` |
 
 > 💡 **Tip:** When both frontend and API use Node.js, prefer a **single Linux App Service Plan** for both. This avoids mixed-platform complexity and keeps all services on one plan.
 

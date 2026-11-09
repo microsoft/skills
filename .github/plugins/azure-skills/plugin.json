@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "azure",
   "description": "Microsoft Azure MCP and Skills integration for cloud resource management, deployments, and Azure services. Manage your Azure infrastructure, monitor applications, and deploy resources directly from your development environment.",
-  "version": "1.2.118",
+  "version": "1.2.115",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"

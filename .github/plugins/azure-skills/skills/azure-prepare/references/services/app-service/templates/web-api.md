@@ -117,7 +117,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 **Node.js**
 ```dockerfile
-FROM node:22-slim
+FROM node:20-slim
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --production

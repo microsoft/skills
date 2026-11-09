@@ -4,7 +4,7 @@ description: "Pre-deployment validation for Azure readiness. Run deep checks on 
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.5"
+  version: "1.2.4"
 ---
 
 # Azure Validate
@@ -49,7 +49,7 @@ pwsh references/scripts/workflow.ps1 -WorkspacePath <workspace-path>
 
 Each run prints the next action and the value to pass next. Perform the action, then re-run with that value (`-CompletedStep <value>` for pwsh, `--completed-step <value>` for bash). Repeat until it reports the azure-validate workflow is complete.
 
-Read [references/recipes/README.md](references/recipes/README.md) and apply its Node.js runtime check for **every recipe** before provisioning or deployment. The steps also reference [role checks](references/role-verification.md).
+The steps reference recipe details in [references/recipes/README.md](references/recipes/README.md) and role checks in [references/role-verification.md](references/role-verification.md).
 
 > **⛔ VALIDATION AUTHORITY**
 >

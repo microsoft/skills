@@ -1,17 +1,5 @@
 # Changelog
 
-## 1.2.118
-
-- fix: require supported Node.js 22+ deployment runtimes ([#3491](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3491))
-
-## 1.2.117
-
-- chore: refresh Azure MCP allowlists to 4.0.0-beta.6 ([#3494](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3494))
-
-## 1.2.116
-
-- feat: automate Azure MCP tool allowlist refresh ([#3484](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3484))
-
 ## 1.2.115
 
 - fix: harden Python App Service deployment preflight and packaging ([#3461](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3461))

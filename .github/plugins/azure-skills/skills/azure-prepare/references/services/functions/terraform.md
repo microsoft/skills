@@ -261,7 +261,7 @@ resource "azurerm_windows_function_app" "function_app" {
   site_config {
     application_insights_connection_string = azurerm_application_insights.function_insights.connection_string
     application_stack {
-      node_version = "~22"
+      node_version = "~20"
     }
   }
 
@@ -292,7 +292,7 @@ resource "azurerm_windows_function_app_slot" "staging" {
   site_config {
     application_insights_connection_string = azurerm_application_insights.function_insights.connection_string
     application_stack {
-      node_version = "~22"
+      node_version = "~20"
     }
   }
 

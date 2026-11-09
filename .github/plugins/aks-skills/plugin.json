@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "aks-skills",
   "description": "AKS operational skills for troubleshooting, advanced cost-efficiency analysis, known issues, GPU inference, and packet capture.",
-  "version": "1.0.14",
+  "version": "1.0.12",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"
