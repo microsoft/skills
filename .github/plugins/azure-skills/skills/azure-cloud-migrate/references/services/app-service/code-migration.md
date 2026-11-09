@@ -10,7 +10,7 @@ Migrate source platform web application code to Azure App Service.
 ## Rules
 
 - Create all output in `<source-folder>-azure/` — never modify the source directory
-- Use latest GA runtime stack for the target language
+- Use latest GA runtime stack for the target language. Node.js must use a supported GA LTS major >=22; prefer 24 where supported. Inspect source Dockerfiles and runtime settings, assess dependency compatibility, and obtain approval for required major-version upgrades before migration.
 - Prefer managed identity over connection strings or API keys
 - Use App Configuration for shared settings, Key Vault for secrets
 - Always configure health check endpoint
@@ -45,7 +45,7 @@ For non-Docker deployments, configure the startup command in App Service:
 Use a Dockerfile when the app requires custom system dependencies or multi-process setups:
 
 ```dockerfile
-FROM node:20-slim
+FROM node:22-slim
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev

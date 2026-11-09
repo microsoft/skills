@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.20
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.6 ([#3494](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3494))
+
+## 1.0.19
+
+- feat: automate Azure MCP tool allowlist refresh ([#3484](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3484))
+
 ## 1.0.18
 
 - feat: adopt Agent Plugins 1.0 package format ([#3469](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3469))

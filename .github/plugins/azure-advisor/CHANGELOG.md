@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.10
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.6 ([#3494](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3494))
+
+## 1.0.9
+
+- feat: automate Azure MCP tool allowlist refresh ([#3484](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3484))
+
 ## 1.0.8
 
 - feat: align Azure Advisor skill routing with MCP summary and list tools ([#3474](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3474))

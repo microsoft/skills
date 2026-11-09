@@ -147,6 +147,8 @@ resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
 
 ### Linux Consumption (no slot support)
 
+Node.js 22 is the last supported Node.js major on Linux Consumption; use Flex Consumption for newer majors.
+
 ```bicep
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: '${resourcePrefix}func${uniqueHash}'
@@ -171,7 +173,7 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
     serverFarmId: functionAppPlan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'Node|24'
+      linuxFxVersion: 'Node|22'
       appSettings: [
         { name: 'AzureWebJobsStorage', value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value}' }
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
@@ -206,7 +208,7 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
     httpsOnly: true
     siteConfig: {
       appSettings: [
-        { name: 'WEBSITE_NODE_DEFAULT_VERSION', value: '~20' }
+        { name: 'WEBSITE_NODE_DEFAULT_VERSION', value: '~22' }
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
         { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'node' }
         { name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value}' }
@@ -228,7 +230,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2022-09-01' = {
     serverFarmId: functionAppPlan.id
     siteConfig: {
       appSettings: [
-        { name: 'WEBSITE_NODE_DEFAULT_VERSION', value: '~20' }
+        { name: 'WEBSITE_NODE_DEFAULT_VERSION', value: '~22' }
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
         { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'node' }
         { name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value}' }

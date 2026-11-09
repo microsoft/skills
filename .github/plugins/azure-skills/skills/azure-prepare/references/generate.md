@@ -115,6 +115,12 @@ mkdir -p src/frontend/src src/api
 
 ### Runtime Configuration
 
+For new/generated Node.js apps, use a supported GA LTS major **>=22**; prefer **24** where supported. Verify support for the target service, OS, and hosting plan. Azure Functions **Linux Consumption is limited to Node.js 22**; use Flex Consumption for newer majors.
+
+Inspect existing projects and downloaded azd/MCP templates before accepting their defaults. Check every Docker build/runtime stage, Bicep/Terraform runtime setting, production/staging slot, and `package.json` engine. Resolve image/runtime parameters to their actual values; do not rely on the CI runner's Node version or floating `node:lts` tags.
+
+For existing apps below 22, document dependency compatibility and the required upgrade in the deployment plan and obtain approval before changing the major. Do not silently preserve an unsupported runtime or deploy it. Keep the chosen major consistent across build images, runtime images, and platform settings.
+
 Apply language-specific production settings for containerized apps:
 
 | Runtime | Reference |
