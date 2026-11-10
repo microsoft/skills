@@ -1,6 +1,6 @@
 # Prompt Voice YAML
 
-Author a single managed Voice Agent after applying [common invariants](voice-agent-common.md).
+Author a single managed Voice Agent after applying [common invariants](common.md).
 
 ## Managed Real-Time Model
 
@@ -48,7 +48,7 @@ services:
 
 If the deployment is missing and the user intends creation:
 
-1. Read [Foundry Model Reference](foundry-model.md) and resolve the exact model version, format, supported SKU/capacity, lifecycle, and available quota. Never guess these values.
+1. Read [Foundry Model Reference](../foundry-model.md) and resolve the exact model version, format, supported SKU/capacity, lifecycle, and available quota. Never guess these values.
 2. State the billable/quota-consuming deployment plan and obtain confirmation unless creation was explicit.
 3. Preserve existing deployment entries and unrelated infrastructure, then append the resolved deployment to the existing `ai-project` service. Set `model.id` to the exact `deployments[].name`.
 
@@ -83,6 +83,6 @@ For an existing azd project, edit `deployments[]` in place; do not rerun `azd ai
 
 ## Optional Configuration
 
-When requested settings require YAML edits, load [Voice Agent YAML settings](voice-agent-settings.md). Preserve unrelated existing fields and edit only requested paths.
+When requested settings require YAML edits, load [Voice Agent YAML settings](prompt-and-hosted-voice-settings.md). Preserve unrelated existing fields and edit only requested paths.
 
 Common defaults include PCM at 24 kHz, Azure Speech transcription, server VAD, and audio output. Omit `voice` unless requested or required by an existing definition so azd applies its default.

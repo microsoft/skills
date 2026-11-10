@@ -1,12 +1,14 @@
 # Voice Agent YAML Settings
 
-For requested/preserved YAML settings. Use `kind: voice`; preserve unrelated fields.
+For requested/preserved Prompt Voice and Hosted Voice settings. Use `kind: voice`; preserve unrelated fields. Do not apply this reference to GPT-Live Voice; use [GPT-Live Voice YAML](gpt-live-voice-yaml.md), whose native Live authoring surface is intentionally separate.
 
 | Owner | Settings |
 |---|---|
 | Prompt Voice | Model, instructions, inputs, audio, tools, behavior, data, telephony |
-| Hosted wrapper | Audio, voice, behavior, store only |
+| Hosted wrapper | Audio/voice, `structuredInputs`, greeting, `outputModalities`/avatar, `store`, `parallelToolCalls`, `maxOutputTokens`, `include` |
 | Hosted target | Model, instructions, tools, logic |
+
+Hosted wrappers must omit target/runtime-owned `model`, `modelType`, `instructions`, `tools`, `toolChoice`, `policies`, `protocols`, `codeConfiguration`, `sessionConfiguration`, and environment fields.
 
 ## Advanced Settings
 
@@ -26,7 +28,7 @@ audio:
   output:
     format: { type: audio/pcm, rate: 24000 }
     voice: { type: azure-standard, name: <voice-name>,
-             style: cheerful, pitch: "+0Hz", rate: "+0%", locale: en-US, volume: "+0%" }
+             style: cheerful, pitch: "+0Hz", locale: en-US, volume: "+0%" }
     speed: 1.1
 ```
 
@@ -36,14 +38,14 @@ audio:
 
 | Setting | Values / constraints |
 |---|---|
-| `audio.*.format` | `type`: `audio/pcm`, `audio/pcmu`, `audio/pcma`; `rate`: positive integer. G.711 `pcmu`/`pcma` may omit `rate`. |
+| `audio.*.format` | `audio/pcm` requires `rate: 24000`; `audio/pcmu` and `audio/pcma` must omit `rate`. |
 | `audio.input.turnDetection` | Known `type` values: `server_vad`, `semantic_vad`, `azure_semantic_vad` (schema is open, not an enum). `threshold`: >0 and <=1. `prefixPaddingMs`, `silenceDurationMs`, `speechDurationMs`: nonnegative integers. `createResponse`, `removeFillerWords`, `interruptResponse`, `autoTruncate`: booleans. `languages`: string array. Known service `eagerness`: `auto`, `low`, `medium`, `high` (schema is open). |
 | `audio.input.noiseReduction` | Nonblank `type`; known values: `near_field`, `far_field`, `azure_deep_noise_suppression` (schema is open). |
 | `audio.input.transcription` | `model`, `language`, `prompt`: strings. Known phrase-compatible models: `azure-speech`, `azure-fast-transcription`; `include: [item.input_audio_transcription.phrases]` requires one. Do not author `phraseList`; azd doesn't support it. |
-| `audio.output.voice` | Nested shape requires nonblank `type` and `name`; source-known types: `azure-standard` / `azure_standard`, `openai`. Keep the canonical nested example above. |
+| `audio.output.voice` | Nested shape requires nonblank `type` and `name`; source-known types: `azure-standard` / `azure_standard`, `openai`. Nonempty legacy `voice.rate` is rejected; use `audio.output.speed`. |
 | `audio.output.speed` | 0.25-1.5. |
-| Responses | `outputModalities` must be nonempty; known values: `audio`, `text`, `animation`, `avatar`. `maxOutputTokens`: integer 1-2147483647 or `inf`. `parallelToolCalls` is unsupported and rejected. |
-| Telephony | Providers: `twilio`, `acs`; each binding requires provider, identifier, connection. Twilio identifier: `+<E.164>`; ACS: `28:orgid:<guid>` or `4:+<E.164>`. |
+| Responses | `outputModalities` must be nonempty; known values: `audio`, `text`, `animation`, `avatar`. `maxOutputTokens`: integer 1-2147483647 or `inf`. `parallelToolCalls` is a boolean for Prompt Voice and Hosted Voice wrappers. GPT-Live Voice root definitions reject it; GPT-Live Responses delegation is documented separately. |
+| Telephony | Prompt Voice providers: `twilio`, `acs`; each binding requires provider, identifier, connection. Twilio identifier: `+<E.164>`; ACS/TPE identifier: `28:orgid:<guid>`. |
 
 ### Behavior and Responses
 
@@ -53,6 +55,7 @@ outputModalities: [audio, text]
 avatar: { type: video_avatar, character: lisa, output_protocol: webrtc }
 tools: [{ type: system, name: end_conversation }]
 toolChoice: auto
+parallelToolCalls: true
 maxOutputTokens: inf # or integer 1-2147483647
 include: [item.input_audio_transcription.phrases]
 ```
@@ -88,9 +91,21 @@ telephony:
     - provider: twilio
       identifier: "+14255550123"
       connection: telephony-twilio
+      transferTargets:
+        - name: support
+          description: Transfer the caller to support.
+          destination: { kind: pstn, value: "+14255550124" }
 ```
 
 Token: process environment only, never YAML/chat/summaries. Connection must preexist deploy. azd doesn't create accounts, buy/discover numbers, or prove routing; test a call.
+
+Bindings require `provider`, `identifier`, and `connection`; `transferTargets` is optional. Omit it to leave the existing singleton transfer targets unmanaged, or set `transferTargets: []` to manage the set as empty. When present, each item requires `name`, a nonblank `description`, and `destination`. Destination kinds:
+
+- `pstn`: `value` is `+<E.164>`.
+- `teams`: `value` is a canonical GUID or `28:orgid:<guid>`.
+- `sip`: `value` is a valid `sip:` or `sips:` URI with `user@host`.
+
+Names in the effective target set must be unique case-insensitively. Descriptions are limited to 1024 UTF-16 code units; destination values, including SIP URIs, are limited to 2048.
 
 ### Teams Phone extensibility (TPE) / ACS
 
@@ -104,4 +119,4 @@ telephony:
       connection: <acs-connection-name>
 ```
 
-`4:+<E.164>` is a separate ACS-purchased-number route, not TPE. If no compatible TPE/ACS connection exists, don't create it with azd or automate RBAC/Event Grid/TPE setup. Use the [guide](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/voice-agent-telephony-channels) and **Foundry portal → Voice Agent → Channels → Phone numbers → Add a number → Microsoft Teams**; the portal coordinates the ACS connection, project identity, TPE resource account, secure webhook/Event Grid, and TPE telephony binding. Test a real call; WebSocket smoke doesn't validate telephony.
+Legacy ACS purchased-number identifiers such as `4:+<E.164>` are rejected by authoring validation. If no compatible TPE/ACS connection exists, don't create it with azd or automate RBAC/Event Grid/TPE setup. Use the [guide](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/voice-agent-telephony-channels) and **Foundry portal → Voice Agent → Channels → Phone numbers → Add a number → Microsoft Teams**; the portal coordinates the ACS connection, project identity, TPE resource account, secure webhook/Event Grid, and TPE telephony binding. Test a real call; WebSocket smoke doesn't validate telephony.

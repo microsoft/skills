@@ -17,19 +17,20 @@ try {
     exit 1
 }
 
-$foundryInstalled = @($extensions) | Where-Object { $_.id -eq "microsoft.foundry" } | Select-Object -First 1
-if ($foundryInstalled) {
-    Write-Host "Dependencies are ready: azd and the microsoft.foundry extension are ready."
-    exit 0
+foreach ($extensionId in @("microsoft.foundry", "azure.ai.evaluations")) {
+    $installed = @($extensions) | Where-Object { $_.id -eq $extensionId } | Select-Object -First 1
+    if ($installed) {
+        continue
+    }
+
+    Write-Host "$extensionId is not installed. Installing it now..."
+    & azd extension install $extensionId
+    $installExitCode = $LASTEXITCODE
+    if ($installExitCode -ne 0) {
+        Write-Error "Failed to install the $extensionId azd extension."
+        exit $installExitCode
+    }
 }
 
-Write-Host "microsoft.foundry is not installed. Installing it now..."
-& azd extension install microsoft.foundry
-$installExitCode = $LASTEXITCODE
-if ($installExitCode -ne 0) {
-    Write-Error "Failed to install the microsoft.foundry azd extension."
-    exit $installExitCode
-}
-
-Write-Host "Dependencies are ready: azd and the microsoft.foundry extension are ready."
+Write-Host "Dependencies are ready: azd and the microsoft.foundry and azure.ai.evaluations extensions are ready."
 exit 0
