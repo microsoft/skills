@@ -108,7 +108,7 @@ The official `voice-live-bridge-basic-python` sample includes `scripts/smoke_tes
    - Expects exact frame sequence: `response.created` -> `response.output_text.done` -> `response.done`
    - Sends `session.end` (`reason: "validation_complete"`)
 
-> **Important**: Testing the hosted target directly over `/invocations_ws` validates only its Voice Live Bridge `1.0` handler. End-to-end validation must also smoke-test the Voice wrapper over its managed `voice` endpoint (see [voice-agent-smoke-test.md](voice-agent-smoke-test.md)).
+> **Important**: Testing the hosted target directly over `/invocations_ws` validates only its Voice Live Bridge `1.0` handler. End-to-end validation must also smoke-test the Voice wrapper over its managed `voice` endpoint (see [Prompt and Hosted Voice smoke testing](prompt-and-hosted-voice-smoke-test.md)).
 
 ---
 

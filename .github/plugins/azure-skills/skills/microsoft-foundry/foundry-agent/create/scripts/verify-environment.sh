@@ -56,7 +56,7 @@ note_ok "Azure CLI installed (version ${AZ_VERSION})."
 
 # 2. Required azd extensions
 EXT_JSON="$(azd extension list --installed --output json 2>/dev/null || echo '[]')"
-for ext in azure.ai.agents azure.ai.projects microsoft.foundry; do
+for ext in azure.ai.agents azure.ai.projects microsoft.foundry azure.ai.evaluations; do
   if printf '%s' "$EXT_JSON" | grep -q "$ext"; then
     note_ok "Extension '$ext' is installed."
   else

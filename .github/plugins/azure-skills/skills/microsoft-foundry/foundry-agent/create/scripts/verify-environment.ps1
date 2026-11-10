@@ -133,7 +133,7 @@ try {
 } catch {
     $extRaw = ""
 }
-foreach ($ext in @("azure.ai.agents", "azure.ai.projects", "microsoft.foundry")) {
+foreach ($ext in @("azure.ai.agents", "azure.ai.projects", "microsoft.foundry", "azure.ai.evaluations")) {
     if ($extRaw -match [regex]::Escape($ext)) {
         Note-Ok "Extension '$ext' is installed."
     } else {

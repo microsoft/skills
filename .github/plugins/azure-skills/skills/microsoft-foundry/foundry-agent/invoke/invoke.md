@@ -1,6 +1,6 @@
 # Invoke Foundry Agent
 
-Invoke ordinary Prompt Agents with Foundry MCP. Invoke Hosted and Managed Harness Agents with azd. Invoke Voice Agents over the managed Foundry `voice` WebSocket endpoint (not `azd ai agent invoke`).
+Invoke ordinary Prompt Agents with Foundry MCP. Invoke Hosted and Managed Harness Agents with azd. Invoke Voice Agents over the subtype-specific WebSocket endpoint (not `azd ai agent invoke`).
 
 ## Route by Agent Type
 
@@ -8,38 +8,42 @@ Invoke ordinary Prompt Agents with Foundry MCP. Invoke Hosted and Managed Harnes
 |------------|----------|-------------|------------------|
 | Prompt | — | Foundry MCP `agent_invoke` | `conversationId`; no hosted session or file operations |
 | Managed Harness Agent | Responses | `azd ai agent invoke` | Managed response history; no Hosted session/file operations |
+| Voice (GPT-Live Voice) | `voice/live/sessions` (`wss://.../protocols/voice/live/sessions?api-version=v1`) | Session lifecycle smoke; Foundry Voice playground for interactive audio-to-audio testing; **never** the ordinary Voice helper or `azd ai agent invoke` | Native Live session; no Hosted session/file commands |
 | Voice (Prompt Voice or Hosted Voice wrapper) | `voice` (`wss://.../protocols/voice?api-version=v1`) | Smoke helper for minimal programmatic verification; Foundry Voice playground for interactive audio-to-audio testing; **never** `azd ai agent invoke` | Real-time Voice session; no Hosted session/file commands on `kind: voice` |
-| Hosted Voice target (diagnostic only) | `invocations_ws` + Bridge `1.0` | Bridge-compatible WebSocket client; see [voice-agent-hosted-bridge.md](../create/references/voice-agent-hosted-bridge.md) | Target container session (`agent_session_id`); does not validate the Voice wrapper |
+| Hosted Voice target (diagnostic only) | `invocations_ws` + Bridge `1.0` | Bridge-compatible WebSocket client; see [hosted-voice-bridge.md](../create/references/voice-agent/hosted-voice-bridge.md) | Target container session (`agent_session_id`); does not validate the Voice wrapper |
 | Hosted | `responses` | `azd ai agent invoke` | azd sessions, files, conversations, and monitor commands |
 | Hosted | `invocations` | `azd ai agent invoke --protocol invocations` | azd sessions, files, conversations, and monitor commands |
 | Hosted | `activity` | Microsoft 365 channel, such as Teams | Activity conversation and channel state |
 | Hosted (custom real-time/audio) | `invocations_ws` | Custom WebSocket client; follow [invocations-ws](../invocations-ws/invocations-ws.md) | Agent-managed state keyed by `agent_session_id` |
 
-Classify `azure.yaml` services in order: Voice is a **Voice Agent** (`conversationEngine.type: hosted_agent` for Hosted Voice wrapper, `modelType: managed` or `self_deployed` for Prompt Voice); apply the top-level compatibility classification for legacy manifests. `kind: hosted` is **Hosted**; `kind: prompt` plus `harness.type: microsoft_copilot_preview` or legacy `github_copilot_preview` is a **Managed Harness Agent**; other `kind: prompt` services are ordinary **Prompt Agents**. If still unknown, use `agent_get` only to classify.
+For `kind: voice` or legacy `kind: prompt-voice`, read [Voice Agent subtypes](../create/references/voice-agent/subtypes.md). Classify other agent types from the top-level agent rules; use `agent_get` only when project context remains insufficient.
 
-## Voice Agent Workflow (Prompt Voice and Hosted Voice Wrapper)
+## Voice Agent Workflow
 
-> **Critical**: `azd ai agent invoke` does **not** support Voice Agents, including Hosted Voice wrappers. Use the bundled smoke helper for minimal programmatic/single-turn verification. For "talk to," interactive testing, microphone/audio-to-audio, voice quality, VAD, interruption, or full-experience requests, provide the Voice Agent Playground URL from `azd ai agent show --output json`.
+> **Critical**: `azd ai agent invoke` does **not** support Voice Agents. GPT-Live Voice must use its dedicated Live session helper; Prompt Voice and Hosted Voice use the bundled ordinary Voice helper. For interactive microphone/audio-to-audio testing, provide the Voice Agent Playground URL from `azd ai agent show --output json`.
 
 ### Step 1: Verify Deployed Version(s)
 
 Inside the azd project, run:
 
 ```bash
-azd ai agent show --output json
+azd ai agent show "<voice-service-key>" --output json
+azd ai agent endpoint show "<voice-service-key>" --output json
 ```
 
-- For **Prompt Voice**, confirm the `kind: voice` agent version is active.
+- For **GPT-Live Voice** or **Prompt Voice**, confirm the `kind: voice` agent version is active.
 - For **Hosted Voice**, confirm **both** the `kind: hosted` target and the `kind: voice` wrapper versions are active, and target the **`kind: voice` wrapper's** name for end-to-end Voice invocation.
+- Use the local service key for these readback commands. Use the resolved remote Voice Agent name for the smoke helper when it differs.
 
 ### Step 2: Choose the Invocation Experience
 
-- **Minimal programmatic or single-turn verification:** run the bundled smoke helper over the managed `voice` WebSocket.
-- **Interactive or full audio-to-audio testing:** direct the user to the Foundry Voice Agent playground URL returned by `azd ai agent show --output json`. This is the path for microphone capture, STT quality, VAD/turn-taking, barge-in/interruption, playback/voice quality, browser/device behavior, and perceived latency.
+- **GPT-Live Voice technical verification:** follow [gpt-live-voice-smoke-test.md](../create/references/voice-agent/gpt-live-voice-smoke-test.md) over `/protocols/voice/live/sessions`. The gate verifies startup and clean requested closure.
+- **Prompt Voice or Hosted Voice technical verification:** run the bundled smoke helper over the managed `voice` WebSocket.
+- **Interactive or full audio-to-audio testing:** direct the user to the Foundry Voice Agent playground URL returned by `azd ai agent show --output json`. For GPT-Live Voice, validate microphone input, full-duplex behavior, interruption, playback/voice quality, and perceived latency. For Prompt Voice and Hosted Voice, also validate STT quality and VAD/turn-taking.
 
-The smoke helper is a text-driven technical verification client, not a complete interactive microphone client. See [voice-agent-smoke-test.md](../create/references/voice-agent-smoke-test.md) for the validation boundary.
+Neither verification path is a complete interactive microphone client. See the selected subtype reference for the validation boundary.
 
-#### Automated Smoke Test
+#### Prompt Voice and Hosted Voice Automated Smoke Test
 
 Run the paired smoke-test helper from the `microsoft-foundry` skill root (`plugins/azure-skills/skills/microsoft-foundry`) using `DefaultAzureCredential` (`https://ai.azure.com/.default`). Note that PowerShell uses PascalCase parameters (`-Endpoint`, `-AgentName`, `-Text`, `-Timeout`, `-OutputAudio`, `-DryRun`).
 
@@ -61,11 +65,11 @@ Run the paired smoke-test helper from the `microsoft-foundry` skill root (`plugi
   -Timeout 180
 ```
 
-See [voice-agent-smoke-test.md](../create/references/voice-agent-smoke-test.md) for `--dry-run` / `-DryRun`, `--output-audio` / `-OutputAudio`, and exit code semantics (`0` pass, `1` failure, `2` usage error).
+See [prompt-and-hosted-voice-smoke-test.md](../create/references/voice-agent/prompt-and-hosted-voice-smoke-test.md) for `--dry-run` / `-DryRun`, `--output-audio` / `-OutputAudio`, and exit code semantics (`0` pass, `1` failure, `2` usage error).
 
 ### Optional Step 3: Hosted Voice Target Bridge `1.0` Diagnostic
 
-When a **Hosted Voice Agent** fails or needs target-level isolation, test the `kind: hosted` target directly over `/invocations_ws` using the diagnostic sequence in [voice-agent-hosted-bridge.md](../create/references/voice-agent-hosted-bridge.md). Target-only testing does **not** replace end-to-end wrapper verification in Step 2.
+When a **Hosted Voice Agent** fails or needs target-level isolation, test the `kind: hosted` target directly over `/invocations_ws` using the diagnostic sequence in [hosted-voice-bridge.md](../create/references/voice-agent/hosted-voice-bridge.md). Target-only testing does **not** replace end-to-end wrapper verification in Step 2.
 
 ## Managed Harness Agent Workflow with azd
 

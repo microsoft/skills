@@ -14,11 +14,14 @@ if ! extension_list="$(azd extension list --installed --output json)"; then
   exit 1
 fi
 
-if printf '%s' "$extension_list" | grep -Eq '"id"[[:space:]]*:[[:space:]]*"microsoft\.foundry"'; then
-  echo "Dependencies are ready: azd and the microsoft.foundry extension are ready."
-  exit 0
-fi
+for extension_id in microsoft.foundry azure.ai.evaluations; do
+  extension_pattern="${extension_id//./[.]}"
+  if printf '%s' "$extension_list" | grep -Eq "\"id\"[[:space:]]*:[[:space:]]*\"$extension_pattern\""; then
+    continue
+  fi
 
-echo "microsoft.foundry is not installed. Installing it now..."
-azd extension install microsoft.foundry
-echo "Dependencies are ready: azd and the microsoft.foundry extension are ready."
+  echo "$extension_id is not installed. Installing it now..."
+  azd extension install "$extension_id"
+done
+
+echo "Dependencies are ready: azd and the microsoft.foundry and azure.ai.evaluations extensions are ready."

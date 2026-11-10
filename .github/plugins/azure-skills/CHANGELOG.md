@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.122
+
+- feature: add GPT-Live voice agent skill support ([#3485](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3485))
+
+## 1.2.121
+
+- fix: improve Foundry quickstart and evaluation workflows ([#3507](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3507))
+
 ## 1.2.120
 
 - fix: pass packaged allowlists to telemetry reporter ([#3505](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3505))

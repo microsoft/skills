@@ -2,6 +2,8 @@
 
 How to verify a deployed Microsoft Foundry Voice Agent — either a **Prompt Voice Agent** or a **Hosted Voice wrapper** — over the managed Foundry `voice` WebSocket endpoint.
 
+This helper does not support GPT-Live Voice. For that subtype, use [GPT-Live Voice smoke testing](gpt-live-voice-smoke-test.md).
+
 > **Why not `azd ai agent invoke`?**
 > `azd ai agent invoke` does not support Voice Agents. Always verify them over the managed `voice` WebSocket endpoint or in the Microsoft Foundry portal (`https://ai.azure.com`). You can inspect the deployed endpoint URL with `azd ai agent endpoint show <voice-service>`.
 
@@ -58,10 +60,10 @@ python -m pip install websockets
 ## Running the Smoke-Test Helper Scripts
 
 Run the paired helper scripts from the `microsoft-foundry` skill root (`plugins/azure-skills/skills/microsoft-foundry`):
-- Bash: [../scripts/smoke-test-voice.sh](../scripts/smoke-test-voice.sh)
-- PowerShell: [../scripts/smoke-test-voice.ps1](../scripts/smoke-test-voice.ps1)
+- Bash: [../../scripts/smoke-test-voice.sh](../../scripts/smoke-test-voice.sh)
+- PowerShell: [../../scripts/smoke-test-voice.ps1](../../scripts/smoke-test-voice.ps1)
 
-Both wrappers launch the shared [Python client](../scripts/smoke_test_voice.py), which owns authentication, protocol handling, response validation, and JSON output.
+Both wrappers launch the shared [Python client](../../scripts/smoke_test_voice.py), which owns authentication, protocol handling, response validation, and JSON output.
 
 Note that PowerShell uses PascalCase parameter names (`-Endpoint`, `-AgentName`, `-Text`, `-ExpectedMarker`, `-Timeout`, `-OutputAudio`, `-DryRun`, `-Help`), whereas Bash uses kebab-case flags (`--endpoint`, `--agent-name`, `--text`, `--expected-marker`, `--timeout`, `--output-audio`, `--dry-run`, `--help`).
 

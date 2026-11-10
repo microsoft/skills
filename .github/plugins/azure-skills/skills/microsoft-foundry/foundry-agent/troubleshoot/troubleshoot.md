@@ -31,16 +31,17 @@ Use the project endpoint and agent name from the project context (see [Common Pr
 
 ### Step 2: Identify the Agent Type (`Hosted`, `Voice`, `Managed Harness Agent`, or `Prompt`)
 
-Inspect `azure.yaml` (`host: azure.ai.agent`) and classify the service in order:
+Inspect `azure.yaml` (`host: azure.ai.agent`) and classify the top-level agent type:
 1. **Voice Agent** (apply the top-level compatibility classification for legacy manifests):
-   - Read [common Voice invariants](../create/references/voice-agent-common.md) and the selected subtype reference from [create-voice](../create/create-voice.md).
+   - Read [Voice Agent subtypes](../create/references/voice-agent/subtypes.md), [common Voice invariants](../create/references/voice-agent/common.md), and the selected subtype reference from [create-voice](../create/create-voice.md).
    - Triage in this exact order:
      1. **Definition & deployment**: Validate the selected subtype and run `azd ai agent show --output json`.
-     2. **Voice WebSocket upgrade & auth**: Confirm the client connects to `wss://<project-host>/api/projects/<project>/agents/<voice-agent>/endpoint/protocols/voice?api-version=v1` with `Foundry-Features: VoiceAgents=V1Preview` and an Entra token for `https://ai.azure.com` (never use `azd ai agent invoke`).
-     3. **Audio & session settings**: Compare audio, voice, greeting, model, and storage settings with the selected subtype reference.
+     2. **Voice WebSocket upgrade & auth**: For GPT-Live Voice, confirm `/endpoint/protocols/voice/live/sessions?api-version=v1`. For Prompt Voice and Hosted Voice, confirm `/endpoint/protocols/voice?api-version=v1` with `Foundry-Features: VoiceAgents=V1Preview`. Use an Entra token for `https://ai.azure.com`; never use `azd ai agent invoke`.
+     3. **Audio & session settings**: Compare audio, voice, greeting, model, storage, and delegation settings with the selected subtype reference. Do not apply Prompt Voice settings to GPT-Live Voice.
      4. **Subtype-specific runtime triage**:
+        - **GPT-Live Voice**: Has no Hosted container and must not use the ordinary Voice helper. Verify the deployed version, `session.started`, and `session.closed` with reason `close_requested` using [GPT-Live Voice smoke testing](../create/references/voice-agent/gpt-live-voice-smoke-test.md).
         - **Prompt Voice (`modelType: managed` or `self_deployed`)**: Has no Hosted container, no `azd ai agent sessions`, no `files`, and no `azd ai agent monitor` log stream. Skip Step 3 and proceed to Step 4 (Application Insights telemetry).
-        - **Hosted Voice (`conversationEngine.type: hosted_agent`)**: Separate wrapper configuration/endpoint failures from target Bridge, startup, model, and RBAC failures. Use [Hosted Voice Bridge troubleshooting](../create/references/voice-agent-hosted-bridge.md), then inspect logs on the `kind: hosted` target service.
+        - **Hosted Voice (`conversationEngine.type: hosted_agent`)**: Separate wrapper configuration/endpoint failures from target Bridge, startup, model, and RBAC failures. Use [Hosted Voice Bridge troubleshooting](../create/references/voice-agent/hosted-voice-bridge.md), then inspect logs on the `kind: hosted` target service.
      5. **Observability**: Proceed to Step 4 and Step 5 for Application Insights conversation telemetry.
 2. **`kind: hosted` (Hosted Agent or Hosted Voice target)**: Run:
 
@@ -121,8 +122,9 @@ Present a summary to the user including:
 | No observability connection | Application Insights not configured for the project | Suggest configuring Application Insights for the Foundry project |
 | Kusto query failed | Invalid cluster/database or insufficient permissions | Verify Application Insights resource details and reader permissions |
 | No telemetry data | Agent not instrumented or too recent | Check if Application Insights SDK is configured; data may take a few minutes to appear |
-| `session.rejected` (`protocol_mismatch`) on Hosted Voice startup | Hosted target does not satisfy the selected Bridge contract | Follow [Hosted Voice Bridge troubleshooting](../create/references/voice-agent-hosted-bridge.md), redeploy the target, and retest |
-| `azd ai agent invoke` fails on Voice Agent | `azd ai agent invoke` does not support the Voice protocol | Use the Voice WebSocket smoke-test script ([smoke-test-voice.sh](../create/scripts/smoke-test-voice.sh) / [smoke-test-voice.ps1](../create/scripts/smoke-test-voice.ps1)) or Foundry Voice playground |
+| `session.rejected` (`protocol_mismatch`) on Hosted Voice startup | Hosted target does not satisfy the selected Bridge contract | Follow [Hosted Voice Bridge troubleshooting](../create/references/voice-agent/hosted-voice-bridge.md), redeploy the target, and retest |
+| GPT-Live Voice connects to ordinary `/protocols/voice` or the regular helper | The wrong subtype workflow was selected | Re-read [Voice Agent subtypes](../create/references/voice-agent/subtypes.md) and use `/protocols/voice/live/sessions?api-version=v1` with the GPT-Live Voice session smoke helper |
+| `azd ai agent invoke` fails on Voice Agent | `azd ai agent invoke` does not support Voice protocols | Use the GPT-Live Voice session smoke helper for GPT-Live Voice; otherwise use the Voice WebSocket smoke-test script ([smoke-test-voice.sh](../create/scripts/smoke-test-voice.sh) / [smoke-test-voice.ps1](../create/scripts/smoke-test-voice.ps1)); use the Foundry Voice playground for manual acceptance |
 
 ## Additional Resources
 

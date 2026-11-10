@@ -47,7 +47,7 @@ Act on the summary prefixes:
 
 - `[OK]` -- nothing to do.
 - `[WARN]` -- non-blocking; continue.
-- `[ACTION]` -- resolve first, then rerun the script. If `az` or `azd` is missing, ask before installing in interactive mode; install directly in non-interactive mode. For how to install `azd`, see <https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd>. In any mode, never run `az login` or `azd auth login`; stop and ask the user to log in manually before any init, provision, or deploy command. Missing `azure.ai.agents` / `azure.ai.projects` extensions may be resolved with `azd extension install <name>`.
+- `[ACTION]` -- resolve first, then rerun the script. If `az` or `azd` is missing, ask before installing in interactive mode; install directly in non-interactive mode. For how to install `azd`, see <https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd>. In any mode, never run `az login` or `azd auth login`; stop and ask the user to log in manually before any init, provision, or deploy command. Missing `azure.ai.agents` / `azure.ai.projects` / `azure.ai.evaluations` extensions may be resolved with `azd extension install <name>`.
 
 ### Step 2 — Collect necessary information
 
@@ -113,7 +113,7 @@ Step 4 needs `--runtime` and `--entry-point` values. These are CLI args, **not**
 
 Run `azd ai agent init`. `azd ai agent init` is sufficient to create new Foundry projects (or reuse an existing one) and create new Foundry agents. By default, you do not need to run `azd init` unless the user has specific initialization requirements.
 
-Pass `--deploy-mode code` by default to use code deploy.
+Pass `--deploy-mode code` by default to use code deploy. Do not pass `--protocol` when running `azd ai agent init` with an azure.yaml manifest specified via -m.
 
 ```bash
 azd ai agent init --no-prompt \
@@ -260,11 +260,10 @@ azd ai agent run --no-client
 ```
 
 > **Readiness gate — required before local invocation.**
-> - Start checking TCP connections to `localhost:<port>` immediately after launching the agent in the background; retry failed connections every 2–5 seconds.
-> - In the same loop, check whether the `azd ai agent run` process has exited. **If it exited, stop polling immediately**, read its output, and fix that specific cause (for example, a dependency install failure) before restarting.
-> - **Keep each startup wait at 5 seconds or less**, including sleeps and shell-tool output reads.
-> - **Proceed to the smoke invocation as soon as TCP connects**, keeping the server running.
-> - If the startup timeout expires before a connection succeeds, inspect the server logs and resolve the cause before retrying.
+> Run the bundled [Bash helper](scripts/wait-local-ready.sh) or [PowerShell helper](scripts/wait-local-ready.ps1) to wait for the local server port (`8088` by default) to accept TCP connections. Keep the working directory at the azd project root; replace `<skill-root>` below with the absolute path to the installed `microsoft-foundry` skill.
+>
+> - macOS / Linux: `bash "<skill-root>/foundry-agent/create/scripts/wait-local-ready.sh" <port>`
+> - PowerShell: `& "<skill-root>/foundry-agent/create/scripts/wait-local-ready.ps1" -Port <port>`
 
 Smoke-invoke (local):
 
@@ -310,28 +309,21 @@ Run the smoke invocation only as part of the requested deployment or test.
 
 Directly submit the eval suite generation asynchronously, do not ask the user for confirmation.
 
-Read the agent service's `description:` from `azure.yaml` (the value you set in Step 5) and pass it as `--gen-instruction`:
+Read the agent service's `description:` from `azure.yaml` (the value you set in Step 5) and pass it as `--agent-instruction`:
 
 ```bash
-azd ai agent eval generate --gen-instruction "<agent service description>" --no-wait --no-prompt
+azd ai eval generate --from agent --agent-instruction "<agent service description>" --no-wait --no-prompt
 ```
 
 Expected output:
 
-```
-Eval generate submitted (async)
-   dataset generation: datagen-<id> (queued)
-   evaluator generation: evaluatorgen-<id> (in_progress)
-   Config written to: src/<agent-name>/eval.yaml
-   When ready, run:
-     azd ai agent eval run
-```
+Separate dataset and evaluator generation job IDs.
 
 Generation runs server-side and takes several minutes. Tell the user:
 
-> *"Eval suite generation submitted. Run `azd ai agent eval run` whenever you're ready — it'll wait for generation to finish and execute the eval in one step."*
+> *"Eval suite generation submitted. Collect each job with `azd ai eval job show <job-id> --dataset` or `--evaluator`, configure and create the eval with `azd ai eval init` and `azd ai eval create`, then run `azd ai eval run start` whenever you're ready."*
 
-Run `azd ai agent eval run` only after the user explicitly agrees.
+Run `azd ai eval run start` only after the user explicitly agrees.
 
 ### Step 14 — Final summary
 
@@ -351,7 +343,7 @@ Three follow-up commands to include:
 
 ```bash
 azd ai agent invoke "<follow-up message>"   # chat with the deployed agent (billed)
-azd ai agent eval run                       # finalize + run the eval suite (Step 13)
+azd ai eval run start                       # run the eval suite after setup (Step 13)
 azd down                                    # tear down all resources when done
 ```
 
@@ -365,8 +357,11 @@ azd down                                    # tear down all resources when done
 | `azd deploy` postdeploy hook fails with missing `AZURE_TENANT_ID` | Run `az account show --query tenantId -o tsv` and `azd env set AZURE_TENANT_ID <tenant-id>`, then re-run `azd deploy --no-prompt`. The deployed agent version from the first deploy is still valid; the postdeploy hook just registers env vars. |
 | Scaffold sanity check fails (Step 7) | Pick a recovery path from Step 7. If still failing → [create-hosted.md](create-hosted.md). |
 | Local invoke returns model `404` / wrong deployment | Stale `AZURE_AI_MODEL_DEPLOYMENT_NAME` in azd env overrides `.env`. Re-run Step 9 to sync both. |
-| Anything else | Escape to [create-hosted.md](create-hosted.md). |
+| CLI parameter, flag, or working-directory mistake | Fix the command arguments or working directory (check `--help` if needed) and retry the current step in place. |
+| Anything not covered by this quickstart | Follow [create-hosted.md](create-hosted.md). |
 
 ## Escape Hatch
 
-If any step fails in a way not covered above, the output looks unexpected, or the user's request drifts outside what this quickstart covers → **stop improvising**. Read [create-hosted.md](create-hosted.md) and follow its full workflow.
+Do **not** escape to [create-hosted.md](create-hosted.md) for self-correctable mistakes such as wrong CLI flags/parameters, working-directory errors, env-var mismatches, or minor command retries — fix those in place and continue this quickstart.
+
+If a step still fails after targeted recovery, or the user's request drifts outside what this quickstart covers → **stop improvising**. Read [create-hosted.md](create-hosted.md) and follow its full workflow.
