@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "foundry-iq-skills",
   "description": "Create and retrieve from a Foundry IQ knowledge base using File, Azure Blob, or ADLS Gen2, then connect an existing Prompt or Hosted Agent.",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"
