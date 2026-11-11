@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.13
+
+- build(deps): bump pypdf ([#3472](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3472))
+
 ## 0.2.12
 
 - fix: pass packaged allowlists to telemetry reporter ([#3505](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3505))
