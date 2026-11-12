@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.123
+
+- fix: correct Python runtime discovery query ([#3508](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3508))
+
 ## 1.2.122
 
 - feature: add GPT-Live voice agent skill support ([#3485](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3485))

@@ -113,7 +113,7 @@ The 8-hex-char GUID suffix from §1b is sufficient for global hostname uniquenes
 If `PYTHON:3.14` is unavailable in the region:
 
 ```bash
-az webapp list-runtimes --os linux --query "[?contains(@, 'PYTHON')]" -o tsv
+az webapp list-runtimes --os linux --runtime python --query "[].config" -o tsv
 ```
 
 The output uses the pipe form (e.g., `PYTHON|3.14`) — **convert to colon form** before passing to `--runtime`. Prefer 3.14; fall back to 3.13, then 3.12.
