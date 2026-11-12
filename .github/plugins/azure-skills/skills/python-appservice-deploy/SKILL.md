@@ -4,7 +4,7 @@ description: "Deploy Python (Flask/Django/FastAPI) code to Azure App Service Lin
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.1.2"
+  version: "1.1.3"
 ---
 
 # Python on Azure App Service — Code Deploy
