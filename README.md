@@ -90,6 +90,7 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [G
 
 | Skill | Description |
 |-------|-------------|
+| [azure-cli-patterns](.github/skills/azure-cli-patterns/) | Azure CLI best practices for scripting, automation, and resource management. Authentication, JMESPath queries, idempotent scripts, CI/CD integration. |
 | [cloud-solution-architect](.github/skills/cloud-solution-architect/) | Design well-architected Azure cloud systems. Architecture styles, 44 design patterns, technology choices, mission-critical design, WAF pillars. |
 | [copilot-sdk](.github/skills/copilot-sdk/) | Build applications powered by GitHub Copilot using the Copilot SDK. Session management, custom tools, streaming, hooks, MCP servers, BYOK, deployment patterns. |
 | [debugview](.github/skills/debugview/) | Sysinternals DebugView CLI — capture and analyze usermode/kernel-mode Windows debug output. Bounded execution, filtering, boot logging, remote monitoring. |
