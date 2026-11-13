@@ -39,14 +39,16 @@ For generated insights, follow [Agent Insights](../insights/insights.md) directl
 ## Before Starting — Resolve App Insights Connection
 
 1. Resolve the target agent root, environment, effective deployment context, and selected metadata overlay using [Common Project Context Resolution](../../SKILL.md#agent-common-project-context-resolution).
-2. In azd projects, prefer App Insights values from `azd env get-values`; otherwise check `environments.<env>.observability.applicationInsightsConnectionString` or `environments.<env>.observability.applicationInsightsResourceId` in the selected metadata file.
+2. In azd projects, prefer `AZURE_APPLICATION_INSIGHTS_RESOURCE_ID` (or the starter's `APPLICATIONINSIGHTS_RESOURCE_ID`), `AZURE_APPLICATION_INSIGHTS_APP_ID`, and `AZURE_LOG_ANALYTICS_WORKSPACE_RESOURCE_ID` from the selected environment; otherwise check `environments.<env>.observability.applicationInsightsResourceId`. Legacy connection-string values may be read without displaying or copying them.
 3. If observability settings are missing, use `project_connection_list` to discover App Insights linked to the Foundry project, then persist the chosen resource back to `environments.<env>.observability` only when azd cannot provide it.
 4. Confirm the selected App Insights resource and environment with the user before querying.
 5. Use **`monitor_resource_log_query`** (Azure MCP tool) to execute KQL queries against the App Insights resource. This is preferred over delegating to the `azure-kusto` skill. Pass the App Insights resource ID and the KQL query directly.
 
+For missing setup or a monitoring opt-out, use [best-effort tracing readiness](references/agent-tracing-setup.md); discovery/querying does not authorize repairs. To verify that a specific invocation produced a stored trace, use [fresh invocation verification](references/agent-tracing-verification.md), not older traces or setup status. Persist nonsecret resource IDs only, never new connection-string copies.
+
 | Metadata field | Purpose | Example |
 |----------------|---------|---------|
-| `environments.<env>.observability.applicationInsightsConnectionString` | App Insights connection string | `InstrumentationKey=...;IngestionEndpoint=...` |
+| `environments.<env>.observability.applicationInsightsConnectionString` | Legacy read compatibility only; do not add new copies | Existing value, never display |
 | `environments.<env>.observability.applicationInsightsResourceId` | ARM resource ID | `/subscriptions/.../Microsoft.Insights/components/...` |
 
 > ⚠️ **Always pass `subscription` explicitly** to Azure MCP tools like `monitor_resource_log_query` - they do not extract it from resource IDs.

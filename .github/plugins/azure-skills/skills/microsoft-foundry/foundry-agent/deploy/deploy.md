@@ -118,7 +118,7 @@ azd provision --no-prompt
 What this does:
 
 - Creates the Foundry project (if not present) and supporting resources under `infra/`.
-- Creates connections declared as top-level `azure.ai.connection` services. `${PARAM_*}` placeholders resolve from the active azd env.
+- Provisions required infrastructure. Top-level `azure.ai.connection` services are reconciled during **deploy**, not project provisioning.
 - Wires model deployments, AI Search, ACR, etc. `infra/layers/` provision in parallel when present.
 
 After provision completes for a new project, run `azd env get-values` and set missing required azd env values, especially `AZURE_AI_PROJECT_ID` and `AZURE_TENANT_ID`, before local run or the first `azd deploy`.
@@ -189,6 +189,8 @@ For a multi-protocol service, pass `--protocol` explicitly.
 For the Activity protocol, `azd ai agent invoke` won't work; follow [invoke](../invoke/invoke.md) to invoke the agent.
 
 Run one remote invocation only unless the user explicitly asked to test multi-turn/session behavior. A single successful response is enough for the deployment smoke test. Anything other than a completed/successful response -> run `azd ai agent doctor --output json`, then follow [troubleshoot](../troubleshoot/troubleshoot.md).
+
+For hosted text agents, add one line to the deployment summary: if the project has Application Insights, traces take 1-5 minutes to appear, and the user can ask to verify or query them (routes to [trace](../trace/trace.md)).
 
 ### Step 6: Auto-Generate Evaluation Suite (MANDATORY — RUNS AUTOMATICALLY)
 

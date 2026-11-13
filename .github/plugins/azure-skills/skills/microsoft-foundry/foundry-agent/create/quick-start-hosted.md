@@ -66,6 +66,7 @@ Populate each question with the default option below.
 | Region | The active azd environment already contains the intended `AZURE_LOCATION`, or this change does not provision regional resources. | `northcentralus` | Azure resource location. |
 | Foundry project | The workspace or azd environment is already configured with a Foundry project, or the user provided one. | New Foundry project | Offer a new or existing project. For a new project, do not pass `--project-id`; `azd provision` creates it. For an existing project, use its ARM resource ID with `azd ai agent init --project-id`. |
 | Foundry model deployment | The user provided one. | Official sample's model selection | If the user specifies a model deployment, collect its deployment name. |
+| Monitoring | Not creating a new Foundry project. | Yes | Ask a simple Yes/No: provisioning a new project enables Application Insights and Log Analytics by default, which incur charges and store agent telemetry. If No, follow [tracing setup](../trace/references/agent-tracing-setup.md) to set `monitoring.enabled: false` before Step 8. |
 | Deploy mode | Always — resolve without asking. | `code` | Container deploy is not supported in this quick start. To use container deploy, follow [create-hosted.md](create-hosted.md). |
 
 If the user supplied only a **Foundry project endpoint** (not an ARM ID), resolve the ARM ID before Step 4:
@@ -327,7 +328,7 @@ Run `azd ai eval run start` only after the user explicitly agrees.
 
 ### Step 14 — Final summary
 
-Produce a concise summary covering: agent name/version/status/endpoints, a Playground link, the resources created, the eval suite generation submission, and the three follow-up commands below. Read `playground_url` directly from `azd ai agent show --output json`. If it is absent, construct the Playground URL from `azd env get-values`:
+Produce a concise summary covering: agent name/version/status/endpoints, a Playground link, the resources created, the eval suite generation submission, and the three follow-up commands below. If the user approved monitoring in Step 2, add one line: Application Insights is enabled and traces appear in 1-5 minutes. Read `playground_url` directly from `azd ai agent show --output json`. If it is absent, construct the Playground URL from `azd env get-values`:
 
 ```
 https://ai.azure.com/nextgen/r/{encodedSubId},{resourceGroup},,{accountName},{projectName}/build/agents/{agentName}/build?version={agentVersion}
