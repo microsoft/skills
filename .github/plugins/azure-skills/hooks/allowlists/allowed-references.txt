@@ -873,6 +873,8 @@ microsoft-foundry\foundry-agent\toolbox\references\toolbox-azd.md
 microsoft-foundry\foundry-agent\toolbox\scripts\get-catalog-inputs.ps1
 microsoft-foundry\foundry-agent\toolbox\scripts\get-catalog-inputs.sh
 microsoft-foundry\foundry-agent\toolbox\toolbox.md
+microsoft-foundry\foundry-agent\trace\references\agent-tracing-setup.md
+microsoft-foundry\foundry-agent\trace\references\agent-tracing-verification.md
 microsoft-foundry\foundry-agent\trace\references\analyze-failures.md
 microsoft-foundry\foundry-agent\trace\references\analyze-latency.md
 microsoft-foundry\foundry-agent\trace\references\conversation-detail.md

@@ -4,7 +4,7 @@ description: "Build, deploy, evaluate, optimize, fine-tune, and manage Microsoft
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.34"
+  version: "1.2.35"
 ---
 
 # Microsoft Foundry Skill
@@ -174,7 +174,8 @@ Run `azd env get-values` for the selected environment when project/deployment va
 | `AGENT_<SERVICE>_NAME` | Agent name for the selected azd service |
 | `AGENT_<SERVICE>_VERSION` | Agent version for the selected azd service |
 | `AZURE_CONTAINER_REGISTRY_NAME` or `AZURE_CONTAINER_REGISTRY_ENDPOINT` | ACR registry name / image URL prefix |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | App Insights connection string for trace workflows |
+| `AZURE_APPLICATION_INSIGHTS_RESOURCE_ID`, `AZURE_APPLICATION_INSIGHTS_APP_ID`, `AZURE_LOG_ANALYTICS_WORKSPACE_RESOURCE_ID` | Preferred nonsecret tracing destination identifiers |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Legacy read-only fallback; never copy into new metadata or configuration |
 | `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`, `AZURE_AI_ACCOUNT_NAME`, `AZURE_AI_PROJECT_NAME` | Azure resource lookup and Playground links |
 
 When azd supplies these values, use them as the source of truth and do not copy them into `.foundry/agent-metadata*.yaml` on metadata writes.
