@@ -8,8 +8,8 @@ scoring:
 defaults:
   runs: 1
   timeout: 30m
-  model: claude-sonnet-4.6
-  judge_model: gpt-5.5
+  model: ${MODEL=gpt-5.6-terra}
+  judge_model: ${GRADER_MODEL=claude-sonnet-4.6}
 stimuli:
   - name: client_creation
     prompt: |-
