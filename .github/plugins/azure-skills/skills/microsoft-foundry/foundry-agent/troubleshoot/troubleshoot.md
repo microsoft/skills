@@ -41,7 +41,7 @@ Inspect `azure.yaml` (`host: azure.ai.agent`) and classify the top-level agent t
      4. **Subtype-specific runtime triage**:
         - **GPT-Live Voice**: Has no Hosted container and must not use the ordinary Voice helper. Verify the deployed version, `session.started`, and `session.closed` with reason `close_requested` using [GPT-Live Voice smoke testing](../create/references/voice-agent/gpt-live-voice-smoke-test.md).
         - **Prompt Voice (`modelType: managed` or `self_deployed`)**: Has no Hosted container, no `azd ai agent sessions`, no `files`, and no `azd ai agent monitor` log stream. Skip Step 3 and proceed to Step 4 (Application Insights telemetry).
-        - **Hosted Voice (`conversationEngine.type: hosted_agent`)**: Separate wrapper configuration/endpoint failures from target Bridge, startup, model, and RBAC failures. Use [Hosted Voice Bridge troubleshooting](../create/references/voice-agent/hosted-voice-bridge.md), then inspect logs on the `kind: hosted` target service.
+        - **Hosted Voice (`conversationEngine.type: hosted_agent`)**: Separate wrapper configuration/endpoint failures from target transport, Bridge, startup, model, and RBAC failures. Route through exact `voice_conversation_engine/1.0.0` unless legacy `invocations_ws/1.0.0` was explicitly selected or already declared with both compatibility metadata values. Use [Hosted Voice Bridge troubleshooting](../create/references/voice-agent/hosted-voice-bridge.md), then inspect logs on the `kind: hosted` target service.
      5. **Observability**: Proceed to Step 4 and Step 5 for Application Insights conversation telemetry.
 2. **`kind: hosted` (Hosted Agent or Hosted Voice target)**: Run:
 
@@ -56,7 +56,7 @@ If azd returns Hosted Agent details, proceed to Step 3. If the command fails for
 
 Hosted Agent logs are scoped to sessions. Use azd for session discovery and log retrieval.
 
-> **`invocations_ws` agents:** use the client-supplied `agent_session_id` from the WebSocket upgrade URL. It is not created by `azd ai agent invoke`. Pass it to `azd ai agent monitor --session-id`. See the [invocations-ws skill](../invocations-ws/invocations-ws.md) for the URL contract.
+> **Hosted WebSocket agents:** use the client-supplied session id when the selected protocol exposes one. `azd ai agent invoke` does not create conversation-engine or `invocations_ws` sessions. Pass a known session id to `azd ai agent monitor --session-id`.
 
 1. **Check agent version status.** Use the result from Step 2 and verify that the deployed version is `active`.
 
@@ -123,6 +123,7 @@ Present a summary to the user including:
 | Kusto query failed | Invalid cluster/database or insufficient permissions | Verify Application Insights resource details and reader permissions |
 | No telemetry data | Agent not instrumented or too recent | Check if Application Insights SDK is configured; data may take a few minutes to appear |
 | `session.rejected` (`protocol_mismatch`) on Hosted Voice startup | Hosted target does not satisfy the selected Bridge contract | Follow [Hosted Voice Bridge troubleshooting](../create/references/voice-agent/hosted-voice-bridge.md), redeploy the target, and retest |
+| Hosted Voice target endpoint is missing or wrong | Target protocol declaration does not match the deployed route | Verify `voice_conversation_engine/1.0.0` and `AGENT_<TARGET_SERVICE_KEY>_VOICE_CONVERSATION_ENGINE_ENDPOINT`, or preserve the complete legacy `invocations_ws` plus metadata contract |
 | GPT-Live Voice connects to ordinary `/protocols/voice` or the regular helper | The wrong subtype workflow was selected | Re-read [Voice Agent subtypes](../create/references/voice-agent/subtypes.md) and use `/protocols/voice/live/sessions?api-version=v1` with the GPT-Live Voice session smoke helper |
 | `azd ai agent invoke` fails on Voice Agent | `azd ai agent invoke` does not support Voice protocols | Use the GPT-Live Voice session smoke helper for GPT-Live Voice; otherwise use the Voice WebSocket smoke-test script ([smoke-test-voice.sh](../create/scripts/smoke-test-voice.sh) / [smoke-test-voice.ps1](../create/scripts/smoke-test-voice.ps1)); use the Foundry Voice playground for manual acceptance |
 
