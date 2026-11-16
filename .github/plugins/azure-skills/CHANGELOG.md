@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.125
+
+- feature: add Hosted Voice conversation engine transport ([#3525](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3525))
+
 ## 1.2.124
 
 - Agent Skills Foundry Tracing: verify optional App Insight tracing across agent workflows ([#3447](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3447))

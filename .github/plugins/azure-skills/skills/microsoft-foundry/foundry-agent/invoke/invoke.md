@@ -10,7 +10,7 @@ Invoke ordinary Prompt Agents with Foundry MCP. Invoke Hosted and Managed Harnes
 | Managed Harness Agent | Responses | `azd ai agent invoke` | Managed response history; no Hosted session/file operations |
 | Voice (GPT-Live Voice) | `voice/live/sessions` (`wss://.../protocols/voice/live/sessions?api-version=v1`) | Session lifecycle smoke; Foundry Voice playground for interactive audio-to-audio testing; **never** the ordinary Voice helper or `azd ai agent invoke` | Native Live session; no Hosted session/file commands |
 | Voice (Prompt Voice or Hosted Voice wrapper) | `voice` (`wss://.../protocols/voice?api-version=v1`) | Smoke helper for minimal programmatic verification; Foundry Voice playground for interactive audio-to-audio testing; **never** `azd ai agent invoke` | Real-time Voice session; no Hosted session/file commands on `kind: voice` |
-| Hosted Voice target (diagnostic only) | `invocations_ws` + Bridge `1.0` | Bridge-compatible WebSocket client; see [hosted-voice-bridge.md](../create/references/voice-agent/hosted-voice-bridge.md) | Target container session (`agent_session_id`); does not validate the Voice wrapper |
+| Hosted Voice target (diagnostic only) | `voice_conversation_engine/1.0.0`, or preserved legacy `invocations_ws/1.0.0` | Selected sample's protocol-aware WebSocket client; see [hosted-voice-bridge.md](../create/references/voice-agent/hosted-voice-bridge.md) | Bridge `1.0` target session; does not validate the Voice wrapper |
 | Hosted | `responses` | `azd ai agent invoke` | azd sessions, files, conversations, and monitor commands |
 | Hosted | `invocations` | `azd ai agent invoke --protocol invocations` | azd sessions, files, conversations, and monitor commands |
 | Hosted | `activity` | Microsoft 365 channel, such as Teams | Activity conversation and channel state |
@@ -69,7 +69,7 @@ See [prompt-and-hosted-voice-smoke-test.md](../create/references/voice-agent/pro
 
 ### Optional Step 3: Hosted Voice Target Bridge `1.0` Diagnostic
 
-When a **Hosted Voice Agent** fails or needs target-level isolation, test the `kind: hosted` target directly over `/invocations_ws` using the diagnostic sequence in [hosted-voice-bridge.md](../create/references/voice-agent/hosted-voice-bridge.md). Target-only testing does **not** replace end-to-end wrapper verification in Step 2.
+When a **Hosted Voice Agent** fails or needs target-level isolation, run `azd ai agent run <target-service> --no-client`, then test the `kind: hosted` target with the selected sample's protocol-aware smoke client. Use `/voice_conversation_engine` unless the user explicitly selected `/invocations_ws` or the manifest already declares the complete legacy shape. `azd ai agent invoke` and Agent Inspector do not invoke either target protocol. Target-only testing does **not** replace end-to-end wrapper verification in Step 2.
 
 ## Managed Harness Agent Workflow with azd
 

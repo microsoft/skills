@@ -105,7 +105,7 @@ Note that PowerShell uses PascalCase parameter names (`-Endpoint`, `-AgentName`,
   -Timeout 180
 ```
 
-When testing a Hosted Voice Agent running the official `voice-live-bridge-basic-python` target (or any agent with a deterministic response), pass `--expected-marker` / `-ExpectedMarker` (for example, `--text "/help" --expected-marker "Commands:"`) to assert that the returned transcript matches the requested turn rather than a greeting.
+When testing a Hosted Voice Agent whose target has a deterministic response, pass `--expected-marker` / `-ExpectedMarker` with a marker appropriate to that target to assert that the returned transcript matches the requested turn rather than a greeting.
 
 ### Exit Codes
 

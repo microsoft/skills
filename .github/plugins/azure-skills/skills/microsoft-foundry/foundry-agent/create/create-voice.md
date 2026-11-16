@@ -207,10 +207,10 @@ Use the official Hosted Voice manifest when starting from the sample:
 
 ```bash
 azd ai agent init --no-prompt \
-  -m "https://github.com/microsoft-foundry/foundry-samples/blob/main/samples/python/hosted-agents/bring-your-own/voice-agent-target-agent/basic/azure.yaml"
+  -m "https://github.com/microsoft-foundry/foundry-samples/blob/main/samples/python/hosted-agents/bring-your-own/conversation_engine/basic/azure.yaml"
 ```
 
-Add `--project-id "<project-arm-id>"` when using an existing project. For existing target code, preserve the target service and add or update the wrapper using [Hosted Voice YAML](references/voice-agent/hosted-voice-yaml.md); do not replace it with a Prompt Voice definition.
+Add `--project-id "<project-arm-id>"` when using an existing project. Route Hosted Voice targets to `voice_conversation_engine/1.0.0` unless the user explicitly selects `invocations_ws`, or the existing manifest already declares the complete legacy shape. Preserve that legacy shape during ordinary edits; do not auto-migrate it. Add or update the wrapper using [Hosted Voice YAML](references/voice-agent/hosted-voice-yaml.md); do not replace it with a Prompt Voice definition.
 
 After init, enter the generated project directory before setting subscription, region, project name, endpoint, or model values. Do not chain `azd env set` to the init command.
 
