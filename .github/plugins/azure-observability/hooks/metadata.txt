@@ -1,0 +1,2 @@
+plugin-name=azure-observability
+plugin-version=1.0.0

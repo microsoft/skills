@@ -1,0 +1,26 @@
+# Runtime state, evidence, and local helper output.
+.obs/
+.foundry/
+.local-context/
+.test-work/
+test-results/
+results/
+coverage/
+.coverage
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.azure/
+.azd/
+.lab-context.json
+
+# Secrets and machine-specific integrations. Plugin .mcp.json is tracked.
+.env*
+*.pem
+*.key
+*.pfx
+*.p12
+.vscode/
+Thumbs.db
+.DS_Store

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "azure-observability",
+  "description": "Guide read-only Azure web/API and Foundry-agent troubleshooting, approved fixes, and evidence-based recovery validation.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Microsoft",
+    "url": "https://www.microsoft.com"
+  },
+  "homepage": "https://github.com/microsoft/github-copilot-for-azure",
+  "repository": "https://github.com/microsoft/GitHub-Copilot-for-Azure",
+  "license": "MIT",
+  "keywords": [
+    "azure",
+    "observability",
+    "troubleshooting",
+    "monitor",
+    "foundry"
+  ]
+}

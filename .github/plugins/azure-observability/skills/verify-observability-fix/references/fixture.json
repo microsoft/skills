@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "incident": "synthetic-incident",
+  "scope": {
+    "environment": "synthetic-test",
+    "targets": ["synthetic-api"],
+    "confirmed": true,
+    "confirmed_at": "2026-10-30T12:00:00Z"
+  },
+  "change": {
+    "id": "synthetic-change",
+    "version": "synthetic-v2",
+    "deployed_at": "2026-10-30T11:00:00Z",
+    "confirmed": true
+  },
+  "evaluated_at": "2026-10-30T12:00:00Z",
+  "max_evidence_age_seconds": 300,
+  "checks": [
+    {
+      "id": "synthetic-error-fraction",
+      "target": "synthetic-api",
+      "role": "symptom",
+      "required": true,
+      "metric": "synthetic-error-fraction",
+      "kind": "fraction",
+      "unit": "ratio",
+      "operator": "lte",
+      "threshold": 0.02,
+      "expected_workload": "synthetic-comparable-cohort",
+      "comparable": true,
+      "min_samples": 100,
+      "min_observation_seconds": 600,
+      "freshness_seconds": 120,
+      "original": {
+        "state": "usable",
+        "complete": true,
+        "source": "synthetic-source",
+        "query_ref": "synthetic-original-query-result",
+        "collected_at": "2026-10-30T11:00:00Z",
+        "window_start": "2026-10-30T10:00:00Z",
+        "window_end": "2026-10-30T11:00:00Z",
+        "first_event_at": "2026-10-30T10:01:00Z",
+        "latest_event_at": "2026-10-30T10:59:00Z",
+        "sample_count": 100,
+        "total": 20,
+        "workload": "synthetic-comparable-cohort",
+        "version": "synthetic-v1"
+      },
+      "post": {
+        "state": "usable",
+        "complete": true,
+        "source": "synthetic-source",
+        "query_ref": "synthetic-post-query-result",
+        "collected_at": "2026-10-30T12:00:00Z",
+        "window_start": "2026-10-30T11:00:00Z",
+        "window_end": "2026-10-30T12:00:00Z",
+        "first_event_at": "2026-10-30T11:01:00Z",
+        "latest_event_at": "2026-10-30T11:59:00Z",
+        "sample_count": 100,
+        "total": 1,
+        "workload": "synthetic-comparable-cohort",
+        "version": "synthetic-v2"
+      }
+    }
+  ],
+  "supporting_results": [
+    {
+      "kind": "deployment",
+      "reference": "synthetic-existing-deployment-result",
+      "state": "passed"
+    },
+    {
+      "kind": "evaluation",
+      "reference": "synthetic-existing-evaluation-result",
+      "state": "passed"
+    }
+  ]
+}
