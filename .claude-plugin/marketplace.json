@@ -262,6 +262,17 @@
       },
       "homepage": "https://github.com/microsoft/github-copilot-for-azure",
       "repository": "https://github.com/microsoft/github-copilot-for-azure"
+    },
+    {
+      "name": "azure-observability",
+      "source": "./.github/plugins/azure-observability",
+      "description": "Guide read-only Azure web/API and Foundry-agent troubleshooting, approved fixes, and evidence-based recovery validation.",
+      "author": {
+        "name": "Microsoft",
+        "url": "https://www.microsoft.com"
+      },
+      "homepage": "https://github.com/microsoft/github-copilot-for-azure",
+      "repository": "https://github.com/microsoft/github-copilot-for-azure"
     }
   ]
 }

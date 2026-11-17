@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "incident": "synthetic-slow-agent",
+  "scope": {
+    "environment": "synthetic-test",
+    "targets": ["synthetic-agent"],
+    "confirmed": true,
+    "confirmed_at": "2026-10-30T12:00:00Z"
+  },
+  "change": {
+    "id": "synthetic-agent-change",
+    "version": "synthetic-agent-v2",
+    "deployed_at": "2026-10-30T11:00:00Z",
+    "confirmed": true
+  },
+  "evaluated_at": "2026-10-30T12:00:00Z",
+  "max_evidence_age_seconds": 300,
+  "checks": [
+    {
+      "id": "synthetic-agent-run-latency-p95",
+      "target": "synthetic-agent",
+      "role": "symptom",
+      "required": true,
+      "metric": "synthetic-agent-run-latency",
+      "kind": "percentile",
+      "percentile": 95,
+      "unit": "milliseconds",
+      "operator": "lte",
+      "threshold": 5000,
+      "expected_workload": "synthetic-comparable-agent-runs",
+      "comparable": true,
+      "min_samples": 250,
+      "min_observation_seconds": 600,
+      "freshness_seconds": 120,
+      "original": {
+        "state": "usable",
+        "complete": true,
+        "source": "synthetic-agent-traces",
+        "query_ref": "synthetic-original-p95-query-result",
+        "collected_at": "2026-10-30T11:00:00Z",
+        "window_start": "2026-10-30T10:00:00Z",
+        "window_end": "2026-10-30T11:00:00Z",
+        "first_event_at": "2026-10-30T10:01:00Z",
+        "latest_event_at": "2026-10-30T10:59:00Z",
+        "sample_count": 500,
+        "total": null,
+        "percentile": 95,
+        "percentile_value": 12000,
+        "workload": "synthetic-comparable-agent-runs",
+        "version": "synthetic-agent-v1"
+      },
+      "post": {
+        "state": "usable",
+        "complete": true,
+        "source": "synthetic-agent-traces",
+        "query_ref": "synthetic-post-p95-query-result",
+        "collected_at": "2026-10-30T12:00:00Z",
+        "window_start": "2026-10-30T11:00:00Z",
+        "window_end": "2026-10-30T12:00:00Z",
+        "first_event_at": "2026-10-30T11:01:00Z",
+        "latest_event_at": "2026-10-30T11:59:00Z",
+        "sample_count": 500,
+        "total": null,
+        "percentile": 95,
+        "percentile_value": 4000,
+        "workload": "synthetic-comparable-agent-runs",
+        "version": "synthetic-agent-v2"
+      }
+    }
+  ],
+  "supporting_results": [
+    {
+      "kind": "deployment",
+      "reference": "synthetic-existing-agent-deployment",
+      "state": "passed"
+    }
+  ]
+}
