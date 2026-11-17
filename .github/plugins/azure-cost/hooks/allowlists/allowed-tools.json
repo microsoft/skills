@@ -449,6 +449,9 @@
     "4.0.0-beta.6": [
       "advisor_insight_list",
       "advisor_recommendation_prevalidate"
+    ],
+    "4.0.0-beta.7": [
+      "deviceprovisioning_onboarding_validate"
     ]
   },
   "areas": {

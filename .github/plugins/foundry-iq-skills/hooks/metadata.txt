@@ -1,2 +1,4 @@
 plugin-name=foundry-iq-skills
-plugin-version=0.2.13
+plugin-version=0.3.0
+mcp-server=azure
+mcp-server=foundry-iq-graph

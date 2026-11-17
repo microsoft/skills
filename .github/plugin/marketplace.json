@@ -222,7 +222,7 @@
     {
       "name": "foundry-iq-skills",
       "source": "./.github/plugins/foundry-iq-skills",
-      "description": "Create and retrieve from a Foundry IQ knowledge base using File, Azure Blob, or ADLS Gen2, then connect an existing Prompt or Hosted Agent.",
+      "description": "Diagnose Foundry IQ and Azure AI Search access and ingestion issues, and configure Azure AI Search and Foundry IQ with source-aware security and verified API guidance. Build and query entity graphs, topic graphs and ontologies over your documents.",
       "author": {
         "name": "Microsoft",
         "url": "https://www.microsoft.com"

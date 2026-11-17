@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.14
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.7 ([#3516](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3516))
+
 ## 1.0.13
 
 - fix: pass packaged allowlists to telemetry reporter ([#3505](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3505))

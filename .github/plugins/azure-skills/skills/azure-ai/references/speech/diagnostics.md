@@ -1,10 +1,9 @@
 # Speech SDK client diagnostics
 
 For Speech SDK log collection, STT/TTS client failures, configuration, features
-and IDs. Native SDK, JavaScript SDK and REST paths (Fast transcription, Batch,
-TTS) are distinct; verify which the user uses first. This is not a REST or
-backend RCA analyzer; do not apply it to ordinary coding questions or other AI
-services. Read [source boundaries](source-contract.md).
+and IDs. Native SDK, JavaScript SDK and REST paths differ; verify which is used.
+Audio headers, Fast/Batch STT, Batch TTS, Entra: [preflight](transcription-and-audio-preflight.md).
+Not a backend RCA analyzer or for coding questions. Read [source boundaries](source-contract.md).
 
 ## Workflow
 
