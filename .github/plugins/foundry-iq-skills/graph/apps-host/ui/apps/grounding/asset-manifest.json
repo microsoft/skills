@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "domain": "grounding",
+  "server": "grounding-skills",
+  "sourceCommit": "23e151711d4d4bae960e7784ab3292c404677f0b",
+  "sourceTree": "38d0c672bacf4f6ec1f56109eeed9857174d64c4",
+  "sourceDirty": false,
+  "lockfileSha256": "02463bfbe2cf9439ef5d8ddfc55fbfe79d29776a6bcf04bf98f4725a07be6a69",
+  "entries": {
+    "grounding_present": {
+      "html": "explorer.html",
+      "uri": "ui://grounding-skills/explorer.html",
+      "embeddedHtmlSha256": "f93f0ec55e320e2c565f1545df37aa1aca031ff6f118aa4083fc0a9835819b42"
+    }
+  },
+  "files": {
+    "THIRD_PARTY_NOTICES.txt": "48dbc99fc23fb1d5737e14f09a7a98cd79d00fe6f5c6e116e7dd298d52062a45",
+    "assets/explorer-gSfK-h9u.js": "7962438e6d86a1959d7f40ce87b3381e15755bbca862474dd6d4d876f5e2a828",
+    "assets/explorer-aqcDZ3fH.css": "a5ee413e21faeb250f59c1d5bf9717553aeeb394fb9e32db9c89a77afa69f178",
+    "explorer.html": "9c229bcc23d216924b9026f7952aef532920acd83a4299b2c818ece62cd5ef85"
+  },
+  "reports": {
+    "grounding_present": {
+      "gzipJsCssBytes": 534270,
+      "budgetBytes": 1048576
+    }
+  }
+}

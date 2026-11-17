@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- feat(foundry-iq): release graph-enabled Foundry IQ plugin ([#3524](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3524))
+
+## 0.2.14
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.7 ([#3516](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3516))
+
 ## 0.2.13
 
 - build(deps): bump pypdf ([#3472](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3472))

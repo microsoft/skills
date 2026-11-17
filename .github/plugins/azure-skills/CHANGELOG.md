@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.127
+
+- feat: add offline Speech audio and REST/batch preflight to azure-ai ([#3523](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3523))
+
+## 1.2.126
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.7 ([#3516](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3516))
+
 ## 1.2.125
 
 - feature: add Hosted Voice conversation engine transport ([#3525](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3525))

@@ -35,6 +35,7 @@ azure-ai\references\sdk\azure-ai-vision-imageanalysis-py.md
 azure-ai\references\sdk\azure-search-documents-dotnet.md
 azure-ai\references\sdk\azure-search-documents-py.md
 azure-ai\references\sdk\azure-search-documents-ts.md
+azure-ai\references\speech\audio-without-node.md
 azure-ai\references\speech\azure-checks.md
 azure-ai\references\speech\collection.md
 azure-ai\references\speech\diagnostics.md
@@ -42,10 +43,14 @@ azure-ai\references\speech\interpretation.md
 azure-ai\references\speech\logging-apis.md
 azure-ai\references\speech\output.md
 azure-ai\references\speech\source-contract.md
+azure-ai\references\speech\transcription-and-audio-preflight.md
 azure-ai\references\speech\without-node.md
 azure-ai\scripts\analyze-speech-sdk-log.mjs
 azure-ai\scripts\analyze-speech-sdk-log.ps1
 azure-ai\scripts\analyze-speech-sdk-log.sh
+azure-ai\scripts\inspect-speech-audio.mjs
+azure-ai\scripts\inspect-speech-audio.ps1
+azure-ai\scripts\inspect-speech-audio.sh
 azure-aigateway\references\auth-best-practices.md
 azure-aigateway\references\patterns.md
 azure-aigateway\references\policies.md
