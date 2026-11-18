@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.130
+
+- feat: add offline preflights for Document Intelligence, Translator, AI Search, and Content Safety to azure-ai ([#3532](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3532))
+
+## 1.2.129
+
+- fix: identify GitHub Copilot app in telemetry ([#3542](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3542))
+
+## 1.2.128
+
+- chore: update telemetry reporter to 0.1.24 ([#3530](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3530))
+
 ## 1.2.127
 
 - feat: add offline Speech audio and REST/batch preflight to azure-ai ([#3523](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3523))

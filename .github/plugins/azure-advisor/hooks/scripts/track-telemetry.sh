@@ -15,6 +15,10 @@
 #   - Detection:      COPILOT_CLI is "1" with standalone launcher evidence,
 #                     unless a stronger application marker identifies another host
 #
+# GitHub Copilot app:
+#   - Detection:      AI_AGENT is "github_copilot_app_agent"
+#   - Client name:    "copilot-app"
+#
 # Claude Code:
 #   - Field names:    snake_case (tool_name, session_id, tool_input, hook_event_name)
 #   - Tool names:     PascalCase (Skill, Read, Edit)
@@ -176,7 +180,7 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-TELEMETRY_REPORTER_VERSION="0.1.20-gc133b914e3"
+TELEMETRY_REPORTER_VERSION="0.1.24-gf157164ac1"
 
 # Skip telemetry if opted out
 if [ "${AZURE_MCP_COLLECT_TELEMETRY}" = "false" ]; then
@@ -437,6 +441,8 @@ elif [ -n "$harness" ] && [ "$harness" != "copilot-vscode" ]; then
     clientName="$harness"
 elif [ -n "$cursorVersion" ]; then
     clientName="cursor"
+elif [ "$AI_AGENT" = "github_copilot_app_agent" ]; then
+    clientName="copilot-app"
 elif [ "$isCopilotRuntime" = true ] && [ "$hasStandaloneCopilotLauncher" = true ] && [ "$AI_AGENT" != "github_copilot_vscode_agent" ]; then
     clientName="copilot-cli"
 elif [ "$AI_AGENT" = "github_copilot_vscode_agent" ] || [ "$isVscodeExtensionHost" = true ] || [[ "$toolUseId" == *"__vscode"* ]] || [[ "$transcriptPathNorm" == */Code/* ]] || [[ "$transcriptPathNorm" == */Code\ -\ Insiders/* ]]; then
