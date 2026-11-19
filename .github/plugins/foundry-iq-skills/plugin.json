@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "foundry-iq-skills",
   "description": "Diagnose Foundry IQ and Azure AI Search access and ingestion issues, and configure Azure AI Search and Foundry IQ with source-aware security and verified API guidance. Build and query entity graphs, topic graphs and ontologies over your documents.",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "author": {
     "name": "Microsoft",
     "url": "https://www.microsoft.com"
