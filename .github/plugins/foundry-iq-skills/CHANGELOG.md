@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+- fix: identify GitHub Copilot app in telemetry ([#3542](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3542))
+
+## 0.3.1
+
+- chore: update telemetry reporter to 0.1.24 ([#3530](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3530))
+
 ## 0.3.0
 
 - feat(foundry-iq): release graph-enabled Foundry IQ plugin ([#3524](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3524))

@@ -1,3 +1,3 @@
 plugin-name=azure-kusto-graph-skills
-plugin-version=1.0.39
+plugin-version=1.0.41
 mcp-server=azure
