@@ -10,8 +10,6 @@ Usage:
 """
 
 import json
-import asyncio
-import aiohttp
 import re
 from pathlib import Path
 from dataclasses import dataclass
@@ -98,7 +96,7 @@ def extract_article_content(html_content: str) -> str:
 
 
 async def fetch_page_content(
-    session: aiohttp.ClientSession, url: str, semaphore: asyncio.Semaphore
+    session: "aiohttp.ClientSession", url: str, semaphore: "asyncio.Semaphore"
 ) -> tuple[str, str]:
     """Fetch page content and return (url, content)."""
     async with semaphore:
@@ -121,16 +119,19 @@ async def fetch_page_content(
                 else:
                     print(f"  Warning: {url} returned {response.status}")
                     return (url, "")
-        except asyncio.TimeoutError:
-            print(f"  Timeout: {url}")
-            return (url, "")
         except Exception as e:
-            print(f"  Error fetching {url}: {e}")
+            print(f"  Timeout or error: {url}: {e}")
             return (url, "")
 
 
 async def fetch_all_pages(urls: list[str]) -> dict[str, str]:
     """Fetch all pages concurrently with rate limiting."""
+    import asyncio
+    try:
+        import aiohttp
+    except ImportError:
+        return {}
+
     semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
     results = {}
 
@@ -242,7 +243,7 @@ def generate_llms_full_txt(manifest: dict, contents: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
-async def main():
+def main():
     """Main function."""
     print("=" * 60)
     print("Microsoft Foundry llms-full.txt Generator")
@@ -386,4 +387,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
