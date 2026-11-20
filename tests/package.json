@@ -18,7 +18,7 @@
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "yaml": "^2.4.5",
-    "zod": "^3.23.8"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@microsoft/vally": "^0.10.0",
