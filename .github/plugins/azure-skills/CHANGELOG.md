@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.133
+
+- fix: distinguish resource metadata from Azure Resource Health ([#3513](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3513))
+
+## 1.2.132
+
+- test: add live Functions VNet routing diagnostics ([#3481](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3481))
+
 ## 1.2.131
 
 - feat: expand Azure AI Foundry diagnostics ([#3546](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3546))

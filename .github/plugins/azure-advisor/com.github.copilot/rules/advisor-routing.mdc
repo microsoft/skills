@@ -1,0 +1,7 @@
+---
+description: Route idle-resource discovery to Azure Advisor.
+alwaysApply: true
+---
+
+For discovering idle or unused Azure resources, load
+`azure-advisor-cost-optimization` first.

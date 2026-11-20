@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.17
+
+- fix: route unused-resource discovery to Advisor ([#3550](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3550))
+
 ## 1.0.16
 
 - fix: identify GitHub Copilot app in telemetry ([#3542](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3542))
