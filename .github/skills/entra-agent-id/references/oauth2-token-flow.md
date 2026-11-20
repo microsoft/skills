@@ -1,6 +1,6 @@
 # OAuth2 Token Flow
 
-Source: [Agent ID Setup Instructions](https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-id-setup-instructions)
+Source: the Agent ID Setup Instructions page was retired from Learn (the URL now redirects to this repository's `entra-agent-id` skill). The token-flow model — Managed Identity + Workload Identity Federation for production, client secret for local dev — is re-verified against the [Agent ID FAQ](https://learn.microsoft.com/en-us/entra/agent-id/faq) and [best-practices guide](https://learn.microsoft.com/en-us/entra/agent-id/best-practices-agent-id).
 
 Agent Identities authenticate at runtime using credentials configured on the **Blueprint** (not the Agent Identity itself). Two options are available:
 

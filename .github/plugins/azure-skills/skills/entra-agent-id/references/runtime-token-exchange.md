@@ -1,6 +1,6 @@
 # Runtime Token Exchange (`fmi_path`)
 
-Source: [Agent ID Setup Instructions](https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-id-setup-instructions)
+Source: the Agent ID Setup Instructions page was retired from Learn (the URL now redirects to this repository's `entra-agent-id` skill). Re-verify exchange details against the [Agent ID FAQ](https://learn.microsoft.com/en-us/entra/agent-id/faq) and current Graph reference ([agentIdentity v1.0](https://learn.microsoft.com/en-us/graph/api/resources/agentidentity?view=graph-rest-1.0)).
 
 Agent Identities authenticate at runtime via a **two-step token exchange** against the Entra `/oauth2/v2.0/token` endpoint. This is a standard Entra feature — it works anywhere (Azure, on-premises, local dev), not only inside Foundry.
 

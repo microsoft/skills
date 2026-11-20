@@ -119,7 +119,8 @@ blueprint_body = {
 ### 4.3 ❌ INCORRECT: ServicePrincipal as sponsor
 
 ```python
-# WRONG — sponsors must be User objects, not ServicePrincipals or Groups
+# WRONG — service principals and role-assignable groups cannot be sponsors;
+# use a user, or a supported group (dynamic membership / assigned Microsoft 365)
 "sponsors@odata.bind": [
     f"https://graph.microsoft.com/beta/servicePrincipals/{sp_id}"
 ]

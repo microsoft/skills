@@ -1,7 +1,7 @@
 ---
 name: entra-agent-id
 description: |
-  Microsoft Entra Agent ID (preview) for creating OAuth2-capable AI agent identities via Microsoft Graph beta API.
+  Microsoft Entra Agent ID for creating OAuth2-capable AI agent identities via Microsoft Graph API.
   Covers Agent Identity Blueprints, BlueprintPrincipals, Agent Identities, required permissions, sponsors, and Workload Identity Federation.
   Includes Microsoft Entra SDK for AgentID (containerized sidecar) for polyglot agent authentication (Docker/Kubernetes), 3P agent integration, autonomous and interactive agent patterns.
   Triggers: "agent identity", "agent id", "Agent Identity Blueprint", "BlueprintPrincipal", "entra agent", "agent identity provisioning", "Graph agent identity", "entra sidecar", "agent id sidecar", "auth sidecar", "3P agent", "third-party agent identity", "polyglot agent auth".
@@ -9,9 +9,9 @@ description: |
 
 # Microsoft Entra Agent ID
 
-Create and manage OAuth2-capable identities for AI agents using Microsoft Graph beta API.
+Create and manage OAuth2-capable identities for AI agents using Microsoft Graph.
 
-> **Preview API** — All Agent Identity endpoints are under `/beta` only. Not available in `/v1.0`.
+> **API surface** — Agent ID resources are published in both Graph `/beta` and `/v1.0` ([agentIdentity v1.0](https://learn.microsoft.com/en-us/graph/api/resources/agentidentity?view=graph-rest-1.0), [agentIdentityBlueprint v1.0](https://learn.microsoft.com/en-us/graph/api/resources/agentidentityblueprint?view=graph-rest-1.0)). The samples in this skill use `/beta`, which remains supported.
 
 ## Before You Start
 
@@ -46,7 +46,7 @@ pip install azure-identity requests
 
 ### Required Entra Roles
 
-One of: **Agent Identity Developer**, **Agent Identity Administrator**, or **Application Administrator**.
+One of: **Agent ID Developer**, **Agent ID Administrator**, or **AI Administrator** (AI Administrator for agent identity creation only). Owners of a blueprint or blueprint principal can create agent identities from it with delegated permissions and no Agent ID role.
 
 ## Environment Variables
 
@@ -104,7 +104,7 @@ headers = {
 
 ### Step 1: Create Agent Identity Blueprint
 
-Sponsors are required and **must be User objects** — ServicePrincipals and Groups are rejected.
+A sponsor is **required at creation** and can be a user (guests allowed) or a **supported group** — dynamic membership groups (security or Microsoft 365) and assigned Microsoft 365 groups. Role-assignable groups, assigned security groups, and service principals are rejected as sponsors (service principals can be owners). With delegated permissions the calling user becomes sponsor automatically when none is specified; app-only requests must set sponsors explicitly.
 
 ```python
 import subprocess
@@ -224,7 +224,7 @@ requests.delete(f"{GRAPH}/applications/{blueprint_obj_id}", headers=headers)
 ## Best Practices
 
 1. **Always create BlueprintPrincipal after Blueprint** — not auto-created; implement idempotent checks on both
-2. **Use User objects as sponsors** — ServicePrincipals and Groups are rejected
+2. **Set sponsors correctly — users or supported groups** — a sponsor is required at create for agent identities and blueprints; users (including guests), dynamic membership groups (security or Microsoft 365), and assigned Microsoft 365 groups are accepted. Role-assignable groups, assigned security groups, and service principals are rejected (service principals can be owners)
 3. **Handle permission propagation delays** — after admin consent, wait 30–120s; retry with backoff on 403
 4. **Include `OData-Version: 4.0` header** on every Graph request
 5. **Use Workload Identity Federation for production auth** — for local dev, use a client secret on the Blueprint (see [references/oauth2-token-flow.md](references/oauth2-token-flow.md))
@@ -244,7 +244,9 @@ requests.delete(f"{GRAPH}/applications/{blueprint_obj_id}", headers=headers)
 
 | Resource | URL |
 |----------|-----|
-| Official Setup Guide | https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-id-setup-instructions |
-| AI-Guided Setup | https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-id-ai-guided-setup |
+| Best practices for Microsoft Entra Agent ID | https://learn.microsoft.com/en-us/entra/agent-id/best-practices-agent-id |
+| Agent ID FAQ (limits, blocked permissions, monitoring) | https://learn.microsoft.com/en-us/entra/agent-id/faq |
+| Owners, sponsors, and managers | https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/agent-owners-sponsors-managers |
+| AI-Guided Setup | https://learn.microsoft.com/en-us/entra/agent-id/agent-id-ai-guided-setup |
 | Microsoft Entra SDK for AgentID — Overview | https://learn.microsoft.com/en-us/entra/msidweb/agent-id-sdk/overview |
 | Microsoft Entra SDK for AgentID — Endpoints | https://learn.microsoft.com/en-us/entra/msidweb/agent-id-sdk/endpoints |
