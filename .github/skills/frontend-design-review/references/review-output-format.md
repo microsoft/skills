@@ -32,11 +32,11 @@
 
 | Pillar | Status | Notes |
 |--------|--------|-------|
-| Frictionless | 🟢/🟠/⚫ | Task completion efficient, primary action clear |
-| Quality Craft | 🟢/🟠/⚫ | Design system compliant, aesthetic distinctive, accessible |
-| Trustworthy | 🟢/🟠/⚫ | AI disclaimers present, errors actionable |
+| Frictionless | ✅/⚠️/❌ | Task completion efficient, primary action clear |
+| Quality Craft | ✅/⚠️/❌ | Design system compliant, aesthetic distinctive, accessible |
+| Trustworthy | ✅/⚠️/❌ | AI disclaimers present, errors actionable |
 
-**Legend:** 🟢 Pass | 🟠 Needs attention | ⚫ Blocking issue
+**Legend:** ✅ Pass | ⚠️ Needs attention | ❌ Blocking issue
 
 ### Design Critique
 **Verdict:** [Pass / Needs work / Reach out to design for more support]
@@ -44,9 +44,9 @@
 **Rationale:** [Brief explanation based on pillar assessment, design system compliance, and aesthetic direction]
 
 **Criteria:**
-- **Pass**: All pillars 🟢 or minor 🟠 that don't block user tasks, design system compliant, clear aesthetic direction
-- **Needs work**: Multiple 🟠 or any critical workflow issues, design system deviations, or generic aesthetic choices
-- **Reach out to design for more support**: Any ⚫ blocking issues, fundamental pattern problems, major design system violations, or need for aesthetic direction
+- **Pass**: All pillars ✅ or minor ⚠️ that don't block user tasks, design system compliant, clear aesthetic direction
+- **Needs work**: Multiple ⚠️ or any critical workflow issues, design system deviations, or generic aesthetic choices
+- **Reach out to design for more support**: Any ❌ blocking issues, fundamental pattern problems, major design system violations, or need for aesthetic direction
 
 ### Issues
 
