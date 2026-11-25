@@ -3,7 +3,7 @@
   "base_url": "https://learn.microsoft.com/en-us/azure/ai-foundry/",
   "source": "https://raw.githubusercontent.com/MicrosoftDocs/azure-ai-docs/main/articles/foundry/toc.yml",
   "sections": {
-    "General": [
+    "What is Microsoft Foundry (new)?": [
       {
         "title": "What is Microsoft Foundry (new)?",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-foundry?view=foundry"
@@ -11,15 +11,15 @@
     ],
     "Get started": [
       {
-        "title": "\"Quickstart: Create resources\"",
+        "title": "Quickstart: Create resources",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/quickstart-create-foundry-resources?view=foundry"
       },
       {
-        "title": "\"Quickstart: Chat with an agent\"",
+        "title": "Quickstart: Chat with an agent",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/quickstarts/get-started-code?view=foundry"
       },
       {
-        "title": "\"Tutorial: Idea to prototype\"",
+        "title": "Tutorial: Idea to prototype",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/tutorials/developer-journey-idea-to-prototype?view=foundry"
       },
       {
@@ -31,10 +31,6 @@
       {
         "title": "Agent development overview",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview?view=foundry"
-      },
-      {
-        "title": "FAQ",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/faq?view=foundry"
       },
       {
         "title": "Quotas, limits, models and region support",
@@ -144,11 +140,11 @@
       },
       {
         "title": "Quickstart - Talk to a voice agent",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/voice-live-agents-quickstart?view=foundry"
+        "url": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/voice-live-agents-quickstart?view=foundry"
       },
       {
         "title": "How to build a voice agent",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/how-to-voice-agent-integration?view=foundry"
+        "url": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/how-to-voice-agent-integration?view=foundry"
       },
       {
         "title": "Code interpreter",
@@ -219,40 +215,12 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/what-is-foundry-iq?view=foundry"
       },
       {
-        "title": "FAQ",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/foundry-iq-faq?view=foundry"
-      },
-      {
         "title": "Connect knowledge base to agents",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/foundry-iq-connect?view=foundry"
       },
       {
         "title": "Azure Speech in Foundry Tools",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/azure-ai-speech?view=foundry"
-      },
-      {
-        "title": "Azure Language tools and agents",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/concepts/foundry-tools-agents?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Try CLU multi-turn conversations",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/conversational-language-understanding/how-to/quickstart-multi-turn-conversations?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Detect Personally Identifiable Information (PII)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/personally-identifiable-information/quickstart?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Try Azure Language detection",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/language-service/language-detection/quickstart?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Azure text translation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/translator/text-translation/overview?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Azure document translation",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/translator/document-translation/overview?context=/azure/foundry/context/context?view=foundry"
       },
       {
         "title": "Connect to MCP server",
@@ -351,10 +319,6 @@
       {
         "title": "Realtime API for speech and audio",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio?view=foundry"
-      },
-      {
-        "title": "Realtime API for speech and audio quickstart",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio.md#quickstart?view=foundry"
       },
       {
         "title": "Realtime API via WebRTC",
@@ -479,22 +443,6 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/audio-completions-quickstart?view=foundry"
       },
       {
-        "title": "Speech to text",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/get-started-speech-to-text.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Text to speech",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/get-started-text-to-speech.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Text to speech avatar",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/text-to-speech-avatar/batch-synthesis-avatar.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Voice Live",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/voice-live-quickstart.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
         "title": "Vision-enabled chats",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/gpt-with-vision?view=foundry"
       },
@@ -509,10 +457,6 @@
       {
         "title": "Video generation (preview)",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/video-generation?view=foundry"
-      },
-      {
-        "title": "Video translation (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/speech-service/video-translation-get-started.md?context=/azure/foundry/context/context?view=foundry"
       },
       {
         "title": "Codex",
@@ -789,18 +733,6 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/endpoints?view=foundry"
       },
       {
-        "title": "C#",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/dotnet/api/overview/azure/ai.projects-readme?view=foundry"
-      },
-      {
-        "title": "JavaScript",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/javascript/api/overview/azure/ai-projects-readme?view=azure-node-preview?view=foundry"
-      },
-      {
-        "title": "Python",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/python/api/overview/azure/ai-projects-readme?view=azure-python-preview?view=foundry"
-      },
-      {
         "title": "REST API",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/reference/foundry-project?view=foundry"
       },
@@ -821,38 +753,6 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest?view=foundry"
       },
       {
-        "title": "Chat",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-chat-completion?view=foundry"
-      },
-      {
-        "title": "Embeddings",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-embedding?view=foundry"
-      },
-      {
-        "title": "Evals (preview)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-evals?view=foundry"
-      },
-      {
-        "title": "Files",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-file?view=foundry"
-      },
-      {
-        "title": "Fine-tuning",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-fine-tuning-job?view=foundry"
-      },
-      {
-        "title": "Models",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-models?view=foundry"
-      },
-      {
-        "title": "Responses",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#create-response?view=foundry"
-      },
-      {
-        "title": "Vector stores",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest.md#list-vector-stores?view=foundry"
-      },
-      {
         "title": "2024-10-21 API reference",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference?view=foundry"
       },
@@ -869,32 +769,12 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference-preview?view=foundry"
       },
       {
-        "title": "REST API (resource creation & deployment)",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/rest/api/aiservices/accountmanagement/deployments/create-or-update?tabs=HTTP?view=foundry"
-      },
-      {
         "title": "Azure OpenAI monitoring data reference",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/monitor-openai-reference?view=foundry"
       },
       {
         "title": "Audio events reference",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/realtime-audio-reference?view=foundry"
-      },
-      {
-        "title": "Foundry Tools SDKs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/reference/sdk-package-resources.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Foundry Tools REST APIs",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/reference/rest-api-resources.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Azure Resource Manager/Bicep/Terraform",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/templates/microsoft.cognitiveservices/accounts?pivots=deployment-language-bicep?view=foundry"
-      },
-      {
-        "title": "Azure CLI",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/cli/azure/cognitiveservices?view=azure-cli-latest?view=foundry"
       }
     ],
     "Guardrails and controls": [
@@ -928,7 +808,7 @@
       },
       {
         "title": "Protected material for code",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/quickstart-protected-material-code?view=foundry"
+        "url": "https://learn.microsoft.com/en-us/azure/ai-services/content-safety/quickstart-protected-material-code?view=foundry"
       },
       {
         "title": "Protected material for text",
@@ -936,11 +816,7 @@
       },
       {
         "title": "Block lists",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/quickstart-blocklist?view=foundry"
-      },
-      {
-        "title": "Custom categories",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/content-safety/concepts/custom-categories.md?context=/azure/foundry/context/context?view=foundry"
+        "url": "https://learn.microsoft.com/en-us/azure/ai-services/content-safety/quickstart-blocklist?view=foundry"
       },
       {
         "title": "Intervention points",
@@ -970,7 +846,7 @@
       },
       {
         "title": "Limited access",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/cognitive-services-limited-access?view=foundry"
+        "url": "https://learn.microsoft.com/en-us/azure/ai-services/cognitive-services-limited-access?view=foundry"
       },
       {
         "title": "Overview",
@@ -979,10 +855,6 @@
       {
         "title": "Limited access",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/openai/limited-access?view=foundry"
-      },
-      {
-        "title": "Code of conduct",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/legal/ai-code-of-conduct?view=foundry"
       },
       {
         "title": "Data, privacy, and security",
@@ -1029,20 +901,12 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/planning?view=foundry"
       },
       {
-        "title": "Create your first resource",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/multi-service-resource.md?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
         "title": "Create resources using Bicep template",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-resource-template?view=foundry"
       },
       {
         "title": "Manage resources using Terraform",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-resource-terraform?view=foundry"
-      },
-      {
-        "title": "Recover or purge deleted resources",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/recover-purge-resources.md?context=/azure/foundry/context/context?view=foundry"
       },
       {
         "title": "Upgrade from Azure OpenAI Service",
@@ -1123,16 +987,8 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/disable-preview-features-with-rbac?view=foundry"
       },
       {
-        "title": "Role-based access control",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/rbac-foundry?view=foundry"
-      },
-      {
         "title": "Configure keyless authentication",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/configure-entra-id?view=foundry"
-      },
-      {
-        "title": "Configure private link",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/configure-private-link?view=foundry"
       },
       {
         "title": "Managed virtual network",
@@ -1149,14 +1005,6 @@
       {
         "title": "Store secrets in your Azure Key Vault",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/set-up-key-vault-connection?view=foundry"
-      },
-      {
-        "title": "Rotate API access keys",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/azure/ai-services/rotate-keys?context=/azure/foundry/context/context?view=foundry"
-      },
-      {
-        "title": "Built-in policy definitions",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/ai-services/policy-reference.md?context=/azure/foundry/context/context?view=foundry"
       },
       {
         "title": "Built-in policy for model deployment",
@@ -1185,10 +1033,6 @@
       {
         "title": "Plan and manage costs",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/manage-costs?view=foundry"
-      },
-      {
-        "title": "Security baseline",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/security/benchmark/azure/baselines/azure-ai-foundry-security-baseline?view=foundry"
       },
       {
         "title": "Service architecture",
@@ -1225,39 +1069,15 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/reference/region-support?view=foundry"
       },
       {
-        "title": "Region support",
-        "url": "https://azure.microsoft.com/explore/global-infrastructure/products-by-region/"
-      },
-      {
         "title": "Model lifecycle and retirement",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/model-lifecycle-retirement?view=foundry"
       },
       {
         "title": "Azure OpenAI model retirement",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/concepts/model-retirements?view=foundry"
-      },
-      {
-        "title": "Code of conduct",
-        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/legal/ai-code-of-conduct?view=foundry"
-      },
-      {
-        "title": "Compliance",
-        "url": "https://aka.ms/AzureCompliance"
-      },
-      {
-        "title": "Service Level Agreement (SLA)",
-        "url": "https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services"
-      },
-      {
-        "title": "Azure updates",
-        "url": "https://azure.microsoft.com/updates/?filters=%5B%22Azure+AI+Foundry%22%5D#"
-      },
-      {
-        "title": "Microsoft Foundry pricing",
-        "url": "https://azure.microsoft.com/pricing/details/ai-foundry/"
       }
     ]
   },
-  "total_pages": 305,
-  "generated_at": "2026-03-02T03:56:57Z"
+  "total_pages": 260,
+  "generated_at": "2026-03-04T04:24:33Z"
 }
