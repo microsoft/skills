@@ -37,7 +37,7 @@ try:
 except (AttributeError, OSError):
     pass  # Stream not reconfigurable (older Python or non-tty); default encoding is fine
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import HelpOnErrorParser, get_clients, upload_file
+from common import HelpOnErrorParser, _validate_azure_endpoint, get_clients, upload_file
 
 import requests
 
@@ -67,6 +67,7 @@ def submit_sft_sdk(client, model, train_id, val_id, epochs=2, lr=1.0, batch_size
 
 def submit_sft_rest(endpoint, api_key, model, train_id, val_id, epochs=2, lr=1.0, batch_size=None, suffix=None, training_type="globalStandard"):
     """Submit SFT job via REST API (fallback for models like gpt-oss-20b)."""
+    _validate_azure_endpoint(endpoint, "endpoint")
     url = f"{endpoint}/openai/fine_tuning/jobs?api-version=2025-04-01-preview"
     body = {
         "model": model,
@@ -84,7 +85,7 @@ def submit_sft_rest(endpoint, api_key, model, train_id, val_id, epochs=2, lr=1.0
     resp = requests.post(url, headers={
         "Content-Type": "application/json",
         "api-key": api_key,
-    }, json=body, timeout=(10, 60))
+    }, json=body, timeout=(10, 60), allow_redirects=False)
 
     if resp.status_code in (200, 201):
         try:

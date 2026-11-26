@@ -452,6 +452,11 @@
     ],
     "4.0.0-beta.7": [
       "deviceprovisioning_onboarding_validate"
+    ],
+    "4.0.0-beta.10": [
+      "monitor_healthmodels_inspect",
+      "monitor_traces_query_analyze-critical-path",
+      "monitor_traces_query_analyze-top-attributes"
     ]
   },
   "areas": {
@@ -524,6 +529,9 @@
       "virtualdesktop",
       "wellarchitectedframework",
       "workbooks"
+    ],
+    "4.0.0-beta.10": [
+      "dashboards"
     ]
   },
   "extensionTools": {
