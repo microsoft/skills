@@ -119,6 +119,7 @@ Present a summary to the user including:
 | Hosted Agent not active | Hosted Agent is still provisioning or failed | Check deployment status, identity permissions, and system logs, then recheck status |
 | Session logs unavailable | The session does not exist or has not been invoked | Run `azd ai agent sessions list`; invoke with azd when authorized, then retry `monitor` |
 | No saved session ID | azd has not persisted an invoke session | Select one from `azd ai agent sessions list` and pass `--session-id` |
+| `401 PermissionDenied` on `ChatOpenAI` inside a hosted LangChain / LangGraph container | The model request uses the container's managed identity, independently of the smoke-test caller | Read the [project-scoped `Foundry User` check and fix](../create/references/langchain-langgraph-hosting.md#pre-smoke-test-rbac) before diagnosing or recommending a role change. Confirm the container identity's access before retrying. |
 | No observability connection | Application Insights not configured for the project | Suggest configuring Application Insights for the Foundry project |
 | Kusto query failed | Invalid cluster/database or insufficient permissions | Verify Application Insights resource details and reader permissions |
 | No telemetry data | Agent not instrumented or too recent | Check if Application Insights SDK is configured; data may take a few minutes to appear |

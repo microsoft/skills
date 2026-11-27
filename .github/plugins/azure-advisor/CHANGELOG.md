@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.18
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.10 ([#3574](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3574))
+
 ## 1.0.17
 
 - fix: route unused-resource discovery to Advisor ([#3550](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3550))

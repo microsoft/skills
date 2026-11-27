@@ -4,7 +4,7 @@ description: "Build, deploy, evaluate, optimize, fine-tune, and manage Microsoft
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.2.36"
+  version: "1.2.38"
 ---
 
 # Microsoft Foundry Skill
@@ -31,6 +31,8 @@ Strictly follow the script output for subsequent actions.
 ### Workflow Guidance
 
 **MANDATORY:** Before executing ANY workflow-specific steps, you MUST read the corresponding sub-skill document. Do not call workflow-specific MCP tools for a workflow without reading its skill document. This applies even if you already know the MCP tool parameters — the skill document contains required workflow steps, pre-checks, and validation logic that must be followed. This rule applies on every new user message that triggers a different workflow, even if the skill is already loaded.
+
+For advice or planning on new hosted agents, consult [quick-start-hosted](foundry-agent/create/quick-start-hosted.md) ([create-hosted](foundry-agent/create/create-hosted.md) for containers); do not scaffold or deploy.
 
 ### Foundry MCP
 
