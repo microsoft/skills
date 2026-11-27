@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.10 ([#3574](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3574))
+
 ## 0.3.2
 
 - fix: identify GitHub Copilot app in telemetry ([#3542](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3542))

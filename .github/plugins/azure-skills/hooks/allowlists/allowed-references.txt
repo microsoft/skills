@@ -799,6 +799,7 @@ microsoft-foundry\foundry-agent\create\create-managed-harness.md
 microsoft-foundry\foundry-agent\create\create-prompt.md
 microsoft-foundry\foundry-agent\create\create-voice.md
 microsoft-foundry\foundry-agent\create\quick-start-hosted.md
+microsoft-foundry\foundry-agent\create\references\detect-existing-python-framework.md
 microsoft-foundry\foundry-agent\create\references\enable-incoming-a2a.md
 microsoft-foundry\foundry-agent\create\references\foundry-model.md
 microsoft-foundry\foundry-agent\create\references\foundry-tool-catalog.md

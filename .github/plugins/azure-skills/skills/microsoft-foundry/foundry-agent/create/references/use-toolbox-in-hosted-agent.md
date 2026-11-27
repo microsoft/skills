@@ -2,10 +2,11 @@
 
 A **toolbox** is a single MCP-compatible endpoint that exposes all the tools you've configured; your agent connects to that one URL and discovers every tool inside. For the concept, object model, and API/schema, see [toolbox.md](../../toolbox/toolbox.md).
 
-There are two ways to consume it from agent code:
+There are three ways to consume it from agent code:
 
 - **Default SDK — Microsoft Agent Framework (MAF).** The `FoundryToolbox` wrapper does all the plumbing (endpoint resolution, auth, per-request call-id, connect/close). This is the happy path below.
-- **Other — LangGraph, generic/BYO raw MCP client, or C#.** You wire the MCP client yourself. See [Bring Your Own (BYO) — raw MCP client](#bring-your-own-byo--raw-mcp-client).
+- **LangChain / LangGraph SDK.** Use `AzureAIProjectToolbox` from `langchain-azure-ai`; see the [SDK path](#langchain--langgraph-sdk) below.
+- **Other — generic/BYO raw MCP client or C#.** You wire the MCP client yourself. See [Bring Your Own (BYO) — raw MCP client](#bring-your-own-byo--raw-mcp-client).
 
 > 🚦 **Toolbox creation gate:** before creating a toolbox/connection, you MUST read the boundary rules in [create-hosted.md → Toolbox creation boundary](../create-hosted.md#toolbox-creation-boundary) and follow them, then continue with the rest of this file.
 
@@ -18,7 +19,7 @@ Pick the path that matches your framework, then start from its sample:
 | Path | Framework | Sample | When to use |
 |------|-----------|--------|-------------|
 | **Default** | Agent Framework (MAF) | [`agent-framework/responses/04-foundry-toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/agent-framework/responses/04-foundry-toolbox) | Most agents — the `FoundryToolbox` wrapper handles the wiring. Follow the [happy path](#happy-path-default-sdk--maf) below. |
-| Other | LangGraph (BYO) | [`bring-your-own/responses/langgraph-toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/responses/langgraph-toolbox) | LangGraph ReAct agent with a toolbox. See [BYO](#bring-your-own-byo--raw-mcp-client). |
+| SDK | LangChain / LangGraph (`langchain-azure-ai`) | [`langgraph/responses/02-langgraph-toolbox`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/langgraph/responses/02-langgraph-toolbox) | Use `AzureAIProjectToolbox`; for user OAuth use [`03-langgraph-toolbox-user-identity`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/langgraph/responses/03-langgraph-toolbox-user-identity). |
 | Other | Generic MCP (BYO), Responses | [`bring-your-own/responses/bring-your-own-toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/responses/bring-your-own-toolbox) | Raw `httpx` MCP client — works with any framework. See [BYO](#bring-your-own-byo--raw-mcp-client). |
 | Other | Generic MCP (BYO), Invocations | [`bring-your-own/invocations/toolbox/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents/bring-your-own/invocations/toolbox) | Toolbox via the Invocations protocol. See [BYO](#bring-your-own-byo--raw-mcp-client). |
 | Other | C# (.NET), Agent Framework | [`csharp/hosted-agents/agent-framework/foundry-toolbox-server-side/`](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/csharp/hosted-agents/agent-framework/foundry-toolbox-server-side) | Agent Framework agent with toolbox MCP (Responses). |
@@ -50,6 +51,30 @@ azd deploy
 azd ai agent invoke "list the tools you have access to"
 ```
 
+## LangChain / LangGraph SDK
+
+**Read the supplied error first.** When the request mentions an attached Toolbox MCP error, find it in the workspace (for example, `consent-error.json`) and open it with a file-reading tool before answering, even if the request does not name the file. Base the handler on the supplied payload, not the example below, and show the returned consent URL when present.
+
+Set the toolbox name in the agent service's `TOOLBOX_NAME` environment variable and read it when constructing `AzureAIProjectToolbox` instead of hardcoding the name. Load and sanitize the schemas in the async graph factory before passing the tools to `create_agent`:
+
+```python
+import os
+from langchain_azure_ai.tools import AzureAIProjectToolbox
+
+async def load_tools():
+    toolbox = AzureAIProjectToolbox(toolbox_name=os.environ["TOOLBOX_NAME"])
+    tools = await toolbox.get_tools()
+    for tool in tools:
+        schema = tool.args_schema
+        if isinstance(schema, dict) and schema.get("type") == "object":
+            schema.setdefault("properties", {})
+    return tools
+```
+
+Restore any missing required property definitions from the tool contract before binding.
+
+For user OAuth, follow the user-identity sample. On discovery or invocation failure, check for `-32006` in the outer JSON-RPC `error.code` before decoding the JSON embedded in `error.message`. The embedded JSON contains `errors`, not the outer code. Extract the [nested `CONSENT_REQUIRED` URL](#handling-consent_required) from it and surface it to the affected user. Retry only after consent; preserve unrelated errors.
+
 ## Troubleshooting
 
 | Error | Cause | Resolution |
@@ -69,7 +94,7 @@ For toolbox-composition / provisioning errors (`Multiple tools without identifie
 
 ## Bring Your Own (BYO) — raw MCP client
 
-Everything below is only needed when you **hand-write the MCP client** (generic frameworks, or the BYO samples) instead of using the Microsoft Agent Framework, which handles all of it for you.
+The MCP client wiring below is only needed when you **hand-write the MCP client** (generic frameworks, or the BYO samples). The consent error shape also applies to the LangChain / LangGraph SDK.
 
 For the MCP protocol methods and tool-naming rules, see [mcp-protocol.md § MCP protocol](../../toolbox/references/mcp-protocol.md#mcp-protocol) and [§ Tool naming](../../toolbox/references/mcp-protocol.md#tool-naming).
 

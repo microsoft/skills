@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.136
+
+- feat: add LangChain and LangGraph hosting guidance for Microsoft Foundry ([#3571](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3571))
+
+## 1.2.135
+
+- fix: validate fine-tuning authentication endpoints ([#3569](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3569))
+
+## 1.2.134
+
+- chore: refresh Azure MCP allowlists to 4.0.0-beta.10 ([#3574](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3574))
+
 ## 1.2.133
 
 - fix: distinguish resource metadata from Azure Resource Health ([#3513](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/3513))

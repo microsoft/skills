@@ -176,6 +176,8 @@ azd ai agent show --output json
 
 Expect `"status": "active"` (or `"deployed"`) and an `agent_endpoints` map. Inspect the selected service protocols in `azure.yaml`, then smoke-test:
 
+For LangChain / LangGraph calling the project's OpenAI endpoint, [verify `Foundry User` access or other project-scoped model inference access for the agent's identity](../create/references/langchain-langgraph-hosting.md#pre-smoke-test-rbac) before smoke testing or retrying `401 PermissionDenied`.
+
 For the Responses or Invocations protocol, smoke-test with azd:
 
 ```bash
